@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <table name="web_data_profil">
+        <!-- id=数据库字段 ref=json值 <column>where 条件</column>-->
+        <!-- datas 非数据库字段，是嵌套子表判断条件是包含[list]-->
+        <column id="Rpt_ID" ref="Id"/>
+        <column id="Rpt_Typ" ref="type"/>
+        <column id="Rpt_Nm" ref="rptNm"/>
+        <column id="Rpt_Prd" ref="rtpPrd"/>
+        <column id="Src_Web_Addr" ref="srcWeb"/>
+        <column id="Src_Desc" ref="srcDesc"/>
+    </table>
+    <!-- 参展人员信息/活动信息 -->
+    <!-- 子表配置参数 json字段 子表list表名 关联主表字段-->
+    <table name="GATE_EXPO_AUDI_INFO">
+        <column id="id" ref="id">id = roleType + id</column>
+        <column id="datas" ref="[list]GATE_Prtc_Act_Info" linkId="id"/>
+    </table>
+
+    <table name="GATE_Prtc_Act_Info">
+        <column id="act_Id" ref="id">id = id</column>
+    </table>
+
+</root>
+
+
+
+
+

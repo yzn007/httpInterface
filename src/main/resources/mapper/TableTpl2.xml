@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springboot.demo.dao.PersonMapper">
+
+    <resultMap id="web_data_profil" type="com.springboot.demo.entity.Person">
+        <result property="Rpt_ID" column ="id" />
+        <result property="Rpt_Typ" column ="type"/>
+        <result property="Rpt_Nm" column ="rptNm" />
+        <result property="Rpt_Prd" column ="rtpPrd" />
+        <result property="Src_Web_Addr" column ="srcWeb" />
+        <result property="Src_Desc" column ="srcDesc" />
+    </resultMap>
+   
+
+</mapper>
+
+
+

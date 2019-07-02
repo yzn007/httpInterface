@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <topics name="topics">
+        <!-- topic列表： 名称 表名(多表用;分割) 是否有效 编码 是否删除后再插入 是否清空表-->
+        <!-- 测试 -->
+        <!--<topic name="bingfu" table="log" valid="true" textCode="0301" isDelete="true"/>-->
+        <!--<topic name="PARK_PARKING_LOT" table="web_data_profil" valid="true" textCode="0401" isDelete="false"/>-->
+        <!-- 停车场信息/历史 -->
+        <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="false" textCode="0301" isDelete="true" isTruncate="false"/>
+        <!-- 车辆驶入事件 -->
+        <topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="false" textCode="0302" isDelete="false" isTruncate="false"/>
+        <!-- 车辆驶出事件 -->
+        <topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="false" textCode="0303" isDelete="false" isTruncate="false"/>
+        <!-- 车位预约信息 -->
+        <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="false" textCode="0304" isDelete="true" isTruncate="false"/>
+        <!-- 车辆位置信息/历史 -->
+        <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG;BUS_VEHIC_LCTN_MSG_HIS" valid="false" textCode="0201" isDelete="true" isTruncate="false"/>
+        <!-- 车辆进出信息 -->
+        <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="BUS_VEHIC_ARRV_DEPRT_MSG" valid="false" textCode="0202" isDelete="false" isTruncate="false"/>
+        <!-- 线路/历史 -->
+        <topic name="BUS_ROUTE" table="BUS_ROUTE;BUS_ROUTE_HIS" valid="false" textCode="0203" isDelete="true" isTruncate="false"/>
+        <!-- 站点/历史 -->
+        <topic name="BUS_STATION" table="BUS_STATION;BUS_STATION_HIS" valid="false" textCode="0204" isDelete="true" isTruncate="false"/>
+        <!-- 车辆/历史 -->
+        <topic name="BUS_VEHICLE" table="BUS_VEHICLE;BUS_VEHICLE_HIS" valid="false" textCode="0205" isDelete="true" isTruncate="false"/>
+        <!-- 参展人与信息 /活动信息-->
+        <topic name="GATE_EXPO_AUDI_INFO" table="GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false"/>
+        <!-- 闸机事件 -->
+        <topic name="GATE_GATE_EVT" table="GATE_GATE_EVT" valid="false" textCode="0102" isDelete="false" isTruncate="false"/>
+        <!-- 参展人员信息 -->
+        <topic name="CQEXPOAPP_EXPO_AUDI_INFO" table="CQEXPOAPP_EXPO_AUDI_INFO" valid="false" textCode="0103" isDelete="true" isTruncate="false" />
+
+    </topics>
+</root>
+
+
+
+
+
