@@ -169,7 +169,7 @@ public class HttpServiceTest {
 //            }
 
             jsonString = jsonObject.toJSONString();
-            textCode = (String) jsonObject.get("code");
+            textCode = (String) jsonObject.get("tx_code");
         }catch (Exception e){
             JSONArray jsonArray = JSONArray.parseArray(requestBody);
             jsonString = jsonArray.toJSONString();

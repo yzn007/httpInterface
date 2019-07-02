@@ -6,7 +6,7 @@
         <!--<topic name="bingfu" table="log" valid="true" textCode="0301" isDelete="true"/>-->
         <!--<topic name="PARK_PARKING_LOT" table="web_data_profil" valid="true" textCode="0401" isDelete="false"/>-->
         <!-- 停车场信息/历史 -->
-        <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="false" textCode="0301" isDelete="true" isTruncate="false"/>
+        <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false"/>
         <!-- 车辆驶入事件 -->
         <topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="false" textCode="0302" isDelete="false" isTruncate="false"/>
         <!-- 车辆驶出事件 -->

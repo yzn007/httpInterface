@@ -21,6 +21,11 @@
         <column id="act_Id" ref="id">id = id</column>
     </table>
 
+    <!-- 停车场信息 -->
+    <table name="PARK_PARKING_LOT">
+        <column id="Park_Lot_Regn_ID" ref="Park_Lot_Regn_ID">Park_Lot_Regn_ID = Park_Lot_Regn_ID</column>
+    </table>
+
 </root>
 
 

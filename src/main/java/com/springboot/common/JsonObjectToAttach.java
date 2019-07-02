@@ -415,47 +415,18 @@ public class JsonObjectToAttach {
     }
 
     public static void  main(String args[]){
-        String  jsonValue =
-"{\n" +
-        "\t\"results\":[\n" +
-        "        {\n" +
-        "            \"Data_Tm\":\"2019-07-01 12:04:04\",\n" +
-        "\t\t\t\"id\":\"1234557788\",\n" +
-        "\t\t\t\"code\":\"34342jjskdjfksjdfk33234jdkfjsdkjkjkjk\",\n" +
-        "\t\t\t\"cname\":\"中南海\",\n" +
-        "\t\t\t\"ename\":\"yyyy\",\n" +
-        "\t\t\t\"nationality\":\"86\",\n" +
-        "\t\t\t\"certificateNum\":\"00\",\n" +
-        "\t\t\t\"certificateType\":\"12347898778\",\n" +
-        "\t\t\t\"gender\":\"f\",\n" +
-        "\t\t\t\"institution\":\"重庆市悦来集团投资有限公司\",\n" +
-        "\t\t\t\"phone\":\"13818189988\",\n" +
-        "\t\t\t\"position\":\"经理\",\n" +
-        "\t\t\t\"headUrl\":\"http://localhost\",\n" +
-        "\t\t\t\"paperWorkType\":\"1\",\n" +
-        "\t\t\t\"sourceType\":\"0101\",\n" +
-        "\t\t\t\"roleType\":\"01\",\n" +
-        "\t\t\t\"vapName\":\"zhangsan\",\n" +
-        "\t\t\t\"vapPhone\":\"12345678901\",\n" +
-        "\t\t\t\"datas\":[\n" +
-        "\t\t\t\t{\n" +
-        "\t\t\t\t\n" +
-        "\t\t\t\t\t\"id\":\"3432423434\",\n" +
-        "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
-        "\t\t\t\t\t\"joinTime\":\"2019-06-30 09:00\"\n" +
-        "\t\t\t\t},\n" +
-        "\t\t\t\t{\n" +
-        "\t\t\t\t\t\n" +
-        "\t\t\t\t\t\"id\":\"897897897\",\n" +
-        "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
-        "\t\t\t\t\t\"joinTime\":\"2019-07-01 09:00\"\n" +
-        "\t\t\t\t}\n" +
-        "\t\t\t\t]\n" +
-        "\n" +
-        "        }\n" +
-        "        ],\n" +
-        "        \"code\":\"0101\"\n" +
-        "}";
+        String  jsonValue ="{\n" +
+                "  \"tx_code\": \"0301\",\n" +
+                "  \"results\": [\n" +
+                "    {\n" +
+                "      \"Park_Lot_ID\": \"1234\",\n" +
+                "      \"Park_Lot_Regn_ID\": \"1\",\n" +
+                "      \"Park_Spc_Totl_Qty\": \"237\",\n" +
+                "      \"Ocup_Park_Spc_Qty\": \"155\",\n" +
+                "      \"Resv_Park_Spc_Qty\": \"23\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {
@@ -484,7 +455,8 @@ public class JsonObjectToAttach {
             for(int k=0;k<table.split(";").length;k++){
                 //删除当前表数据，保留历史表数据
                 String[] sql = JsonObjectToAttach.getBatchStatement(array, table.split(";")[k], "","",
-                       k==0 ? !isDelInsert.equalsIgnoreCase("false"):false,new HashMap(),!isTrancate.equalsIgnoreCase("false"));
+                       k==0 ? !(isDelInsert.indexOf(";")>0?isDelInsert.split(";")[k]:isDelInsert).equalsIgnoreCase("false"):false,new HashMap(),
+                        !(isTrancate.indexOf(";")>0?isTrancate.split(";")[k]:isTrancate).equalsIgnoreCase("false"));
                 if(!reds.contains(sql))
                     reds.add(sql);
             }
