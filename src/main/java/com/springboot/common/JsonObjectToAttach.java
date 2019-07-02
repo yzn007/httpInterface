@@ -416,14 +416,15 @@ public class JsonObjectToAttach {
 
     public static void  main(String args[]){
         String  jsonValue ="{\n" +
-                "  \"tx_code\": \"0301\",\n" +
+                "  \"tx_code\": \"0304\",\n" +
                 "  \"results\": [\n" +
                 "    {\n" +
-                "      \"Park_Lot_ID\": \"1234\",\n" +
-                "      \"Park_Lot_Regn_ID\": \"1\",\n" +
-                "      \"Park_Spc_Totl_Qty\": \"237\",\n" +
-                "      \"Ocup_Park_Spc_Qty\": \"155\",\n" +
-                "      \"Resv_Park_Spc_Qty\": \"23\"\n" +
+                "      \"Resv_ID\": \"1\",\n" +
+                "      \"Plat_No\": \"渝B9878\",\n" +
+                "      \"Resv_Park_Lot_ID\": \"1\",\n" +
+                "      \"Resv_Park_Lot_Regn_ID\": \"1\",\n" +
+                "      \"Resv_Arrv_Tm\": \"2019-07-02\",\n" +
+                "      \"Resv_Stat\": \"2\"\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";
@@ -455,7 +456,7 @@ public class JsonObjectToAttach {
             for(int k=0;k<table.split(";").length;k++){
                 //删除当前表数据，保留历史表数据
                 String[] sql = JsonObjectToAttach.getBatchStatement(array, table.split(";")[k], "","",
-                       k==0 ? !(isDelInsert.indexOf(";")>0?isDelInsert.split(";")[k]:isDelInsert).equalsIgnoreCase("false"):false,new HashMap(),
+                        !(isDelInsert.indexOf(";")>0?isDelInsert.split(";")[k]:isDelInsert).equalsIgnoreCase("false"),new HashMap(),
                         !(isTrancate.indexOf(";")>0?isTrancate.split(";")[k]:isTrancate).equalsIgnoreCase("false"));
                 if(!reds.contains(sql))
                     reds.add(sql);

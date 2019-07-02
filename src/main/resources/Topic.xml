@@ -8,11 +8,11 @@
         <!-- 停车场信息/历史 -->
         <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false"/>
         <!-- 车辆驶入事件 -->
-        <topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="false" textCode="0302" isDelete="false" isTruncate="false"/>
+        <topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="true" textCode="0302" isDelete="false" isTruncate="false"/>
         <!-- 车辆驶出事件 -->
-        <topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="false" textCode="0303" isDelete="false" isTruncate="false"/>
+        <topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0303" isDelete="false" isTruncate="false"/>
         <!-- 车位预约信息 -->
-        <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="false" textCode="0304" isDelete="true" isTruncate="false"/>
+        <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="true" textCode="0304" isDelete="true" isTruncate="false"/>
         <!-- 车辆位置信息/历史 -->
         <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG;BUS_VEHIC_LCTN_MSG_HIS" valid="false" textCode="0201" isDelete="true" isTruncate="false"/>
         <!-- 车辆进出信息 -->

@@ -77,8 +77,9 @@ public class KafkaSaveData extends Thread {
                         //表名固定了，根据实际情况修改
                         for(int m=0;m<this.table.split(";").length;m++){
                             //删除当前表数据，保留历史表数据
-                            String[] sql = JsonObjectToAttach.getBatchStatement(array, this.table.split(";")[m], "","",
-                                    m==0 ? !this.isDelInsert.equalsIgnoreCase("false"):false,new HashMap(),!isTrancate.equalsIgnoreCase("false"));
+                            String[] sql =JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "","",
+                                    !(isDelInsert.indexOf(";")>0?isDelInsert.split(";")[m]:isDelInsert).equalsIgnoreCase("false"),new HashMap(),
+                                    !(isTrancate.indexOf(";")>0?isTrancate.split(";")[m]:isTrancate).equalsIgnoreCase("false"));
                            if(!reds.contains(sql))
                                 reds.add(sql);
                         }
