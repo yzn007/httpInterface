@@ -48,7 +48,13 @@ public class JsonObjectToAttach {
             }
             return a;
         } catch (Exception e) {
-            return null;
+            JSONObject jsonObject=null;
+            try{
+                jsonObject = JSONObject.parseObject(jsonString);
+            }catch (Exception ex){
+                return null;
+            }
+            return new String[]{jsonObject.toJSONString()};
         }
     }
 
@@ -126,10 +132,11 @@ public class JsonObjectToAttach {
      * @param tmpFile
      * @param subTabs
      * @param linkId
+     * @param mapKeys
      * @return
      * @throws IOException
      */
-    public static String []getPropertyRelation(String cols, String table, String tmpFile,List<Map<String,String>> subTabs,String linkId) throws IOException {
+    public static String []getPropertyRelation(String cols, String table, String tmpFile,List<Map<String,String>> subTabs,String linkId,Map<String,Map<String,String>> mapKeys ) throws IOException {
         String tm = cols;
         String [] rets = null;
         List<String> whereStr = new ArrayList<>();
@@ -181,22 +188,53 @@ public class JsonObjectToAttach {
                 }
             }
 
+//            Map<String,Map<String,String>> mapKeys = new HashMap<>();
+            if(mapKeys==null)
+                mapKeys = new HashMap<String,Map<String,String>>();
             for (Map.Entry<String, String> e : m.entrySet()) {
                 String value = e.getValue().toLowerCase();
                 if(e.getValue().indexOf(spChr)>-1){
                     whereStr.add(e.getValue().split(spChr)[1]+"{"+ e.getKey() +"}");
                     value = value.split(spChr)[0];
                 }
-                if(!linkId.equals(e.getKey()))//已经处理过的linkId存在跳过
+                if(e.getKey().indexOf(".")>0){
+                    String key = e.getKey().substring(0,e.getKey().indexOf("."));
+                    if(tm.indexOf(key)>-1 && (tm.substring(tm.indexOf(key)+key.length(),tm.indexOf(key)+key.length()+1>tm.length()?tm.length():tm.indexOf(key)+key.length()+1).equals(",")||
+                           StringUtils.isEmpty(tm.substring(tm.indexOf(key)+key.length(),tm.indexOf(key)+key.length()+1>tm.length()?tm.length():tm.indexOf(key)+key.length()+1)))){
+                        if(mapKeys.get(key)==null){
+                            Map mp = new HashMap();
+                            mp.put(e.getKey().substring(key.length()+1,e.getKey().length()),e.getValue());
+                            mapKeys.put(key,mp);
+                        }else{
+                            Map mp = mapKeys.get(key);
+                            mp.put(e.getKey().substring(key.length()+1,e.getKey().length()),e.getValue());
+                            mapKeys.put(key,mp);
+                        }
+                    }
+                }else if(!linkId.equals(e.getKey()))//已经处理过的linkId存在跳过
                     tm = tm.toLowerCase().replace(e.getKey().toLowerCase(),value);
                 else if(tm.lastIndexOf(e.getKey())>0 && linkId.equals(e.getKey())){
                     String tmpS = tm.substring(linkId.length(),tm.length());
                     tmpS = tmpS.toLowerCase().replace(e.getKey().toLowerCase(),value);
                     tm = tm.substring(0,linkId.length())+tmpS;
                 }
-
-
             }
+
+
+            for(Map.Entry<String,Map<String,String>> mp:mapKeys.entrySet()){
+                if(tm.indexOf(mp.getKey())>0 && tm.substring(tm.indexOf(mp.getKey())+ mp.getKey().length(),tm.indexOf(mp.getKey())+ mp.getKey().length()+1).equals(",")){
+                    Map <String,String>val = mp.getValue();
+                    String replacStr = "";
+                    for(Map.Entry<String,String> v:val.entrySet()){
+                        replacStr += v.getValue() +",";
+                    }
+                    if(!StringUtils.isEmpty(replacStr)){
+                        replacStr = replacStr.substring(0,replacStr.length()-1);
+                        tm = tm.replace(mp.getKey(),replacStr);
+                    }
+                }
+            }
+
             System.out.println(tm);
 
         } catch (Exception e) {
@@ -229,11 +267,12 @@ public class JsonObjectToAttach {
      * @param ky
      * @param noContains
      * @param linkId
+     * @param keyMap
      * @return
      */
 
 
-    public static String getColumsOrValues(JSONObject jsonObject, boolean isCol,Map ky,Map noContains,String linkId) {
+    public static String getColumsOrValues(JSONObject jsonObject, boolean isCol,Map ky,Map noContains,String linkId,Map<String,Map<String,String>> keyMap) {
         String[] a = new String[1];
 
         if(!StringUtils.isEmpty(linkId))
@@ -247,7 +286,24 @@ public class JsonObjectToAttach {
                 a[0] = (!StringUtils.isEmpty(a[0]) ? a[0] : "") + (noContains.get(s.getKey().toString())!=null?"":
                         (isCol ?  s.getKey() : ky.get(s.getKey())==null?s.getValue():ky.get(s.getKey())) + ","));
 
+        if(!isCol) {
 
+            for (Map.Entry<String, Map<String, String>> m : keyMap.entrySet()) {
+                if (jsonObject.get(m.getKey())!=null) {
+                    Map<String, String> val = m.getValue();
+                    String values = "";
+                    JSONObject josnM = JSONObject.parseObject(jsonObject.get(m.getKey()).toString());
+                    for (Map.Entry<String, String> v : val.entrySet()) {
+                        values += josnM.get(v.getKey()) + ",";
+                    }
+                    String subStr = jsonObject.get(m.getKey()).toString();
+                    String head = a[0].substring(0,a[0].indexOf(subStr)+subStr.length());
+                    String tail = a[0].substring(a[0].indexOf(subStr)+subStr.length(),a[0].length());
+                    head = head.replace(subStr,values.substring(0,values.length()-1));
+                    a[0] = head + tail;
+                }
+            }
+        }
         return a[0].substring(0, a[0].length() - 1);
     }
 
@@ -309,7 +365,7 @@ public class JsonObjectToAttach {
             //映射数据库字段和where条件
             List<Map<String,String>> subTabs = new ArrayList<>();
             //取得子表
-            String []rets = getPropertyRelation("", table, null,subTabs,linkId);
+            String []rets = getPropertyRelation("", table, null,subTabs,linkId,null);
             String tmpLink = "";
             Map <String,String>noContainCols = new HashMap();
             for(Map<String,String> t:subTabs) {
@@ -321,8 +377,9 @@ public class JsonObjectToAttach {
                 }
             }
             //取得json key
-            String column = getColumsOrValues(JSONObject.parseObject(jsons[0]), true,keyWhere,noContainCols,linkId);
-            rets = getPropertyRelation(column, table, null,subTabs,linkId);
+            String column = getColumsOrValues(JSONObject.parseObject(jsons[0]), true,keyWhere,noContainCols,linkId,null);
+            Map keyMap = new HashMap<String,Map<String,String>>();
+            rets = getPropertyRelation(column, table, null,subTabs,linkId,keyMap);
 
             for (String json : jsons) {
 
@@ -382,7 +439,7 @@ public class JsonObjectToAttach {
 //                        att.add(delSt);
 //                }
                 //取得json value
-                String values = getColumsOrValues(JSONObject.parseObject(json), false,keyWhere,noContainCols,linkId);
+                String values = getColumsOrValues(JSONObject.parseObject(json), false,keyWhere,noContainCols,linkId,keyMap);
                 String insertSt = "insert into " + table + " (" + rets[0] + ") values(" + getJoinString(values) + ")";
                 if(!att.contains(insertSt))
                     att.add(insertSt);
@@ -416,18 +473,32 @@ public class JsonObjectToAttach {
 
     public static void  main(String args[]){
         String  jsonValue ="{\n" +
-                "  \"tx_code\": \"0304\",\n" +
-                "  \"results\": [\n" +
-                "    {\n" +
-                "      \"Resv_ID\": \"1\",\n" +
-                "      \"Plat_No\": \"渝B9878\",\n" +
-                "      \"Resv_Park_Lot_ID\": \"1\",\n" +
-                "      \"Resv_Park_Lot_Regn_ID\": \"1\",\n" +
-                "      \"Resv_Arrv_Tm\": \"2019-07-02\",\n" +
-                "      \"Resv_Stat\": \"2\"\n" +
-                "    }\n" +
-                "  ]\n" +
+                "  \"AppId\": \"12345\",\n" +
+                "  \"Type\": \"1\",\n" +
+                "  \"VehId\": \"12\",\n" +
+                "  \"VehNum\": \"12\",\n" +
+                "  \"PlateNum\": \"A12\",\n" +
+                "  \"Latitude\": \"90.56\",\n" +
+//                "  \"Longitude\": \"124.55\",\n" +
+                "  \"Angle\": \"231\",\n" +
+                "  \"Speed\": \"50\",\n" +
+                "  \"UpDown\": \"1\",\n" +
+                "  \"SiteNum\": \"2\",\n" +
+                "  \"Milage\": \"12.5\",\n" +
+                "  \"State\": \"0\",\n" +
+                "  \"Time\": \"2018-06-01 10:11:00\",\n" +
+                "  \"OwnRoute\": {\n" +
+                "    \"Id\": \"123\",\n" +
+                "    \"Name\": \"123\",\n" +
+                "    \"Code\": \"123\"\n" +
+                "  },\n" +
+                "  \"RunRoute\": {\n" +
+                "    \"Id\": \"123\",\n" +
+                "    \"Name\": \"123\",\n" +
+                "    \"Code\": \"123\"\n" +
+                "  }\n" +
                 "}";
+        String tablePre = "BUS_VEHIC_LCTN_MSG";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {
@@ -448,6 +519,8 @@ public class JsonObjectToAttach {
             }
 
             String table = tabAndMark[0];
+            if(table.indexOf(tablePre)<0)
+                continue;
             String isDelInsert = tabAndMark[1];
             String isTrancate = tabAndMark[2];
             List<String[]> reds = new ArrayList<>();

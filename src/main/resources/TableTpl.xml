@@ -26,6 +26,16 @@
         <column id="Park_Lot_Regn_ID" ref="Park_Lot_Regn_ID">Park_Lot_Regn_ID = Park_Lot_Regn_ID</column>
     </table>
 
+    <!-- 车辆位置消息 -->
+    <table name="BUS_VEHIC_LCTN_MSG">
+        <column id="OwnRoute_ID" ref="OwnRoute.Id"></column>
+        <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
+        <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
+        <column id="RunRoute_ID" ref="RunRoute.Id"></column>
+        <column id="RunRoute_Name" ref="RunRoute.Name"></column>
+        <column id="RunRoute_Code" ref="RunRoute.Code"></column>
+    </table>
+
 </root>
 
 
