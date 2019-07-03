@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.yarn.server.api.protocolrecords.UpdateNodeResourceRequest;
 import org.dom4j.io.SAXReader;
 import org.dom4j.*;
+import scala.Equals;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 import scala.tools.nsc.transform.patmat.Logic;
@@ -154,7 +155,14 @@ public class JsonObjectToAttach {
             Element root = document.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
-                if (tblEle.attribute(0).getValue().equals(table)) {
+                String tableName = tblEle.attribute(0).getValue();
+                boolean isContain = false;
+                if(tableName.indexOf(table)>-1 && (StringUtils.isEmpty(tableName.substring(tableName.indexOf(table)+table.length(),
+                        tableName.indexOf(table)+table.length()+1>tableName.length()?tableName.length():tableName.indexOf(table)+table.length()+1))
+                        ||tableName.substring(tableName.indexOf(table)+table.length(),
+                        tableName.indexOf(table)+table.length()+1>tableName.length()?tableName.length():tableName.indexOf(table)+table.length()+1).equals(";")))
+                    isContain = true;
+                if (isContain || tableName.equals(table)) {
                     for (Element e : tblEle.elements()) {
                         //存在子表
                         if(e.attribute(1).getValue().indexOf("[list]")>-1){
@@ -473,32 +481,46 @@ public class JsonObjectToAttach {
 
     public static void  main(String args[]){
         String  jsonValue ="{\n" +
-                "  \"AppId\": \"12345\",\n" +
-                "  \"Type\": \"1\",\n" +
-                "  \"VehId\": \"12\",\n" +
-                "  \"VehNum\": \"12\",\n" +
-                "  \"PlateNum\": \"A12\",\n" +
-                "  \"Latitude\": \"90.56\",\n" +
-//                "  \"Longitude\": \"124.55\",\n" +
-                "  \"Angle\": \"231\",\n" +
-                "  \"Speed\": \"50\",\n" +
-                "  \"UpDown\": \"1\",\n" +
-                "  \"SiteNum\": \"2\",\n" +
-                "  \"Milage\": \"12.5\",\n" +
-                "  \"State\": \"0\",\n" +
-                "  \"Time\": \"2018-06-01 10:11:00\",\n" +
-                "  \"OwnRoute\": {\n" +
-                "    \"Id\": \"123\",\n" +
-                "    \"Name\": \"123\",\n" +
-                "    \"Code\": \"123\"\n" +
-                "  },\n" +
-                "  \"RunRoute\": {\n" +
-                "    \"Id\": \"123\",\n" +
-                "    \"Name\": \"123\",\n" +
-                "    \"Code\": \"123\"\n" +
-                "  }\n" +
+                "\t\"results\":[\n" +
+                "        {\n" +
+              //  "            \"Data_Tm\":\"2019-07-01 12:04:04\",\n" +
+                "\t\t\t\"id\":\"1234557788\",\n" +
+                "\t\t\t\"code\":\"34342jjskdjfksjdfk33234jdkfjsdkjkjkjk\",\n" +
+                "\t\t\t\"cname\":\"中南海\",\n" +
+                "\t\t\t\"ename\":\"yyyy\",\n" +
+                "\t\t\t\"nationality\":\"86\",\n" +
+                "\t\t\t\"certificateNum\":\"00\",\n" +
+                "\t\t\t\"certificateType\":\"12347898778\",\n" +
+                "\t\t\t\"gender\":\"f\",\n" +
+                "\t\t\t\"institution\":\"重庆市悦来集团投资有限公司\",\n" +
+                "\t\t\t\"phone\":\"13818189988\",\n" +
+                "\t\t\t\"position\":\"经理\",\n" +
+                "\t\t\t\"headUrl\":\"http://localhost\",\n" +
+                "\t\t\t\"paperWorkType\":\"1\",\n" +
+                "\t\t\t\"sourceType\":\"0101\",\n" +
+                "\t\t\t\"roleType\":\"01\",\n" +
+                "\t\t\t\"vapName\":\"zhangsan\",\n" +
+                "\t\t\t\"vapPhone\":\"12345678901\",\n" +
+                "\t\t\t\"datas\":[\n" +
+                "\t\t\t\t{\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t\t\"id\":\"3432423434\",\n" +
+                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
+                "\t\t\t\t\t\"joinTime\":\"2019-06-30 09:00\"\n" +
+                "\t\t\t\t},\n" +
+                "\t\t\t\t{\n" +
+                "\t\t\t\t\t\n" +
+                "\t\t\t\t\t\"id\":\"897897897\",\n" +
+                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
+                "\t\t\t\t\t\"joinTime\":\"2019-07-01 09:00\"\n" +
+                "\t\t\t\t}\n" +
+                "\t\t\t\t]\n" +
+                "\n" +
+                "        }\n" +
+                "        ],\n" +
+                "        \"tx_code\":\"0101\"\n" +
                 "}";
-        String tablePre = "BUS_VEHIC_LCTN_MSG";
+        String tablePre = "GATE_EXPO_AUDI_INFO";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {
