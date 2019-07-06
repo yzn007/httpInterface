@@ -292,7 +292,8 @@ public class JsonObjectToAttach {
             noContains.put("linkId","");
         jsonObject.entrySet().iterator().forEachRemaining(s ->
                 a[0] = (!StringUtils.isEmpty(a[0]) ? a[0] : "") + (noContains.get(s.getKey().toString())!=null?"":
-                        (isCol ?  s.getKey() : ky.get(s.getKey())==null?s.getValue():ky.get(s.getKey())) + ","));
+                        (isCol ?  s.getKey() : ky.get(s.getKey())==null|| (!ky.get(s.getKey()).equals(linkId) && !StringUtils.isEmpty(linkId)
+                        )?s.getValue():ky.get(s.getKey())) + ","));
 
         if(!isCol) {
 
@@ -481,46 +482,32 @@ public class JsonObjectToAttach {
 
     public static void  main(String args[]){
         String  jsonValue ="{\n" +
-                "\t\"results\":[\n" +
-                "        {\n" +
-              //  "            \"Data_Tm\":\"2019-07-01 12:04:04\",\n" +
-                "\t\t\t\"id\":\"1234557788\",\n" +
-                "\t\t\t\"code\":\"34342jjskdjfksjdfk33234jdkfjsdkjkjkjk\",\n" +
-                "\t\t\t\"cname\":\"中南海\",\n" +
-                "\t\t\t\"ename\":\"yyyy\",\n" +
-                "\t\t\t\"nationality\":\"86\",\n" +
-                "\t\t\t\"certificateNum\":\"00\",\n" +
-                "\t\t\t\"certificateType\":\"12347898778\",\n" +
-                "\t\t\t\"gender\":\"f\",\n" +
-                "\t\t\t\"institution\":\"重庆市悦来集团投资有限公司\",\n" +
-                "\t\t\t\"phone\":\"13818189988\",\n" +
-                "\t\t\t\"position\":\"经理\",\n" +
-                "\t\t\t\"headUrl\":\"http://localhost\",\n" +
-                "\t\t\t\"paperWorkType\":\"1\",\n" +
-                "\t\t\t\"sourceType\":\"0101\",\n" +
-                "\t\t\t\"roleType\":\"01\",\n" +
-                "\t\t\t\"vapName\":\"zhangsan\",\n" +
-                "\t\t\t\"vapPhone\":\"12345678901\",\n" +
-                "\t\t\t\"datas\":[\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\n" +
-                "\t\t\t\t\t\"id\":\"3432423434\",\n" +
-                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
-                "\t\t\t\t\t\"joinTime\":\"2019-06-30 09:00\"\n" +
-                "\t\t\t\t},\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\n" +
-                "\t\t\t\t\t\"id\":\"897897897\",\n" +
-                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
-                "\t\t\t\t\t\"joinTime\":\"2019-07-01 09:00\"\n" +
-                "\t\t\t\t}\n" +
-                "\t\t\t\t]\n" +
-                "\n" +
-                "        }\n" +
-                "        ],\n" +
-                "        \"tx_code\":\"0101\"\n" +
-                "}";
-        String tablePre = "GATE_EXPO_AUDI_INFO";
+                "  \"AppId\": \"12345\",\n" +
+                "  \"Type\": \"1\",\n" +
+                "  \"VehId\": \"12\",\n" +
+                "  \"VehNum\": \"12\",\n" +
+                "  \"PlateNum\": \"A12\",\n" +
+                "  \"Latitude\": \"90.56\",\n" +
+                "  \"Longitude\":\"234.33\",\n" +
+                "  \"Angle\": \"231\",\n" +
+                "  \"Speed\": \"50\",\n" +
+                "  \"UpDown\": \"1\",\n" +
+                "  \"SiteNum\": \"2\",\n" +
+                "  \"Milage\": \"12.5\",\n" +
+                "  \"State\": \"0\",\n" +
+                "  \"Time\": \"2018-06-01 10:11:00\",\n" +
+                "  \"OwnRoute\": {\n" +
+                "    \"Id\": \"123\",\n" +
+                "    \"Name\": \"123\",\n" +
+                "    \"Code\": \"123\"\n" +
+                "  },\n" +
+                "  \"RunRoute\": {\n" +
+                "    \"Id\": \"123\",\n" +
+                "    \"Name\": \"123\",\n" +
+                "    \"Code\": \"123\"\n" +
+                "  }\n" +
+                "}\n";
+        String tablePre = "BUS_VEHIC_LCTN_MSG_HIS";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {

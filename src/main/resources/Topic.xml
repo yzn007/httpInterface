@@ -23,10 +23,12 @@
         <topic name="BUS_STATION" table="BUS_STATION;BUS_STATION_HIS" valid="false" textCode="0204" isDelete="true" isTruncate="false"/>
         <!-- 车辆/历史 -->
         <topic name="BUS_VEHICLE" table="BUS_VEHICLE;BUS_VEHICLE_HIS" valid="false" textCode="0205" isDelete="true" isTruncate="false"/>
-        <!-- 参展人与信息 /活动信息-->
+        <!-- 闸机参展人与信息 /活动信息-->
         <topic name="GATE_EXPO_AUDI_INFO" table="GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false"/>
         <!-- 闸机事件 -->
-        <topic name="GATE_GATE_EVT" table="GATE_GATE_EVT" valid="false" textCode="0102" isDelete="false" isTruncate="false"/>
+        <topic name="GATE_GATE_EVT" table="GATE_GATE_EVT" valid="true" textCode="0102" isDelete="false" isTruncate="false"/>
+        <!-- 登录区域与闸机关系 -->
+        <topic name="GATE_AREA_INFO" table="GATE_AREA_INFO" valid="false" textCode="0103" isDelete="false" isTruncate="false"/>
         <!-- 参展人员信息 -->
         <topic name="CQEXPOAPP_EXPO_AUDI_INFO" table="CQEXPOAPP_EXPO_AUDI_INFO" valid="false" textCode="0103" isDelete="true" isTruncate="false" />
 
