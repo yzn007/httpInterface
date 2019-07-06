@@ -15,15 +15,18 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 /**
  * Created by yzn00 on 2019/7/4.
  */
-public class MyJob extends QuartzJobBean {
+public class MyJob implements BaseJob {
     @Autowired
     PersonService personService;
-    private static Logger _log = LoggerFactory.getLogger(MyJob.class);
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext context) throws JobExecutionException {
         personService.selectAllPerson();
-        System.out.println("hello,my first springboot job!" + jobExecutionContext.getJobDetail().getKey());
-        _log.info("hello,my first springboot job!"+jobExecutionContext.getJobDetail().getKey());
+        System.out.println("hello,my first springboot job!" + context.getJobDetail().getKey());
+        _log.info("hello,my first springboot job!"+context.getJobDetail().getKey());
     }
+
+    private static Logger _log = LoggerFactory.getLogger(MyJob.class);
+
+
 }
