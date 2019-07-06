@@ -41,6 +41,35 @@ spring:
         suffix: .jsp
       static-path-pattern: /**
 
+    quartz:
+      properties:
+        org:
+          quartz:
+            scheduler:
+              instanceName: MyScheduler
+              instanceId: AUTO
+            jobStore:
+              class: org.quartz.impl.jdbcjobstore.JobStoreTX
+              driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+              tablePrefix: QRTZ_
+#              isClustered: true
+#              clusterCheckinInterval: 10000
+              useProperties: false
+            threadPool:
+              class: org.quartz.simpl.SimpleThreadPool
+              threadCount: 10
+              threadPriority: 5
+              threadsInheritContextClassLoaderOfInitializingThread: true
+      job-store-type: jdbc
+      jdbc:
+        initialize-schema: embedded
+
+
+
+
+
+
+
 #    kafka:
 #        producer:
 #          key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -90,20 +119,6 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.springboot.demo.entity
 
-  ####### kafka
+quartz:
 
-#  ### producer 配置
-#  spring.kafka.producer.bootstrap-servers=192.168.13.6:2181,192.168.13.1:2181,192.168.13.2:2181
-#  spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
-#  spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
-
-  ### consumer 配置
-#  spring.kafka.consumer.bootstrap-servers=192.168.13.3:6667
-#  spring.kafka.consumer.group-id=anuoapp
-#  spring.kafka.consumer.enable-auto-commit=true
-#  spring.kafka.consumer.auto-commit-interval=100
-#  spring.kafka.consumer.max-poll-records=1
-#  spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
-#  spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
-#  spring.kafka.listener.concurrency=5
 
