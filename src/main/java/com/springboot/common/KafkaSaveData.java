@@ -22,17 +22,19 @@ public class KafkaSaveData extends Thread {
     private String table ="web_data_profil";//表名
     private String isDelInsert = "false";
     private String isTrancate = "false";
+    private  Consumer<String, String> consumer = null;
 
-    public KafkaSaveData(String topic,String table,String isDelInsert,String isTruncate ) {
+    public KafkaSaveData(String topic,String table,String isDelInsert,String isTruncate,Consumer consumer ) {
         super();
         this.topic = topic;
         this.table = table;
         this.isDelInsert = isDelInsert;
         this.isTrancate = isTruncate;
+        this.consumer = consumer;
     }
 
     //创建消费者
-    private Consumer<String, String> createConsumer() {
+    public static Consumer<String, String> createConsumer() {
 
         try {
             if (config.keySet().size() <= 0)
@@ -59,12 +61,13 @@ public class KafkaSaveData extends Thread {
     public void run() {
         Logger.getLogger(this.getClass().getName()).setLevel(Level.OFF);
         //创建消费者
-        Consumer<String, String> consumer = createConsumer();
+        if(consumer == null)
+            consumer = createConsumer();
         //主题数map
         consumer.subscribe(Arrays.asList(topic));
         System.out.println("消费者对象1：" + consumer);
 
-        while (true) {
+//        while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
             //System.out.println(records);
             List<String[]> reds = new ArrayList<>();
@@ -94,11 +97,11 @@ public class KafkaSaveData extends Thread {
                 if (tmpSeq.size() > 0) {
                     SaveCosumerData.main(tmpSeq.toList());
                 }
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
+//                Thread.sleep(500);
+            } catch (Exception e) {
                 System.out.println(e.toString());
             }
-        }
+//        }
     }
 
     //线程数量
@@ -109,7 +112,7 @@ public class KafkaSaveData extends Thread {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
-        System.out.println(config);
+//        System.out.println(config);
 //        new KafkaSaveData("bingfu","web_data_profil").start();
 
         //取得有效主题
@@ -121,7 +124,8 @@ public class KafkaSaveData extends Thread {
                 tabAndMark =m.getValue().split(",");
             }
 
-            KafkaSaveData kafkaSaveData = new KafkaSaveData(m.getKey(),tabAndMark==null?m.getValue():tabAndMark[0],tabAndMark==null?"false":tabAndMark[1],tabAndMark==null?"false":tabAndMark[2]);
+            KafkaSaveData kafkaSaveData = new KafkaSaveData(m.getKey(),tabAndMark==null?m.getValue():tabAndMark[0],
+                    tabAndMark==null?"false":tabAndMark[1],tabAndMark==null?"false":tabAndMark[2],createConsumer());
             executorService.execute(kafkaSaveData);
         }
         executorService.shutdown();

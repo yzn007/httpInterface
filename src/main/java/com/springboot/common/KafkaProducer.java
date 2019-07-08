@@ -2,7 +2,7 @@ package com.springboot.common;
 
 
 import kafka.serializer.StringEncoder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 

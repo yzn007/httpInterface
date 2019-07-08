@@ -5,10 +5,11 @@ import com.alibaba.druid.sql.visitor.functions.Substring;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.scala.SaveCosumerData;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.server.api.protocolrecords.UpdateNodeResourceRequest;
 import org.dom4j.io.SAXReader;
 import org.dom4j.*;
+import org.springframework.util.ResourceUtils;
 import scala.Equals;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -102,9 +103,11 @@ public class JsonObjectToAttach {
         String fileName = "Topic.xml";
         if(!StringUtils.isEmpty(topicPath))
             fileName = topicPath;
-        String path = Thread.currentThread().getClass().getResource("/").getPath() + fileName;
+//        String path = Thread.currentThread().getClass().getResource("/").getPath() + fileName;
+
 
         try{
+            String path = ResourceUtils.getURL("classpath:").getPath()+ fileName;
             Document document = parseDom4j(path);
             Element root = document.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
@@ -150,7 +153,8 @@ public class JsonObjectToAttach {
 
         try {
 
-            String path = Thread.currentThread().getClass().getResource("/").getPath() + fileName;
+//            String path = Thread.currentThread().getClass().getResource("/").getPath() + fileName;
+            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
             Document document = parseDom4j(path);
             Element root = document.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
@@ -482,32 +486,18 @@ public class JsonObjectToAttach {
 
     public static void  main(String args[]){
         String  jsonValue ="{\n" +
-                "  \"AppId\": \"12345\",\n" +
-                "  \"Type\": \"1\",\n" +
-                "  \"VehId\": \"12\",\n" +
-                "  \"VehNum\": \"12\",\n" +
-                "  \"PlateNum\": \"A12\",\n" +
-                "  \"Latitude\": \"90.56\",\n" +
-                "  \"Longitude\":\"234.33\",\n" +
-                "  \"Angle\": \"231\",\n" +
-                "  \"Speed\": \"50\",\n" +
-                "  \"UpDown\": \"1\",\n" +
-                "  \"SiteNum\": \"2\",\n" +
-                "  \"Milage\": \"12.5\",\n" +
-                "  \"State\": \"0\",\n" +
-                "  \"Time\": \"2018-06-01 10:11:00\",\n" +
-                "  \"OwnRoute\": {\n" +
-                "    \"Id\": \"123\",\n" +
-                "    \"Name\": \"123\",\n" +
-                "    \"Code\": \"123\"\n" +
-                "  },\n" +
-                "  \"RunRoute\": {\n" +
-                "    \"Id\": \"123\",\n" +
-                "    \"Name\": \"123\",\n" +
-                "    \"Code\": \"123\"\n" +
-                "  }\n" +
-                "}\n";
-        String tablePre = "BUS_VEHIC_LCTN_MSG_HIS";
+                "  \"tx_code\": \"0102\",\n" +
+                "  \"results\": [\n" +
+                "    {\n" +
+                "      \"activityName\": \"参加活动1\",\n" +
+                "      \"cardNo\": \"渝B03789\",\n" +
+                "      \"barCode\": \"1\",\n" +
+                "      \"checkTime\": \"2018-06-01 10:11:00\",\n" +
+                "      \"accessPoint\": \"北3\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        String tablePre = "GATE_GATE_EVT";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {

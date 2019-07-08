@@ -11,7 +11,7 @@ import org.springframework.web.SpringServletContainerInitializer;
 import javax.servlet.http.HttpServletRequest;
 
 //@RestController
-@SpringBootApplication(scanBasePackages = "com.springboot.demo")
+@SpringBootApplication(scanBasePackages = {"com.springboot.demo","com.springboot.scala"})
 //@RequestMapping("admin/")
 @MapperScan(value = "com.springboot.demo.dao")
 @EnableScheduling
