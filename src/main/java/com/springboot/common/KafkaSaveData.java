@@ -116,7 +116,7 @@ public class KafkaSaveData extends Thread {
 //        new KafkaSaveData("bingfu","web_data_profil").start();
 
         //取得有效主题
-        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,null);
+        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,null,false);
         ExecutorService executorService =  Executors.newFixedThreadPool(NUM_PROCESS);
         for(Map.Entry<String, String> m : topicM.entrySet()){
             String []tabAndMark = null;

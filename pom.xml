@@ -370,13 +370,13 @@
 			</plugin>
 		</plugins>
         <resources>
-            <resource>
-                <targetPath>lib/</targetPath>
-                <directory>${basedir}/lib/</directory>
-                <includes>
-                    <include>**/*.jar</include>
-                </includes>
-            </resource>
+            <!--<resource>-->
+                <!--<targetPath>lib/</targetPath>-->
+                <!--<directory>${basedir}/lib/</directory>-->
+                <!--<includes>-->
+                    <!--<include>**/*.jar</include>-->
+                <!--</includes>-->
+            <!--</resource>-->
 
             <resource>
                 <directory>src/main/resources</directory>

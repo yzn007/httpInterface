@@ -1,36 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
     <topics name="topics">
-        <!-- topic列表： 名称 表名(多表用;分割) 是否有效 编码 是否删除后再插入 是否清空表-->
-        <!-- 测试 -->
-        <!--<topic name="bingfu" table="log" valid="true" textCode="0301" isDelete="true"/>-->
-        <!--<topic name="PARK_PARKING_LOT" table="web_data_profil" valid="true" textCode="0401" isDelete="false"/>-->
+        <!-- topic列表： 名称 表名(多表用;分割) 是否有效 编码 是否删除后再插入 是否清空表 是否静态数据 静态数据访问url-->
+
         <!-- 停车场信息/历史 -->
-        <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false"/>
+        <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false" isStatic="false"/>
         <!-- 车辆驶入事件 -->
-        <topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="true" textCode="0302" isDelete="false" isTruncate="false"/>
+        <topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="true" textCode="0302" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 车辆驶出事件 -->
-        <topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0303" isDelete="false" isTruncate="false"/>
+        <topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0303" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 车位预约信息 -->
-        <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="true" textCode="0304" isDelete="true" isTruncate="false"/>
-        <!-- 车辆位置信息/历史 -->
-        <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG;BUS_VEHIC_LCTN_MSG_HIS" valid="true" textCode="0201" isDelete="false" isTruncate="true"/>
+        <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="true" textCode="0304" isDelete="true" isTruncate="false" isStatic="false"/>
+        <!-- 车辆信息 -->
+        <!-- 车辆位置信息 -->
+        <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG" valid="true" textCode="0201" isDelete="false" isTruncate="true" isStatic="false"/>
         <!-- 车辆进出信息 -->
-        <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="BUS_VEHIC_ARRV_DEPRT_MSG" valid="false" textCode="0202" isDelete="false" isTruncate="false"/>
-        <!-- 线路/历史 -->
-        <topic name="BUS_ROUTE" table="BUS_ROUTE;BUS_ROUTE_HIS" valid="false" textCode="0203" isDelete="true" isTruncate="false"/>
-        <!-- 站点/历史 -->
-        <topic name="BUS_STATION" table="BUS_STATION;BUS_STATION_HIS" valid="false" textCode="0204" isDelete="true" isTruncate="false"/>
-        <!-- 车辆/历史 -->
-        <topic name="BUS_VEHICLE" table="BUS_VEHICLE;BUS_VEHICLE_HIS" valid="false" textCode="0205" isDelete="true" isTruncate="false"/>
+        <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="BUS_VEHIC_ARRV_DEPRT_MSG" valid="false" textCode="0202" isDelete="false" isTruncate="false" isStatic="false"/>
+        <!-- 令牌信息 -->
+        <topic name="BUS_ACCESS_TOKEN" table="BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="false" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=token"/>
+        <!-- 线路 -->
+        <topic name="BUS_ROUTE" table="BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=route"/>
+        <!-- 线路车辆 -->
+        <topic name="BUS_ROUTE_VEHICLE" table="BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=routeVehicle"/>
+        <!-- 站点 -->
+        <topic name="BUS_STATION" table="BUS_STATION" valid="false" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=station"/>
+        <!-- 车辆 -->
+        <topic name="BUS_VEHICLE" table="BUS_VEHICLE" valid="false" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=vehicle"/>
+        <!-- 线路计划时间 -->
+        <topic name="BUS_ROUTE_DISPT_TIME" table="BUS_ROUTE_DISPT_TIME" valid="false" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=routePlan"/>
+        <!-- 闸机 -->
         <!-- 闸机参展人与信息 /活动信息-->
-        <topic name="GATE_EXPO_AUDI_INFO" table="GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false"/>
+        <topic name="GATE_EXPO_AUDI_INFO" table="GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false" isStatic="false"/>
         <!-- 闸机事件 -->
-        <topic name="GATE_GATE_EVT" table="GATE_GATE_EVT" valid="true" textCode="0102" isDelete="false" isTruncate="false"/>
+        <topic name="GATE_GATE_EVT" table="GATE_GATE_EVT" valid="true" textCode="0102" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 登录区域与闸机关系 -->
-        <topic name="GATE_AREA_INFO" table="GATE_AREA_INFO" valid="false" textCode="0103" isDelete="false" isTruncate="false"/>
+        <topic name="GATE_AREA_INFO" table="GATE_AREA_INFO" valid="false" textCode="0103" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 参展人员信息 -->
-        <topic name="CQEXPOAPP_EXPO_AUDI_INFO" table="CQEXPOAPP_EXPO_AUDI_INFO" valid="false" textCode="0103" isDelete="true" isTruncate="false" />
+        <topic name="CQEXPOAPP_EXPO_AUDI_INFO" table="CQEXPOAPP_EXPO_AUDI_INFO" valid="false" textCode="0103" isDelete="true" isTruncate="false"  isStatic="false"/>
 
     </topics>
 </root>

@@ -34,7 +34,7 @@ public class MyJob implements BaseJob {
 //        personService.selectAllPerson();
         saveCocumerData();
 //        System.out.println("hello,my first springboot job!" + context.getJobDetail().getKey());
-        _log.info("hello,my first springboot job!" + context.getJobDetail().getKey());
+//        _log.info("hello,my first springboot job!" + context.getJobDetail().getKey());
     }
 
     private static Logger _log = LoggerFactory.getLogger(MyJob.class);
@@ -57,7 +57,7 @@ public class MyJob implements BaseJob {
                 config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
             if (topicM.size() == 0)
                 //取得有效主题
-                topicM = JsonObjectToAttach.getValidProperties("topics", null, null);
+                topicM = JsonObjectToAttach.getValidProperties("topics", null, null,false);
             if(consumerMap.size() == 0){
                 for (Map.Entry<String,String> m :topicM.entrySet()){
                     Consumer c =KafkaSaveData.createConsumer();

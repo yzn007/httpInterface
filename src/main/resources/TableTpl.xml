@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-    <table name="web_data_profil">
-        <!-- id=数据库字段 ref=json值 <column>where 条件</column>-->
-        <!-- datas 非数据库字段，是嵌套子表判断条件是包含[list]-->
-        <column id="Rpt_ID" ref="Id"/>
-        <column id="Rpt_Typ" ref="type"/>
-        <column id="Rpt_Nm" ref="rptNm"/>
-        <column id="Rpt_Prd" ref="rtpPrd"/>
-        <column id="Src_Web_Addr" ref="srcWeb"/>
-        <column id="Src_Desc" ref="srcDesc"/>
-    </table>
+
     <!-- 参展人员信息/活动信息 -->
     <!-- 子表配置参数 json字段 子表list表名 关联主表字段-->
     <table name="GATE_EXPO_AUDI_INFO">
@@ -26,8 +17,8 @@
         <column id="Park_Lot_Regn_ID" ref="Park_Lot_Regn_ID">Park_Lot_Regn_ID = Park_Lot_Regn_ID</column>
     </table>
 
-    <!-- 车辆位置消息/历史 -->
-    <table name="BUS_VEHIC_LCTN_MSG;BUS_VEHIC_LCTN_MSG_HIS">
+    <!-- 车辆位置信息 -->
+    <table name="BUS_VEHIC_LCTN_MSG">
         <column id="OwnRoute_ID" ref="OwnRoute.Id"></column>
         <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
@@ -35,10 +26,67 @@
         <column id="RunRoute_Name" ref="RunRoute.Name"></column>
         <column id="RunRoute_Code" ref="RunRoute.Code"></column>
     </table>
+    <!-- 车辆进出站信息 -->
+    <table name="BUS_VEHIC_ARRV_DEPRT_MSG">
+        <column id="OwnRoute_ID" ref="OwnRoute.Id"></column>
+        <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
+        <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
+        <column id="RunRoute_ID" ref="RunRoute.Id"></column>
+        <column id="RunRoute_Name" ref="RunRoute.Name"></column>
+        <column id="RunRoute_Code" ref="RunRoute.Code"></column>
+    </table>
+    <!--  线路车辆 -->
+    <table name="BUS_ROUTE_VEHICLE">
+        <column id="Position_Lat" ref="Position.Lat"></column>
+        <column id="Position_Lng" ref="Position.Lng"></column>
+        <column id="Position_Direct" ref="Position.Direct"></column>
+        <column id="Position_Site" ref="Position.Site"></column>
+    </table>
 
+    <!-- 站点 -->
+    <table name="BUS_STATION">
+        <column id="Sites_Name" ref="Sites.Name"></column>
+        <column id="Sites_Direct" ref="Sites.Direct"></column>
+        <column id="Sites_Num" ref="Sites.Num"></column>
+        <column id="Sites_Lat" ref="Sites.Lat"></column>
+        <column id="Sites_Lng" ref="Sites.Lng"></column>
+        <column id="Sites_Milage" ref="Sites.Milage"></column>
+        <column id="Sites_Attr" ref="Sites.Attr"></column>
+        <column id="Sites_Track" ref="Sites.Track"></column>
+    </table>
 
+    <!-- 线路 -->
+    <table name="BUS_ROUTE">
+        <column id="StartSite_Name" ref="StartSite.Name"></column>
+        <column id="StartSite_Latitude" ref="StartSite.Latitude"></column>
+        <column id="StartSite_Longitude" ref="StartSite.Longitude"></column>
+        <column id="EndSite_Name" ref="EndSite.Name"></column>
+        <column id="EndSite_Latitude" ref="EndSite.Latitude"></column>
+        <column id="EndSite_Longitude" ref="EndSite.Longitude"></column>
+    </table>
 
+    <!-- 车辆信息 -->
+    <table name="BUS_VEHICLE">
+        <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
+        <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
+        <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
+        <column id="RunRoute_ID" ref="RunRoute.ID"></column>
+        <column id="RunRoute_Code" ref="RunRoute.Code"></column>
+        <column id="RunRoute_Name" ref="RunRoute.Name"></column>
+    </table>
 
+    <!-- 车辆计划运行 -->
+    <table name="BUS_ROUTE_DISPT">
+        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
+        <column id="Times" ref="[list]BUS_ROUTE_DISPT_DTL" linkId="RouteId"/>
+    </table>
+
+    <!-- 车辆计划运行明细 -->
+    <table name="BUS_ROUTE_DISPT_DTL">
+        <column id="Times_Time" ref="Time"></column>
+        <column id="Times_PlateNum" ref="PlateNum"></column>
+        <column id="Times_VehNum" ref="VehNum"></column>
+    </table>
 
 </root>
 

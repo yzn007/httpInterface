@@ -98,7 +98,7 @@ public class JsonObjectToAttach {
         return statement.toString();
     }
 
-    public static Map<String,String> getValidProperties(String propertyNm,String topicPath,String code){
+    public static Map<String,String> getValidProperties(String propertyNm,String topicPath,String code,boolean isStatic){
         Map <String,String>m = new HashMap();
         String fileName = "Topic.xml";
         if(!StringUtils.isEmpty(topicPath))
@@ -115,10 +115,15 @@ public class JsonObjectToAttach {
                 if (tblEle.attribute(0).getValue().equals(propertyNm)) {
                     for (Element e : tblEle.elements()) {
                         if(  e.attribute(2).getValue().toLowerCase().equals("true"))
-                            if(!StringUtils.isEmpty(code) && code.equals(e.attribute(3).getValue()))//生产者topic取得
-                                m.put(e.attribute(0).getValue(), e.attribute(1).getValue());
-                            else if(StringUtils.isEmpty(code))//返回消费者topics
-                                m.put(e.attribute(0).getValue(), e.attribute(1).getValue()+","+e.attribute(4).getValue()+","+e.attribute(5).getValue());
+                            if(Boolean.parseBoolean(e.attribute(6).getValue().toString())==isStatic) {
+                                if (!StringUtils.isEmpty(code) && code.equals(e.attribute(3).getValue()))//生产者topic取得
+                                    m.put(e.attribute(0).getValue(), e.attribute(1).getValue());
+                                else if (StringUtils.isEmpty(code))//返回消费者topics
+                                    if(!isStatic)
+                                        m.put(e.attribute(0).getValue(), e.attribute(1).getValue() + "," + e.attribute(4).getValue() + "," + e.attribute(5).getValue());
+                                    else
+                                        m.put(e.attribute(0).getValue(), e.attribute(1).getValue() + "," + e.attribute(4).getValue() + "," + e.attribute(5).getValue()+ "," + e.attribute(7).getValue());
+                            }
                     }
                 }
             }
@@ -234,7 +239,7 @@ public class JsonObjectToAttach {
 
 
             for(Map.Entry<String,Map<String,String>> mp:mapKeys.entrySet()){
-                if(tm.indexOf(mp.getKey())>0 && tm.substring(tm.indexOf(mp.getKey())+ mp.getKey().length(),tm.indexOf(mp.getKey())+ mp.getKey().length()+1).equals(",")){
+                if(tm.indexOf(mp.getKey())>-1 && tm.substring(tm.indexOf(mp.getKey())+ mp.getKey().length(),tm.indexOf(mp.getKey())+ mp.getKey().length()+1).equals(",")){
                     Map <String,String>val = mp.getValue();
                     String replacStr = "";
                     for(Map.Entry<String,String> v:val.entrySet()){
@@ -424,13 +429,13 @@ public class JsonObjectToAttach {
 
 
 
-//                if(isTruncate){
-//                    String truncateStr = "truncate " + table;
-//                    //只清空一次
-//                    if(!att.contains(truncateStr))
-//                        att.add(truncateStr);
-//
-//                }
+                if(isTruncate && rets.length == 1){
+                    String truncateStr = "truncate " + table;
+                    //只清空一次
+                    if(!att.contains(truncateStr))
+                        att.add(truncateStr);
+
+                }
 //                else if (isModify) {
 //                    String delSt = "delete from " + table + " where 1=1 ";
 //                    if (!StringUtils.isEmpty(where))
@@ -486,18 +491,50 @@ public class JsonObjectToAttach {
 
     public static void  main(String args[]){
         String  jsonValue ="{\n" +
-                "  \"tx_code\": \"0102\",\n" +
-                "  \"results\": [\n" +
-                "    {\n" +
-                "      \"activityName\": \"参加活动1\",\n" +
-                "      \"cardNo\": \"渝B03789\",\n" +
-                "      \"barCode\": \"1\",\n" +
-                "      \"checkTime\": \"2018-06-01 10:11:00\",\n" +
-                "      \"accessPoint\": \"北3\"\n" +
-                "    }\n" +
-                "  ]\n" +
+                "\t\"results\":[\n" +
+                "        {\n" +
+                "            \n" +
+                "\t\t\t\"id\":\"1234557788\",\n" +
+                "\t\t\t\"cname\":\"中南海\",\n" +
+                "\t\t\t\"ename\":\"yyyy\",\n" +
+                "\t\t\t\"nationality\":\"86\",\n" +
+                "\t\t\t\"certificateNum\":\"00\",\n" +
+                "\t\t\t\"certificateType\":\"12347898778\",\n" +
+                "\t\t\t\"gender\":\"f\",\n" +
+                "\t\t\t\"institution\":\"重庆市悦来集团投资有限公司\",\n" +
+                "\t\t\t\"phone\":\"13818189988\",\n" +
+                "\t\t\t\"position\":\"经理\",\n" +
+                "\t\t\t\"headUrl\":\"http://localhost\",\t\t\t\n" +
+                "\t\t\t\"roleType\":\"01\",\n" +
+                "\t\t\t\"vapName\":\"zhangsan\",\n" +
+                "\t\t\t\"vapPhone\":\"12345678901\",\n" +
+                "\t\t\t\"certificateLevel\":\"1\",\n" +
+                "\t\t\t\"isMeeting\":\"0101\",\n" +
+                "\t\t\t\"dockingOrgUserName\":\"对接人\",\n" +
+                "\t\t\t\"dockingOrgUserphone\":\"23433344\",\n" +
+                "\t\t\t\"dockingOrgName\":\"对接人公司\",\n" +
+                "\t\t\t\"travel\":\"步行加公交\",\n" +
+                "\t\t\t\"carnumber\":\"渝B88888\",\n" +
+                "\t\t\t\"datas\":[\n" +
+                "\t\t\t\t{\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t\t\"id\":\"3432423434\",\n" +
+                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
+                "\t\t\t\t\t\"joinTime\":\"2019-06-30 09:00\"\n" +
+                "\t\t\t\t},\n" +
+                "\t\t\t\t{\n" +
+                "\t\t\t\t\t\n" +
+                "\t\t\t\t\t\"id\":\"897897897\",\n" +
+                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
+                "\t\t\t\t\t\"joinTime\":\"2019-07-01 09:00\"\n" +
+                "\t\t\t\t}\n" +
+                "\t\t\t\t]\n" +
+                "\n" +
+                "        }\n" +
+                "        ],\n" +
+                "        \"tx_code\":\"0101\"\n" +
                 "}";
-        String tablePre = "GATE_GATE_EVT";
+        String tablePre = "GATE_EXPO_AUDI_INFO";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {
@@ -509,7 +546,7 @@ public class JsonObjectToAttach {
 //        new KafkaSaveData("bingfu","web_data_profil").start();
 
         //取得有效主题
-        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,null);
+        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,null,false);
 
         for(Map.Entry<String, String> m : topicM.entrySet()){
             String []tabAndMark = null;

@@ -5,9 +5,17 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.common.JsonObjectToAttach;
 import com.springboot.common.KafkaProducer;
-import com.springboot.common.KafkaSaveData;
 import com.springboot.common.Ret;
 import com.springboot.demo.services.PersonService;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,6 +56,75 @@ public class HttpServiceTest {
         JSONObject jsonObject = JSONObject.parseObject(requestBody);
         String result = "调用Post(json)成功：数据是 " + "name:" + jsonObject.getString("name") + " city:" + jsonObject.getString("status");
         return JSON.toJSONString(result);
+    }
+
+    private JSONObject getBusTest(String param){
+        String jsonStr = "";
+        Map <String,String> m = new HashMap();
+        if(param.equals("routePlan")){ //公交测试数据-线路计划时间
+             jsonStr = "{\n" +
+                    "\"RouteId\":1,\n" +
+                    "\"RouteName\":\"XXX\",\n" +
+                    "\"RouteCode\":\"X001\",\n" +
+                    "\"Times\":[\n" +
+                    "{\"Time\":\"10:00:00\", \"PlateNum\":\"CNG-9876\", \"VehNum\":\"CNG-9876\"},\n" +
+                    "{\"Time\":\"10:05:00\", \"PlateNum\":\"CNG-9876\", \"VehNum\":\"CNG-9876\"}\n" +
+                    "]\n" +
+                    "}\n";
+        }else if(param.equals("vehicle")){ //公交测试数据-车辆信息
+             jsonStr = "{\n" +
+                    "\"VehId\":1,\n" +
+                    "\"VehNum\":\"XXX\",\n" +
+                    "\"PlateNum\":\"X001\",\n" +
+                    "\"OwnRoute\":{\n" +
+                    "\"ID\":1,\n" +
+                    "\"Code\":\"01\",\n" +
+                    "\"Name\":\"Cargyi Gate\"\n" +
+                    "},\n" +
+                    "\"RunRoute\":{\n" +
+                    "\"ID\":1,\n" +
+                    "\"Code\":\"01\",\n" +
+                    "\"Name\":\"Cargyi Gate\"\n" +
+                    "}\n" +
+                    "}\n";
+        }else if(param.equals("route")){ //公交测试数据-线路
+             jsonStr = "{\n" +
+                    "\"ID\":1,\n" +
+                    "\"Code\":\"01\",\n" +
+                    "\"Name\":\" Cargyi Gate\",\n" +
+                    "\"State\":0,\n" +
+                    "\"DepartTime\":\"05:00:00\",\n" +
+                    "\"ReturnTime\":\"22:00:00\",\n" +
+                    "\"TicketPrice\": 0.0,\n" +
+                    "\"StartSite\": {\"Name\":\"XX\", \"Latitude\":29, \"Longitude\":110},\n" +
+                    "\"EndSite\": {\"Name\":\"YY\", \"Latitude\":29, \"Longitude\":110}\n" +
+                    "}";
+        }else if(param.equals("station")){ //公交测试数据-站点
+             jsonStr = "{\n" +
+                    "  \"RouteId\": 1,\n" +
+                    "  \"RouteName\": \"XXX\",\n" +
+                    "  \"RouteCode\": \"X001\",\n" +
+                    "  \"Sites\": {\n" +
+                    "    \"Name\": \"S1\",\n" +
+                    "    \"Direct\": 0,\n" +
+                    "    \"Num\": 1,\n" +
+                    "    \"Lat\": 16,\n" +
+                    "    \"Lng\": 96,\n" +
+                    "    \"Attr\": 0,\n" +
+                    "    \"Track\": \"96,16;96,15.8;95.8,17.2\"\n" +
+                    "  }\n" +
+                    "}";
+        }else if(param.equals("routeVehicle")){ //公交测试数据-线路车辆
+             jsonStr = "{\n" +
+                    "\"Id\":1,\n" +
+                    "\"PlateNum\":\" CNG-9876\",\n" +
+                    "\"VehNum\":\"CNG-9876\",\n" +
+                    "\"Position\":{\"Lat\":29,\"Lng\":\"111.34\" ,\"Direct\":1 ,\"Site\":3}\n" +
+                    "}\n";
+        }else{//公交测试数据-令牌
+            jsonStr = "{\"access_token\":\"ACCESS_TOKEN\",\"expires_in\":7200}";
+        }
+        return JSONObject.parseObject(jsonStr);
     }
 
     private List getResultTable(String param){
@@ -138,6 +215,61 @@ public class HttpServiceTest {
         return result;
     }
 
+    /**
+     * get请求传输数据
+     *
+     * @param url
+     * @param encoding
+     * @return
+     * @throws ClientProtocolException
+     * @throws IOException
+     */
+    public String getJsonData(String url, String encoding) throws ClientProtocolException, IOException {
+        String result = "";
+
+        // 创建httpclient对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        // 创建get方式请求对象
+//        HttpGet httpGet = new HttpGet(url);
+        HttpPost post = new HttpPost(url);
+        Map<String,String> map = new HashMap();
+        map.put("routid","1");
+
+        //设置参数发送
+        List<BasicNameValuePair> pairs = new ArrayList<>();
+        for(Map.Entry<String,String> entry : map.entrySet())	         {
+            pairs.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+        }
+
+//        httpGet.addHeader("Content-type", "application/json");
+        // 通过请求对象获取响应对象
+//        CloseableHttpResponse response = httpClient.execute(httpGet);
+        CloseableHttpResponse response = null;
+        try{
+            post.setEntity(new UrlEncodedFormEntity(pairs,"UTF-8"));
+            response = httpClient.execute(post);
+            // 获取结果实体
+            // 判断网络连接状态码是否正常(0--200都数正常)
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                result = EntityUtils.toString(response.getEntity(), "utf-8");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            try{
+                httpClient.close();
+                if(response!=null){
+                    // 释放链接
+                    response.close();
+                }
+            }catch (Exception ee){
+                ee.printStackTrace();
+            }
+        }
+        return result;
+    }
+
     @RequestMapping(value = "sendGetData")
     public Ret sendGetData(HttpServletRequest request, HttpServletResponse response) {
         String result = "调用成功：数据是 " + "name:" + request.getParameter("name") + " city:" + request.getParameter("city");
@@ -153,6 +285,15 @@ public class HttpServiceTest {
 //        return Ret.ok(listJson,"OK");
         return Ret.ok(m);
     }
+
+    @RequestMapping(value = "getBusTestData")
+    public JSONObject getBusTestData(HttpServletRequest request, HttpServletResponse response) {
+        JSONObject object = getBusTest(request.getParameter("bus"));
+
+        return object;
+    }
+
+
 
     @RequestMapping(value = "getPostData",method=RequestMethod.POST)
     public Ret sendPostData(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
@@ -176,7 +317,7 @@ public class HttpServiceTest {
         }
 
         //取得有效主题
-        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,textCode);
+        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,textCode,false);
         if(topicM.keySet().size()>0) {
             ExecutorService executorService = Executors.newFixedThreadPool(6);
             for (Map.Entry<String, String> map : topicM.entrySet()) {
