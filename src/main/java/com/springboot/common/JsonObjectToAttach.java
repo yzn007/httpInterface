@@ -1,12 +1,14 @@
 package com.springboot.common;
 
 
+import com.alibaba.druid.sql.visitor.functions.Length;
 import com.alibaba.druid.sql.visitor.functions.Substring;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.scala.SaveCosumerData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.server.api.protocolrecords.UpdateNodeResourceRequest;
+import org.beetl.ext.fn.Print;
 import org.dom4j.io.SAXReader;
 import org.dom4j.*;
 import org.springframework.util.ResourceUtils;
@@ -15,6 +17,7 @@ import scala.collection.JavaConverters;
 import scala.collection.Seq;
 import scala.tools.nsc.transform.patmat.Logic;
 
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -85,17 +88,47 @@ public class JsonObjectToAttach {
      * @return
      */
     public static String getJoinString(String strSplit) {
-        String[] ars = strSplit.split(",");
-        StringBuffer statement = new StringBuffer();
-        for (int i = 0; i < ars.length; i++) {
-            if (i == 0)
-                statement.append("'" + ars[i] + "','");
-            else if (i < ars.length - 1)
-                statement.append(ars[i] + "','");
-            else
-                statement.append(ars[i] + "'");
+        String headStr = "";
+        String tailStr = "";
+        String midStr = "";
+        if(strSplit.indexOf(";")>-1){
+            int lastCInx = strSplit.lastIndexOf(";");
+            int tailInx = strSplit.indexOf(",",lastCInx);
+            tailInx = strSplit.indexOf(",",tailInx+1)>-1?strSplit.indexOf(",",tailInx+1):strSplit.length();
+            int firstInx = strSplit.indexOf(";");
+            int firstC = 0;
+            int firstS = 0;
+            int i = 0;
+            int k = 0;
+
+            String subStr = strSplit;
+            while(firstC<firstInx){
+                i =subStr.indexOf(",");
+                subStr = subStr.substring(i+1>subStr.length()?subStr.length():i+1);
+                if(StringUtils.isEmpty(subStr))
+                    break;
+                if(++k%2==0)//保留前两个
+                    firstS = firstC;
+                firstC +=i+1;
+            }
+            headStr = strSplit.substring(0,firstS-1>0?firstS-1:0);
+            midStr = strSplit.substring(firstS,tailInx);
+            tailStr = strSplit.substring(tailInx+1>strSplit.length()?strSplit.length():tailInx+1,strSplit.length());
+            return getJoinString(headStr) + (StringUtils.isEmpty(headStr)?"'":",'") +midStr + (!StringUtils.isEmpty(tailStr)?"'," :"'")+ getJoinString(tailStr);
+        }else {
+
+            String[] ars = strSplit.split(",");
+            StringBuffer statement = new StringBuffer();
+            for (int i = 0; i < ars.length; i++) {
+                if (i == 0)
+                    statement.append("'" + ars[i] + "','");
+                else if (i < ars.length - 1)
+                    statement.append(ars[i] + "','");
+                else
+                    statement.append(ars[i] + "'");
+            }
+            return statement.toString();
         }
-        return statement.toString();
     }
 
     public static Map<String,String> getValidProperties(String propertyNm,String topicPath,String code,boolean isStatic){
@@ -146,7 +179,7 @@ public class JsonObjectToAttach {
      * @throws IOException
      */
     public static String []getPropertyRelation(String cols, String table, String tmpFile,List<Map<String,String>> subTabs,String linkId,Map<String,Map<String,String>> mapKeys ) throws IOException {
-        String tm = cols;
+        String tm = cols.toLowerCase();
         String [] rets = null;
         List<String> whereStr = new ArrayList<>();
         String spChr = "#";
@@ -216,8 +249,8 @@ public class JsonObjectToAttach {
                 }
                 if(e.getKey().indexOf(".")>0){
                     String key = e.getKey().substring(0,e.getKey().indexOf("."));
-                    if(tm.indexOf(key)>-1 && (tm.substring(tm.indexOf(key)+key.length(),tm.indexOf(key)+key.length()+1>tm.length()?tm.length():tm.indexOf(key)+key.length()+1).equals(",")||
-                           StringUtils.isEmpty(tm.substring(tm.indexOf(key)+key.length(),tm.indexOf(key)+key.length()+1>tm.length()?tm.length():tm.indexOf(key)+key.length()+1)))){
+                    if(tm.indexOf(key.toLowerCase())>-1 && (tm.substring(tm.indexOf(key.toLowerCase())+key.length(),tm.indexOf(key.toLowerCase())+key.length()+1>tm.length()?tm.length():tm.indexOf(key.toLowerCase())+key.length()+1).equals(",")||
+                           StringUtils.isEmpty(tm.substring(tm.indexOf(key.toLowerCase())+key.length(),tm.indexOf(key.toLowerCase())+key.length()+1>tm.length()?tm.length():tm.indexOf(key.toLowerCase())+key.length()+1)))){
                         if(mapKeys.get(key)==null){
                             Map mp = new HashMap();
                             mp.put(e.getKey().substring(key.length()+1,e.getKey().length()),e.getValue());
@@ -229,17 +262,22 @@ public class JsonObjectToAttach {
                         }
                     }
                 }else if(!linkId.equals(e.getKey()))//已经处理过的linkId存在跳过
-                    tm = tm.toLowerCase().replace(e.getKey().toLowerCase(),value);
+//                    tm = tm.toLowerCase().replace(e.getKey().toLowerCase(),value);
+                    tm = replace(tm.toLowerCase(),e.getKey().toLowerCase(),value,"");
                 else if(tm.lastIndexOf(e.getKey())>0 && linkId.equals(e.getKey())){
                     String tmpS = tm.substring(linkId.length(),tm.length());
-                    tmpS = tmpS.toLowerCase().replace(e.getKey().toLowerCase(),value);
+//                    tmpS = tmpS.toLowerCase().replace(e.getKey().toLowerCase(),value);
+                    tmpS =replace(tmpS.toLowerCase(),e.getKey().toLowerCase(),value,"");
                     tm = tm.substring(0,linkId.length())+tmpS;
                 }
             }
 
 
             for(Map.Entry<String,Map<String,String>> mp:mapKeys.entrySet()){
-                if(tm.indexOf(mp.getKey())>-1 && tm.substring(tm.indexOf(mp.getKey())+ mp.getKey().length(),tm.indexOf(mp.getKey())+ mp.getKey().length()+1).equals(",")){
+                if(tm.indexOf(mp.getKey().toLowerCase())>-1 && (tm.substring(tm.indexOf(mp.getKey().toLowerCase())+ mp.getKey().length(),tm.indexOf(mp.getKey().toLowerCase())+ mp.getKey().length()+1>tm.length()?
+                        tm.length():tm.indexOf(mp.getKey().toLowerCase())+ mp.getKey().length()+1).equals(",")||
+                        StringUtils.isEmpty(tm.substring(tm.indexOf(mp.getKey().toLowerCase())+ mp.getKey().length(),tm.indexOf(mp.getKey().toLowerCase())+ mp.getKey().length()+1>tm.length()?
+                                tm.length():tm.indexOf(mp.getKey().toLowerCase())+ mp.getKey().length()+1)))){
                     Map <String,String>val = mp.getValue();
                     String replacStr = "";
                     for(Map.Entry<String,String> v:val.entrySet()){
@@ -247,7 +285,8 @@ public class JsonObjectToAttach {
                     }
                     if(!StringUtils.isEmpty(replacStr)){
                         replacStr = replacStr.substring(0,replacStr.length()-1);
-                        tm = tm.replace(mp.getKey(),replacStr);
+//                        tm = tm.replace(mp.getKey().toLowerCase(),replacStr);
+                        tm = replace(tm,mp.getKey().toLowerCase(),replacStr,"");
                     }
                 }
             }
@@ -274,6 +313,41 @@ public class JsonObjectToAttach {
                 rets [j] = whereStr.get(j-1);
         }
         return rets;
+    }
+
+    /**
+     * 替换块内字符，防止替换局部字符串
+     * @param orignal
+     * @param match
+     * @param replaceS
+     * @param split
+     * @return
+     */
+    public static String replace(String orignal,String match,String replaceS,String split){
+        String rtnStr = "";
+        String sl = StringUtils.isEmpty(split)?",":split;
+        if(orignal.indexOf(sl)>-1){
+            String mat[] = orignal.split(sl);
+            int len = 0;
+            int i = 0;
+            for(;i<mat.length;i++){
+                if(mat[i].equals(match))
+                    break;
+                len += mat[i].length();
+                if(i<mat.length-1)
+                    len += sl.length();
+            }
+            String head = orignal.substring(0,len);
+            String mid = replaceS;
+            String tail = orignal.substring(i<mat.length?len+mat[i].length()+sl.length()>orignal.length()?orignal.length():
+                    len+mat[i].length()+sl.length():orignal.length());
+            rtnStr = !StringUtils.isEmpty(head) || !StringUtils.isEmpty(tail) ? head + (!StringUtils.isEmpty(tail)?mid+sl:mid) + tail:orignal;
+            if(head.equals(orignal))
+                rtnStr = orignal;
+        }else {
+            rtnStr = orignal.replace(match,replaceS);
+        }
+        return rtnStr;
     }
 
     /**
@@ -317,7 +391,8 @@ public class JsonObjectToAttach {
                     String subStr = jsonObject.get(m.getKey()).toString();
                     String head = a[0].substring(0,a[0].indexOf(subStr)+subStr.length());
                     String tail = a[0].substring(a[0].indexOf(subStr)+subStr.length(),a[0].length());
-                    head = head.replace(subStr,values.substring(0,values.length()-1));
+//                    head = head.replace(subStr,values.substring(0,values.length()-1));
+                    head = replace(head,subStr,values.substring(0,values.length()-1),"#");
                     a[0] = head + tail;
                 }
             }
@@ -464,7 +539,7 @@ public class JsonObjectToAttach {
                 //递归调用
 
                 for (Map.Entry<String,String> e : noContainCols.entrySet()) {
-                    String[] bb = getBatchStatement(getJsonList(json, e.getKey()), e.getValue(), null,tmpLink, isModify, keyWhere,false);
+                    String[] bb = getBatchStatement(getJsonList(json, e.getKey()), e.getValue(), null,tmpLink, isModify, keyWhere,isTruncate);
                     if (bb == null)
                         return null;
                     else
@@ -490,6 +565,8 @@ public class JsonObjectToAttach {
     }
 
     public static void  main(String args[]){
+        String stat = "";
+        stat = replace("vehnum_routeid,times_routeid,time,vehnum","time1","times_id",",");
         String  jsonValue ="{\n" +
                 "\t\"results\":[\n" +
                 "        {\n" +

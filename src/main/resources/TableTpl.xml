@@ -67,6 +67,7 @@
 
     <!-- 车辆信息 -->
     <table name="BUS_VEHICLE">
+        <column id="id" ref="VehId"/>
         <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
         <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>

@@ -34,7 +34,7 @@ public class StaticJob implements BaseJob {
 
     public StaticJob() {
 //        this.jsonStr = josonStr;
-        this.table = table;
+//        this.table = table;
         try {
             if (config.size() == 0)
                 config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
@@ -42,8 +42,8 @@ public class StaticJob implements BaseJob {
                 //取得静态表
                 topicS = JsonObjectToAttach.getValidProperties("topics", null, null, true);
 
-            HttpServiceTest httpServiceTest = new HttpServiceTest();
-            this.jsonStr = httpServiceTest.getJsonData("http://localhost/httpService/sendGetData?RayData=CurrTotlCnt", "utf-8");
+//            HttpServiceTest httpServiceTest = new HttpServiceTest();
+//            this.jsonStr = httpServiceTest.getJsonData("http://localhost/httpService/sendGetData?RayData=CurrTotlCnt", "utf-8");
 
         } catch (IOException e) {
             System.out.println(e.toString());
@@ -55,8 +55,7 @@ public class StaticJob implements BaseJob {
             throws JobExecutionException {
 //        _log.error("New Job执行时间: " + new Date());
 
-        if (StringUtils.isEmpty(table) || StringUtils.isEmpty(jsonStr))
-            return;
+//
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
         HttpServiceTest httpServiceTest = new HttpServiceTest();
         try {

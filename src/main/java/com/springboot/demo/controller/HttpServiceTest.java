@@ -105,6 +105,7 @@ public class HttpServiceTest {
                     "  \"RouteName\": \"XXX\",\n" +
                     "  \"RouteCode\": \"X001\",\n" +
                     "  \"Sites\": {\n" +
+                     "   \"Milage\":100,\n"+
                     "    \"Name\": \"S1\",\n" +
                     "    \"Direct\": 0,\n" +
                     "    \"Num\": 1,\n" +
@@ -294,7 +295,13 @@ public class HttpServiceTest {
     }
 
 
-
+    /**
+     * 定时推送数据
+     * @param request
+     * @param response
+     * @param requestBody
+     * @return
+     */
     @RequestMapping(value = "getPostData",method=RequestMethod.POST)
     public Ret sendPostData(HttpServletRequest request, HttpServletResponse response, @RequestBody String requestBody) {
         Map m = new HashMap();

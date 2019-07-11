@@ -57,7 +57,7 @@ spring:
               useProperties: false
             threadPool:
               class: org.quartz.simpl.SimpleThreadPool
-              threadCount: 10
+              threadCount: 50
               threadPriority: 5
               threadsInheritContextClassLoaderOfInitializingThread: true
       job-store-type: jdbc
