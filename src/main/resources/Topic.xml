@@ -11,6 +11,8 @@
         <topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0303" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 车位预约信息 -->
         <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="true" textCode="0304" isDelete="true" isTruncate="false" isStatic="false"/>
+        <!-- 停车支付情况 -->
+        <topic name="PARK_PAY_INFO" table="PARK_PAY_INFO" valid="true" textCode="0305" isDelete="true" isTruncate="false" isStatic="false"/>
         <!-- 车辆信息 -->
         <!-- 车辆位置信息 -->
         <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG" valid="true" textCode="0201" isDelete="false" isTruncate="true" isStatic="false"/>
@@ -18,6 +20,7 @@
         <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="BUS_VEHIC_ARRV_DEPRT_MSG" valid="false" textCode="0202" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 令牌信息 -->
         <topic name="BUS_ACCESS_TOKEN" table="BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="false" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=token"/>
+<!--&amp;Token?&amp;appid=APPID&amp;secret=APPSECRET"/>-->
         <!-- 线路 -->
         <topic name="BUS_ROUTE" table="BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=route"/>
         <!-- 线路车辆 -->

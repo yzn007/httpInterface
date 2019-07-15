@@ -6,7 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.springboot.common.JsonObjectToAttach;
 import com.springboot.common.KafkaProducer;
 import com.springboot.common.Ret;
+import com.springboot.demo.entity.Token;
 import com.springboot.demo.services.PersonService;
+import com.springboot.demo.services.TokenService;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -16,6 +20,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,10 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -58,21 +61,50 @@ public class HttpServiceTest {
         return JSON.toJSONString(result);
     }
 
-    private JSONObject getBusTest(String param){
+
+
+    public Object getBusTest(String param){
         String jsonStr = "";
         Map <String,String> m = new HashMap();
         if(param.equals("routePlan")){ //公交测试数据-线路计划时间
-             jsonStr = "{\n" +
-                    "\"RouteId\":1,\n" +
-                    "\"RouteName\":\"XXX\",\n" +
-                    "\"RouteCode\":\"X001\",\n" +
-                    "\"Times\":[\n" +
-                    "{\"Time\":\"10:00:00\", \"PlateNum\":\"CNG-9876\", \"VehNum\":\"CNG-9876\"},\n" +
-                    "{\"Time\":\"10:05:00\", \"PlateNum\":\"CNG-9876\", \"VehNum\":\"CNG-9876\"}\n" +
-                    "]\n" +
-                    "}\n";
+             jsonStr = "[\n" +
+                     "  {\n" +
+                     "    \"RouteId\": 1,\n" +
+                     "    \"RouteName\": \"XXX\",\n" +
+                     "    \"RouteCode\": \"X001\",\n" +
+                     "    \"Times\": [\n" +
+                     "      {\n" +
+                     "        \"Time\": \"10:00:00\",\n" +
+                     "        \"PlateNum\": \"CNG-9876-1\",\n" +
+                     "        \"VehNum\": \"CNG-9876-1\"\n" +
+                     "      },\n" +
+                     "      {\n" +
+                     "        \"Time\": \"10:05:00\",\n" +
+                     "        \"PlateNum\": \"CNG-9876-2\",\n" +
+                     "        \"VehNum\": \"CNG-9876-2\"\n" +
+                     "      }\n" +
+                     "    ]\n" +
+                     "  },\n" +
+                     "  {\n" +
+                     "    \"RouteId\": 2,\n" +
+                     "    \"RouteName\": \"222\",\n" +
+                     "    \"RouteCode\": \"X002\",\n" +
+                     "    \"Times\": [\n" +
+                     "      {\n" +
+                     "        \"Time\": \"11:00:00\",\n" +
+                     "        \"PlateNum\": \"CNG-9877-3\",\n" +
+                     "        \"VehNum\": \"CNG-9877-6\"\n" +
+                     "      },\n" +
+                     "      {\n" +
+                     "        \"Time\": \"12:05:00\",\n" +
+                     "        \"PlateNum\": \"CNG-9877-4\",\n" +
+                     "        \"VehNum\": \"CNG-9877-5\"\n" +
+                     "      }\n" +
+                     "    ]\n" +
+                     "  }\n" +
+                     "]";
         }else if(param.equals("vehicle")){ //公交测试数据-车辆信息
-             jsonStr = "{\n" +
+             jsonStr = "[{\n" +
                     "\"VehId\":1,\n" +
                     "\"VehNum\":\"XXX\",\n" +
                     "\"PlateNum\":\"X001\",\n" +
@@ -86,22 +118,51 @@ public class HttpServiceTest {
                     "\"Code\":\"01\",\n" +
                     "\"Name\":\"Cargyi Gate\"\n" +
                     "}\n" +
-                    "}\n";
+                    "}]\n";
         }else if(param.equals("route")){ //公交测试数据-线路
-             jsonStr = "{\n" +
-                    "\"ID\":1,\n" +
-                    "\"Code\":\"01\",\n" +
-                    "\"Name\":\" Cargyi Gate\",\n" +
-                    "\"State\":0,\n" +
-                    "\"DepartTime\":\"05:00:00\",\n" +
-                    "\"ReturnTime\":\"22:00:00\",\n" +
-                    "\"TicketPrice\": 0.0,\n" +
-                    "\"StartSite\": {\"Name\":\"XX\", \"Latitude\":29, \"Longitude\":110},\n" +
-                    "\"EndSite\": {\"Name\":\"YY\", \"Latitude\":29, \"Longitude\":110}\n" +
-                    "}";
+             jsonStr = "[\n" +
+                     "  {\n" +
+                     "    \"ID\": 1,\n" +
+                     "    \"Code\": \"01\",\n" +
+                     "    \"Name\": \" Cargyi Gate\",\n" +
+                     "    \"State\": 0,\n" +
+                     "    \"DepartTime\": \"05:00:00\",\n" +
+                     "    \"ReturnTime\": \"22:00:00\",\n" +
+                     "    \"TicketPrice\": 0.0,\n" +
+                     "    \"StartSite\": {\n" +
+                     "      \"Name\": \"XX\",\n" +
+                     "      \"Latitude\": 29,\n" +
+                     "      \"Longitude\": 110\n" +
+                     "    },\n" +
+                     "    \"EndSite\": {\n" +
+                     "      \"Name\": \"YY\",\n" +
+                     "      \"Latitude\": 29,\n" +
+                     "      \"Longitude\": 110\n" +
+                     "    }\n" +
+                     "  },\n" +
+                     "  {\n" +
+                     "    \"ID\": 2,\n" +
+                     "    \"Code\": \"01\",\n" +
+                     "    \"Name\": \" fffCargyi Gate\",\n" +
+                     "    \"State\": 1,\n" +
+                     "    \"DepartTime\": \"06:00:00\",\n" +
+                     "    \"ReturnTime\": \"23:00:00\",\n" +
+                     "    \"TicketPrice\": 0.0,\n" +
+                     "    \"StartSite\": {\n" +
+                     "      \"Name\": \"XX\",\n" +
+                     "      \"Latitude\": 30,\n" +
+                     "      \"Longitude\": 20\n" +
+                     "    },\n" +
+                     "    \"EndSite\": {\n" +
+                     "      \"Name\": \"YY\",\n" +
+                     "      \"Latitude\": 219,\n" +
+                     "      \"Longitude\": 12\n" +
+                     "    }\n" +
+                     "  }\n" +
+                     "]";
         }else if(param.equals("station")){ //公交测试数据-站点
-             jsonStr = "{\n" +
-                    "  \"RouteId\": 1,\n" +
+             jsonStr = "[{\n" +
+                    "  \"RouteId\": 2,\n" +
                     "  \"RouteName\": \"XXX\",\n" +
                     "  \"RouteCode\": \"X001\",\n" +
                     "  \"Sites\": {\n" +
@@ -114,18 +175,43 @@ public class HttpServiceTest {
                     "    \"Attr\": 0,\n" +
                     "    \"Track\": \"96,16;96,15.8;95.8,17.2\"\n" +
                     "  }\n" +
-                    "}";
+                    "}]";
         }else if(param.equals("routeVehicle")){ //公交测试数据-线路车辆
-             jsonStr = "{\n" +
-                    "\"Id\":1,\n" +
-                    "\"PlateNum\":\" CNG-9876\",\n" +
-                    "\"VehNum\":\"CNG-9876\",\n" +
-                    "\"Position\":{\"Lat\":29,\"Lng\":\"111.34\" ,\"Direct\":1 ,\"Site\":3}\n" +
-                    "}\n";
+             jsonStr = "[\n" +
+                     "  {\n" +
+                     "    \"Id\": 1,\n" +
+                     "    \"PlateNum\": \" CNG-9876\",\n" +
+                     "    \"VehNum\": \"CNG-9876\",\n" +
+                     "    \"Position\": {\n" +
+                     "      \"Lat\": 29,\n" +
+                     "      \"Lng\": \"111.34\",\n" +
+                     "      \"Direct\": 1,\n" +
+                     "      \"Site\": 3\n" +
+                     "    }\n" +
+                     "  },\n" +
+                     "  {\n" +
+                     "    \"Id\": 2,\n" +
+                     "    \"PlateNum\": \" CNG-9877\",\n" +
+                     "    \"VehNum\": \"CNG-9877\",\n" +
+                     "    \"Position\": {\n" +
+                     "      \"Lat\": 30,\n" +
+                     "      \"Lng\": \"111.34\",\n" +
+                     "      \"Direct\": 1,\n" +
+                     "      \"Site\": 4\n" +
+                     "    }\n" +
+                     "  }\n" +
+                     "]";
         }else{//公交测试数据-令牌
             jsonStr = "{\"access_token\":\"ACCESS_TOKEN\",\"expires_in\":7200}";
         }
-        return JSONObject.parseObject(jsonStr);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject =JSONObject.parseObject(jsonStr);
+        }catch (Exception e){
+            JSONArray jsonArray = JSONArray.parseArray(jsonStr);
+            return jsonArray;
+        }
+        return jsonObject;
     }
 
     private List getResultTable(String param){
@@ -221,11 +307,12 @@ public class HttpServiceTest {
      *
      * @param url
      * @param encoding
+     * @param routeId
      * @return
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public String getJsonData(String url, String encoding) throws ClientProtocolException, IOException {
+    public String getJsonData(String url, String encoding,String routeId) throws ClientProtocolException, IOException {
         String result = "";
 
         // 创建httpclient对象
@@ -234,21 +321,26 @@ public class HttpServiceTest {
         // 创建get方式请求对象
 //        HttpGet httpGet = new HttpGet(url);
         HttpPost post = new HttpPost(url);
-        Map<String,String> map = new HashMap();
-        map.put("routid","1");
 
-        //设置参数发送
-        List<BasicNameValuePair> pairs = new ArrayList<>();
-        for(Map.Entry<String,String> entry : map.entrySet())	         {
-            pairs.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+        if(!StringUtils.isEmpty(routeId)){
+
+            Map<String,String> map = new HashMap();
+            map.put("routid",routeId);
+
+            //设置参数发送
+            List<BasicNameValuePair> pairs = new ArrayList<>();
+            for(Map.Entry<String,String> entry : map.entrySet())	         {
+                pairs.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+            }
+            post.setEntity(new UrlEncodedFormEntity(pairs,"UTF-8"));
         }
+
 
 //        httpGet.addHeader("Content-type", "application/json");
         // 通过请求对象获取响应对象
 //        CloseableHttpResponse response = httpClient.execute(httpGet);
         CloseableHttpResponse response = null;
         try{
-            post.setEntity(new UrlEncodedFormEntity(pairs,"UTF-8"));
             response = httpClient.execute(post);
             // 获取结果实体
             // 判断网络连接状态码是否正常(0--200都数正常)
@@ -271,6 +363,12 @@ public class HttpServiceTest {
         return result;
     }
 
+    /**
+     * raydatas数据接口，定时推送
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping(value = "sendGetData")
     public Ret sendGetData(HttpServletRequest request, HttpServletResponse response) {
         String result = "调用成功：数据是 " + "name:" + request.getParameter("name") + " city:" + request.getParameter("city");
@@ -287,11 +385,23 @@ public class HttpServiceTest {
         return Ret.ok(m);
     }
 
+    /**
+     * 公交数据取得接口-定时取得
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping(value = "getBusTestData")
-    public JSONObject getBusTestData(HttpServletRequest request, HttpServletResponse response) {
-        JSONObject object = getBusTest(request.getParameter("bus"));
-
-        return object;
+    public Object getBusTestData(HttpServletRequest request, HttpServletResponse response) {
+        Map map = new HashedMap();
+        try{
+            //access token
+           JSONObject jsonObject = (JSONObject) getBusTest(request.getParameter("bus"));
+           return jsonObject;
+        }catch (Exception e){
+            map.put("results",getBusTest(request.getParameter("bus")));
+        }
+        return map;
     }
 
 

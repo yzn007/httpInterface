@@ -38,7 +38,8 @@ public class SaveDataStatic extends Thread {
 
         //System.out.println(records);
         List<String[]> reds = new ArrayList<>();
-
+        String []insertSql = null;
+        String []truncateSql = null;
         try {
             String[] array = JsonObjectToAttach.getJsonList(jsonString, null);
             if (array != null) {
@@ -48,8 +49,9 @@ public class SaveDataStatic extends Thread {
                     String[] sql = JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "", "",
                             !(isDelInsert.indexOf(";") > 0 ? isDelInsert.split(";")[m] : isDelInsert).equalsIgnoreCase("false"), new HashMap(),
                             !(isTrancate.indexOf(";") > 0 ? isTrancate.split(";")[m] : isTrancate).equalsIgnoreCase("false"));
-                    if (!reds.contains(sql))
-                        reds.add(sql);
+
+                        if (!reds.contains(sql))
+                            reds.add(sql);
                 }
             }
         } catch (Exception e) {
@@ -59,9 +61,10 @@ public class SaveDataStatic extends Thread {
         try {
             Seq<String[]> tmpSeq = JavaConverters.asScalaIteratorConverter(reds.iterator()).asScala().toSeq();
             if (tmpSeq.size() > 0) {
+                Thread.sleep(500);
                 SaveCosumerData.main(tmpSeq.toList());
             }
-//                Thread.sleep(500);
+            Thread.sleep(500);
         } catch (Exception e) {
             System.out.println(e.toString());
         }

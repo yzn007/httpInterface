@@ -17,6 +17,10 @@
         <column id="Park_Lot_Regn_ID" ref="Park_Lot_Regn_ID">Park_Lot_Regn_ID = Park_Lot_Regn_ID</column>
     </table>
 
+    <table name="PARK_PAY_INFO">
+        <column id="PAY_ID" ref="PAY_ID">PAY_ID = PAY_ID</column>
+    </table>
+
     <!-- 车辆位置信息 -->
     <table name="BUS_VEHIC_LCTN_MSG">
         <column id="OwnRoute_ID" ref="OwnRoute.Id"></column>

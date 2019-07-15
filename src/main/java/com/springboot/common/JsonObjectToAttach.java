@@ -561,6 +561,8 @@ public class JsonObjectToAttach {
         } catch (Exception e) {
             System.out.println(e.toString());
         }
+        //清空条件，防止条件不一样，一直 用同一个条件的情况出现
+        keyWhere.clear();
         return ret;
     }
 
