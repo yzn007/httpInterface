@@ -65,7 +65,7 @@ public class KafkaSaveData extends Thread {
             consumer = createConsumer();
         //主题数map
         consumer.subscribe(Arrays.asList(topic));
-        System.out.println("消费者对象1：" + consumer);
+//        System.out.println("消费者对象1：" + consumer);
 
 //        while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);

@@ -74,7 +74,7 @@ public class JsonObjectToAttach {
             File file = new File(fileName);
             SAXReader reader = new SAXReader();
             Document document = reader.read(file);
-            System.out.println("Root element :" + document.getRootElement().getName());
+//            System.out.println("Root element :" + document.getRootElement().getName());
             return document;
         } catch (DocumentException e) {
             System.out.print(e.toString());
@@ -291,7 +291,7 @@ public class JsonObjectToAttach {
                 }
             }
 
-            System.out.println(tm);
+//            System.out.println(tm);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -511,10 +511,10 @@ public class JsonObjectToAttach {
                         att.add(truncateStr);
 
                 }
-//                else if (isModify) {
-//                    String delSt = "delete from " + table + " where 1=1 ";
-//                    if (!StringUtils.isEmpty(where))
-//                        delSt += " and " + where;
+                else if (isModify) {
+                    String delSt = "delete from " + table + " where 1=1 ";
+                    if (!StringUtils.isEmpty(where))
+                        delSt += " and " + where;
 
 //                    for(int k=1;k<rets.length;k++){
 //                        String [] vals = rets[k].split("=");
@@ -528,9 +528,9 @@ public class JsonObjectToAttach {
 //                        delSt += " and " + vals[0] + " = '" +  valByKeys + "'";
 //
 //                    }
-//                    if(!att.contains(delSt))
-//                        att.add(delSt);
-//                }
+                    if(!att.contains(delSt))
+                        att.add(delSt);
+                }
                 //取得json value
                 String values = getColumsOrValues(JSONObject.parseObject(json), false,keyWhere,noContainCols,linkId,keyMap);
                 String insertSt = "insert into " + table + " (" + rets[0] + ") values(" + getJoinString(values) + ")";
@@ -621,7 +621,7 @@ public class JsonObjectToAttach {
         } catch (IOException e) {
             System.out.println(e.toString());
         }
-        System.out.println(config);
+//        System.out.println(config);
 //        new KafkaSaveData("bingfu","web_data_profil").start();
 
         //取得有效主题

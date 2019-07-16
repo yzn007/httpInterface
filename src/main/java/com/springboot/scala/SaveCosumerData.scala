@@ -35,7 +35,7 @@ object SaveCosumerData {
       //      stmt.addBatch("truncate log")
       word.foreach(w => {
 //        stmt.addBatch("insert into log(id, name) values('" + w + "','" + w.replaceAll("'", "''") + "')")
-        stmt.addBatch(w);
+        stmt.addBatch(w)
       })
     })
     stmt.executeBatch()

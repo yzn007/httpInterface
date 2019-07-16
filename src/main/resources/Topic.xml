@@ -26,9 +26,9 @@
         <!-- 线路车辆 -->
         <topic name="BUS_ROUTE_VEHICLE" table="BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=routeVehicle"/>
         <!-- 站点 -->
-        <topic name="BUS_STATION" table="BUS_STATION" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=station"/>
+        <topic name="BUS_STATION" table="BUS_STATION" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=station"/>
         <!-- 车辆 -->
-        <topic name="BUS_VEHICLE" table="BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=vehicle"/>
+        <topic name="BUS_VEHICLE" table="BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=vehicle"/>
         <!-- 线路计划时间 -->
         <topic name="BUS_ROUTE_DISPT" table="BUS_ROUTE_DISPT" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=routePlan"/>
         <!-- 闸机 -->

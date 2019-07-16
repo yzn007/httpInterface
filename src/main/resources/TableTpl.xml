@@ -21,6 +21,10 @@
         <column id="PAY_ID" ref="PAY_ID">PAY_ID = PAY_ID</column>
     </table>
 
+    <table name="PARK_PARK_SPC_RESV_INFO">
+        <column id="Resv_ID" ref="Resv_ID">Resv_ID = Resv_ID</column>
+    </table>
+
     <!-- 车辆位置信息 -->
     <table name="BUS_VEHIC_LCTN_MSG">
         <column id="OwnRoute_ID" ref="OwnRoute.Id"></column>
@@ -56,7 +60,6 @@
         <column id="Sites_Lng" ref="Sites.Lng"></column>
         <column id="Sites_Milage" ref="Sites.Milage"></column>
         <column id="Sites_Attr" ref="Sites.Attr"></column>
-        <column id="Sites_Track" ref="Sites.Track"></column>
     </table>
 
     <!-- 线路 -->

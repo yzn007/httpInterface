@@ -172,9 +172,9 @@ public class HttpServiceTest {
                     "    \"Num\": 1,\n" +
                     "    \"Lat\": 16,\n" +
                     "    \"Lng\": 96,\n" +
-                    "    \"Attr\": 0,\n" +
-                    "    \"Track\": \"96,16;96,15.8;95.8,17.2\"\n" +
-                    "  }\n" +
+                    "    \"Attr\": 0\n" +
+                    "  },\n" +
+                     "    \"Track\": \"96,16;96,15.8;95.8,17.2\"\n" +
                     "}]";
         }else if(param.equals("routeVehicle")){ //公交测试数据-线路车辆
              jsonStr = "[\n" +
