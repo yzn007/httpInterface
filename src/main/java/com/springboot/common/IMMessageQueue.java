@@ -1,6 +1,6 @@
 package com.springboot.common;
 
-import com.springboot.demo.entity.CommonMessage;
+import com.springboot.httpInterface.entity.CommonMessage;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.ArrayList;

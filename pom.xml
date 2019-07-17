@@ -362,7 +362,7 @@
 				<configuration>
 					<fork>true</fork>
 					<!-- 工程主入口-->
-					<mainClass>com.springboot.demo.DemoApplication</mainClass>
+					<mainClass>com.springboot.httpInterface.DemoApplication</mainClass>
                     <classifier>exec</classifier>
 				</configuration>
 

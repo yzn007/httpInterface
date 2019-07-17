@@ -1,6 +1,6 @@
 package com.springboot.common;
 
-import com.springboot.demo.job.MyJob;
+import com.springboot.httpInterface.job.MyJob;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
