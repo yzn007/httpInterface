@@ -26,7 +26,16 @@
 
 	<dependencies>
 
-        <dependency>
+		<!-- CXF webservice -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<!-- CXF webservice -->
+
+
+		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
             <version>2.1.0.RELEASE</version>

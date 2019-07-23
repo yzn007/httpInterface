@@ -438,6 +438,69 @@ public class JsonObjectToAttach {
     }
 
     /**
+     * 取得应用库sql语句
+     * @param topic
+     * @param tmpFile
+     * @return
+     */
+    public static String[] getMetaSqls(String topic,String tmpFile){
+        List<String> att = new ArrayList<>();
+
+        String[] ret = null;
+        String fileName = "PreRelations.xml";
+        if (!StringUtils.isEmpty(tmpFile))
+            fileName = tmpFile;
+
+        try{
+            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
+            Document document = parseDom4j(path);
+            Element root = document.getRootElement();
+            for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
+                Element tblEle = (Element) iterator.next();
+                String isValid = "";
+                try{
+                    isValid = tblEle.attributeValue("valid");
+                }catch (Exception ee){
+
+                }
+                if(!isValid.equalsIgnoreCase("true"))
+                    continue;
+                //取得主题
+                String topicName = tblEle.attribute(1).getValue();
+                String []tops = topicName.split(";");
+                boolean isExists = false;
+                for(String t:tops) {
+                    if(t.equalsIgnoreCase(topic)){
+                        isExists = true;
+                        break;
+                    }
+                }
+                if(isExists){
+                    String isSplit = tblEle.attribute(2).getValue();
+                    if(isSplit.equalsIgnoreCase("true")){//需求分割sql
+                        String []sqls = tblEle.getStringValue().split(";");
+                        for(String s:sqls){
+                            att.add(s);
+                        }
+                    }else{
+                        att.add(tblEle.getStringValue());
+                    }
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
+        if(att.size()>0) {
+            ret = new String[att.size()];
+            int i=0;
+            for(String s :att){
+                ret[i++] = s;
+            }
+        }
+        return  ret;
+    }
+
+    /**
      * 生成插入或删除语句
      *
      * @param jsons

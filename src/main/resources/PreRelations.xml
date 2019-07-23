@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+
+    <!-- 停车场信息-->
+    <!-- 目标表名 主题 是否拆分sql 是否有效-->
+     <!-- 执行sql -->
+
+    <select id="T80_TA_PARK_LOT_INFO" target="PARK_PARKING_LOT" split="false"  valid="false">
+        insert into cqyl_ta.T80_TA_PARK_LOT_INFO(PARK_LOT_ID,
+        PARK_LOT_NM,
+        PARK_LOT_CHARC,
+        PARK_LOT_ADDR_INFO,
+        PARK_LOT_TYP,
+        PARK_SPC_TOTL_QTY,
+        REMN_PARK_SPC_QTY,
+        PARK_LOT_CHRG_TYP,
+        CHRG_STD,
+        LGTD,
+        LTTD,
+        BIZ_TM,
+        USE_STAT
+        )
+        select pp.Park_Lot_ID,
+        max(pl.PARK_LOT_NM),
+        '1',
+        max(pl.PARK_LOT_ADDR),
+        max(pl.PARK_LOT_CHRG_TYP),
+        sum(pp.Park_Spc_Totl_Qty),
+        sum(pp.Park_Spc_Totl_Qty)-sum(pp.Ocup_Park_Spc_Qty),
+        max(pl.PARK_LOT_CHRG_TYP),
+        max(pl.CHRG_STD),
+        max(pl.LGTD),
+        max(pl.LTTD),
+        max(pl.BIZ_TM),
+        max(pl.USE_STAT)
+        from PARK_PARKING_LOT pp right join PARK_LOT_STATIC_INFO pl on pp.Park_Lot_ID = pl.PARK_LOT_ID and
+        pp.Park_Lot_Regn_ID = pl.PARK_LOT_REGN_ID group by pl.PARK_LOT_ID
+    </select>
+
+    <!-- 停车位使用数量 -->
+    <select id="T80_RD_LARG_SCRN_INDX" target="PARK_PARKING_LOT" split="true" valid="false">
+        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX;
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX (RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL)
+        select '102',
+        '停车位数量',
+        '102003',
+        '停车位当前使用数量',
+        PARK_LOT_ID,
+        PARK_LOT_NM,
+        PARK_SPC_TOTL_QTY-REMN_PARK_SPC_QTY
+        from cqyl_ta.T80_TA_PARK_LOT_INFO
+
+    </select>
+
+    <!-- 线路 -->
+    <select id="T80_RD_ROUTE" target="BUS_ROUTE" split="true" valid="true">
+        delete from cqyl_rd.T80_RD_ROUTE;
+        insert into cqyl_rd.T80_RD_ROUTE(Rout_ID,
+        Rout_Code,
+        Rout_Nm,
+        Begn_Stat,
+        Term_Stat)
+        select id,
+        Code,
+        Name,
+        StartSite_Name,
+        EndSite_Name
+        from BUS_ROUTE
+
+    </select>
+    <select id="T80_TA_PUB_TRAF_INFO" target="BUS_ROUTE" split="true" valid="false">
+        delete from cqyl_ta.T80_TA_PUB_TRAF_INFO;
+        insert into cqyl_ta.T80_TA_PUB_TRAF_INFO(PUB_TRAF_ID,
+        PUB_TRAF_NM,
+        PUB_TRAF_TYP,
+        PUB_TRAF_STAT,
+        OPR_START_TM,
+        OPR_END_TM,
+        CHRG_STD)
+        select id,
+        Name,
+        '0',
+        state,
+        DepartTime,
+        ReturnTime,
+        TicketPrice
+        from BUS_ROUTE
+
+    </select>
+    <!-- 站点 -->
+    <select id="T80_TA_PUB_TRAF_STAT_INFO" target="BUS_STATION" split="false" valid="false">
+        insert into cqyl_ta.T80_TA_PUB_TRAF_STAT_INFO(PUB_TRAF_ID,
+        STAT_NM,
+        ROUT_DRCT,
+        STAT_ORDR_NUM,
+        LGTD,
+        LTTD,
+        STAT_STAT,
+        STAT_ATTR,
+        TRACK)
+        select RouteId,
+        Sites_Name,
+        Sites_Direct,
+        Sites_Num,
+        Sites_Lat,
+        Sites_Lng,
+        '0',
+        Sites_Attr,
+        Track
+        from BUS_STATION
+
+    </select>
+
+    <select id="T80_RD_LARG_SCRN_INDX" target="BUS_STATION;BUS_ROUTE" split="false" valid="true">
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL)
+        select '106',
+        '公交数据',
+        '106001',
+        '临时站点数量',
+        null,
+        null,
+        count(bs.RouteId)
+        from BUS_STATION bs join BUS_ROUTE br on bs.RouteId = br.ID and br.State = '1'
+        group by bs.RouteId
+
+    </select>
+
+</root>
+
+
+
+
+

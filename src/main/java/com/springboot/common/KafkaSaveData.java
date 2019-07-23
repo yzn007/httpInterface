@@ -85,6 +85,10 @@ public class KafkaSaveData extends Thread {
                                     !(isTrancate.indexOf(";")>0?isTrancate.split(";")[m]:isTrancate).equalsIgnoreCase("false"));
                            if(!reds.contains(sql))
                                 reds.add(sql);
+
+                           sql = JsonObjectToAttach.getMetaSqls(topic,"");
+                           if(!reds.contains(sql))
+                               reds.add(sql);
                         }
 
                     }
@@ -97,6 +101,8 @@ public class KafkaSaveData extends Thread {
                 if (tmpSeq.size() > 0) {
                     SaveCosumerData.main(tmpSeq.toList());
                 }
+
+
 //                Thread.sleep(500);
             } catch (Exception e) {
                 System.out.println(e.toString());

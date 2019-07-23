@@ -52,6 +52,10 @@ public class SaveDataStatic extends Thread {
 
                         if (!reds.contains(sql))
                             reds.add(sql);
+
+                    sql = JsonObjectToAttach.getMetaSqls(topic,null);
+                    if(!reds.contains(sql))
+                        reds.add(sql);
                 }
             }
         } catch (Exception e) {
