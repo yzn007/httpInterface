@@ -50,6 +50,7 @@ public class KafkaSaveData extends Thread {
         //当前消费者的组名称
         properties.put("group.id", "group1");
         properties.put("zookeeper.session.timeout.ms", "10000");
+        properties.put("enable.auto.commit",config.get("enable.auto.commit"));
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.get("metadata.broker.list"));
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -71,6 +72,7 @@ public class KafkaSaveData extends Thread {
             ConsumerRecords<String, String> records = consumer.poll(100);
             //System.out.println(records);
             List<String[]> reds = new ArrayList<>();
+            List<String[]> sqlListDyc = new ArrayList<>();
             for (ConsumerRecord<String, String> record : records) {
                 System.out.println("接收到: " + record.offset() + record.key() + record.value());
                 String[] nameValue = {String.valueOf(record.offset()), record.value()};
@@ -83,25 +85,33 @@ public class KafkaSaveData extends Thread {
                             String[] sql =JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "","",
                                     !(isDelInsert.indexOf(";")>0?isDelInsert.split(";")[m]:isDelInsert).equalsIgnoreCase("false"),new HashMap(),
                                     !(isTrancate.indexOf(";")>0?isTrancate.split(";")[m]:isTrancate).equalsIgnoreCase("false"));
-                           if(!reds.contains(sql))
+                           if(!reds.contains(sql) && null != sql)
                                 reds.add(sql);
 
-                           sql = JsonObjectToAttach.getMetaSqls(topic,"");
-                           if(!reds.contains(sql))
-                               reds.add(sql);
+                            String [] sqlDyc = JsonObjectToAttach.getMetaSqls(topic,"",array);
+                           if( null != sqlDyc && !sqlListDyc.contains(sqlDyc))
+                               sqlListDyc.add(sqlDyc);
                         }
 
                     }
                 } catch (Exception e) {
                     System.out.println(e.toString());
                 }
+                finally {
+                    consumer.commitSync();
+                }
             }
+
             try {
                 Seq<String[]> tmpSeq = JavaConverters.asScalaIteratorConverter(reds.iterator()).asScala().toSeq();
                 if (tmpSeq.size() > 0) {
                     SaveCosumerData.main(tmpSeq.toList());
                 }
 
+                tmpSeq = JavaConverters.asScalaIteratorConverter(sqlListDyc.iterator()).asScala().toSeq();
+                if (tmpSeq.size() > 0) {
+                    SaveCosumerData.main(tmpSeq.toList());
+                }
 
 //                Thread.sleep(500);
             } catch (Exception e) {

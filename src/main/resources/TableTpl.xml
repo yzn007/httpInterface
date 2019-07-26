@@ -27,19 +27,19 @@
 
     <!-- 车辆位置信息 -->
     <table name="BUS_VEHIC_LCTN_MSG">
-        <column id="OwnRoute_ID" ref="OwnRoute.Id"></column>
+        <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
         <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
-        <column id="RunRoute_ID" ref="RunRoute.Id"></column>
+        <column id="RunRoute_ID" ref="RunRoute.ID"></column>
         <column id="RunRoute_Name" ref="RunRoute.Name"></column>
         <column id="RunRoute_Code" ref="RunRoute.Code"></column>
     </table>
     <!-- 车辆进出站信息 -->
     <table name="BUS_VEHIC_ARRV_DEPRT_MSG">
-        <column id="OwnRoute_ID" ref="OwnRoute.Id"></column>
+        <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
         <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
-        <column id="RunRoute_ID" ref="RunRoute.Id"></column>
+        <column id="RunRoute_ID" ref="RunRoute.ID"></column>
         <column id="RunRoute_Name" ref="RunRoute.Name"></column>
         <column id="RunRoute_Code" ref="RunRoute.Code"></column>
     </table>
@@ -53,13 +53,20 @@
 
     <!-- 站点 -->
     <table name="BUS_STATION">
-        <column id="Sites_Name" ref="Sites.Name"></column>
-        <column id="Sites_Direct" ref="Sites.Direct"></column>
-        <column id="Sites_Num" ref="Sites.Num"></column>
-        <column id="Sites_Lat" ref="Sites.Lat"></column>
-        <column id="Sites_Lng" ref="Sites.Lng"></column>
-        <column id="Sites_Milage" ref="Sites.Milage"></column>
-        <column id="Sites_Attr" ref="Sites.Attr"></column>
+        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
+        <column id="Sites" ref="[list]BUS_ROUTE_STATION" linkId="RouteId"/>
+    </table>
+
+    <table name="BUS_ROUTE_STATION">
+        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
+        <column id="Sites_Id" ref="Id"></column>
+        <column id="Sites_Name" ref="Name"></column>
+        <column id="Sites_Direct" ref="Direct"></column>
+        <column id="Sites_Num" ref="Num"></column>
+        <column id="Sites_Lat" ref="Lat"></column>
+        <column id="Sites_Lng" ref="Lng"></column>
+        <column id="Sites_Milage" ref="Milage"></column>
+        <column id="Sites_Attr" ref="Attr"></column>
     </table>
 
     <!-- 线路 -->

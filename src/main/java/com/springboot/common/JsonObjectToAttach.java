@@ -5,6 +5,8 @@ import com.alibaba.druid.sql.visitor.functions.Length;
 import com.alibaba.druid.sql.visitor.functions.Substring;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.springboot.scala.SaveCosumerData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.server.api.protocolrecords.UpdateNodeResourceRequest;
@@ -26,6 +28,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+
+import static java.util.regex.Matcher.quoteReplacement;
 
 /**
  * Created by yzn00 on 2019/6/27.
@@ -54,12 +59,22 @@ public class JsonObjectToAttach {
             return a;
         } catch (Exception e) {
             JSONObject jsonObject=null;
+            Object obj = null;
             try{
                 jsonObject = JSONObject.parseObject(jsonString);
+                obj = jsonObject.get(dataJsonListNm);
+                if (obj==null)
+                    obj = jsonObject;
             }catch (Exception ex){
-                return null;
+                listS = JSONArray.parseArray(jsonString, String.class);
+                String[] a = new String[listS.size()];
+                int i = 0;
+                for (String r : listS) {
+                    a[i++] = r;
+                }
+                return a;
             }
-            return new String[]{jsonObject.toJSONString()};
+            return new String[]{obj.toString()};
         }
     }
 
@@ -118,6 +133,15 @@ public class JsonObjectToAttach {
         }else {
 
             String[] ars = strSplit.split(",");
+            if(ars.length==1)
+                return "'" + ars[0] + "'";
+            else if(strSplit.length() == strSplit.lastIndexOf(",")+1){//最后一个为空如"2,3,"
+                String []argT = new String [ars.length+1];
+                for(int j =0;j<argT.length;j++){
+                    argT[j] = j<ars.length?ars[j]:"";
+                }
+                ars = argT;
+            }
             StringBuffer statement = new StringBuffer();
             for (int i = 0; i < ars.length; i++) {
                 if (i == 0)
@@ -386,7 +410,14 @@ public class JsonObjectToAttach {
                     String values = "";
                     JSONObject josnM = JSONObject.parseObject(jsonObject.get(m.getKey()).toString());
                     for (Map.Entry<String, String> v : val.entrySet()) {
-                        values += josnM.get(v.getKey()) + ",";
+                        String value = "";
+                        try{
+                            value = josnM.get(v.getKey()).toString();
+                        }catch (Exception ee){
+                            System.out.println("error【"+v.getKey()+"】:" +josnM);
+                            return "";
+                        }
+                        values += value + ",";
                     }
                     String subStr = jsonObject.get(m.getKey()).toString();
                     String head = a[0].substring(0,a[0].indexOf(subStr)+subStr.length());
@@ -441,9 +472,10 @@ public class JsonObjectToAttach {
      * 取得应用库sql语句
      * @param topic
      * @param tmpFile
+     * @param jsonArray
      * @return
      */
-    public static String[] getMetaSqls(String topic,String tmpFile){
+    public static String[] getMetaSqls(String topic,String tmpFile,String[] jsonArray){
         List<String> att = new ArrayList<>();
 
         String[] ret = null;
@@ -476,14 +508,48 @@ public class JsonObjectToAttach {
                     }
                 }
                 if(isExists){
-                    String isSplit = tblEle.attribute(2).getValue();
-                    if(isSplit.equalsIgnoreCase("true")){//需求分割sql
-                        String []sqls = tblEle.getStringValue().split(";");
-                        for(String s:sqls){
-                            att.add(s);
+                    for(int j=0;j<jsonArray.length;j++) {
+                        JSONObject jsonObject = null;
+                        try{
+                            jsonObject = JSONObject.parseObject(jsonArray[j]);
+                        }catch (Exception ex){
+                            System.out.println(ex.toString());
                         }
-                    }else{
-                        att.add(tblEle.getStringValue());
+                        String isSplit = tblEle.attribute(2).getValue();
+                        String sqlStr = quoteReplacement(tblEle.getStringValue().replaceAll("\r","").replaceAll("\n",""));
+
+                        String subString = "";
+                        int i = 0;
+                        while(sqlStr.indexOf(quoteReplacement("{"))>-1) {
+                            subString = sqlStr.substring(sqlStr.indexOf(quoteReplacement("{")) + 1, sqlStr.indexOf(quoteReplacement("}")));
+                            String jsonKey = subString;
+                            for(Map.Entry<String,Object> m:jsonObject.entrySet()){
+                                if(m.getKey().equalsIgnoreCase(jsonKey)) {
+                                    jsonKey = m.getKey();
+                                    break;
+                                }
+                            }
+                            int jj = 0;
+                            if(null!=jsonObject.get(jsonKey)){
+                                while(sqlStr.indexOf(quoteReplacement("{"+subString+"}"))>-1) {
+                                    sqlStr = sqlStr.replace(quoteReplacement("{" + subString + "}"), getJoinString(jsonObject.get(jsonKey).toString()));
+                                    if(jj++>sqlStr.length())//防止替换失败死循环
+                                        break;
+                                }
+                            }
+                            i++;
+                            if(i>sqlStr.length())//防止替换失败死循环
+                                break;
+                        }
+
+                        if (isSplit.equalsIgnoreCase("true")) {//需求分割sql
+                            String[] sqls = sqlStr.split(";");
+                            for (String s : sqls) {
+                                att.add(s);
+                            }
+                        } else {
+                            att.add(sqlStr);
+                        }
                     }
                 }
             }
@@ -574,28 +640,18 @@ public class JsonObjectToAttach {
                         att.add(truncateStr);
 
                 }
-                else if (isModify) {
+                else if (isModify && rets.length == 1) {
                     String delSt = "delete from " + table + " where 1=1 ";
                     if (!StringUtils.isEmpty(where))
                         delSt += " and " + where;
 
-//                    for(int k=1;k<rets.length;k++){
-//                        String [] vals = rets[k].split("=");
-//                        String valByKeys = "";
-//                        if(keyWhere.get(vals[1].substring(0,vals[1].indexOf("{")).trim())==null){
-//                            valByKeys = getValuesByKeys(JSONObject.parseObject(json),vals[1].substring(0,vals[1].indexOf("{")),"");
-//                            keyWhere.put(vals[1].substring(vals[1].indexOf("{")+1,vals[1].indexOf("}")),valByKeys);
-//                        }else{
-//                            valByKeys = keyWhere.get(vals[1].substring(0,vals[1].indexOf("{")).trim()).toString();
-//                        }
-//                        delSt += " and " + vals[0] + " = '" +  valByKeys + "'";
-//
-//                    }
                     if(!att.contains(delSt))
                         att.add(delSt);
                 }
                 //取得json value
                 String values = getColumsOrValues(JSONObject.parseObject(json), false,keyWhere,noContainCols,linkId,keyMap);
+                if(StringUtils.isEmpty(values))
+                    continue;
                 String insertSt = "insert into " + table + " (" + rets[0] + ") values(" + getJoinString(values) + ")";
                 if(!att.contains(insertSt))
                     att.add(insertSt);
@@ -618,7 +674,7 @@ public class JsonObjectToAttach {
                 ret = new String[att.size()];
                 int i = 0;
                 for (String t : att) {
-                    ret[i++] = t;
+                    ret[i++] = t.replaceAll("''","null");
                 }
             }
         } catch (Exception e) {

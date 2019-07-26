@@ -14,6 +14,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -317,18 +318,20 @@ public class HttpServiceTest {
         // 创建get方式请求对象
 //        HttpGet httpGet = new HttpGet(url);
         HttpPost post = new HttpPost(url);
-
+        post.addHeader("Content-Type", "application/json");
         if(!StringUtils.isEmpty(routeId)){
 
             Map<String,String> map = new HashMap();
-            map.put("routid",routeId);
+            map.put("RouteId",routeId);
+            map.put("RouteCode","123");
 
             //设置参数发送
-            List<BasicNameValuePair> pairs = new ArrayList<>();
-            for(Map.Entry<String,String> entry : map.entrySet())	         {
-                pairs.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
-            }
-            post.setEntity(new UrlEncodedFormEntity(pairs,"UTF-8"));
+//            List<BasicNameValuePair> pairs = new ArrayList<>();
+//            for(Map.Entry<String,String> entry : map.entrySet())	         {
+//                pairs.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+//            }
+//            post.setEntity(new UrlEncodedFormEntity(pairs,"UTF-8"));
+            post.setEntity(new StringEntity(JSONObject.toJSONString(map)));
         }
 
 
@@ -356,7 +359,7 @@ public class HttpServiceTest {
                 ee.printStackTrace();
             }
         }
-        return result;
+        return  result.replaceAll("null","\"\"");
     }
 
     /**

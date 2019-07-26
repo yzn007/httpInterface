@@ -9,6 +9,7 @@ import com.springboot.httpInterface.entity.Route;
 import com.springboot.httpInterface.entity.Token;
 import com.springboot.httpInterface.services.RouteService;
 import com.springboot.httpInterface.services.TokenService;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,31 +37,66 @@ public class StaticJob implements BaseJob {
 
     private String jsonStr = "";
     private String table = "BUS_VEHIC_LCTN_MSG";
+    //令牌地址
+    static String accessUrl = "http://39.108.107.62:8087/api/Token?appid=001&secret=ABCDEFG";
 
     @Autowired
     TokenService tokenService;
 
-    public static Token token;
+    private Token token;
 
     HttpServiceTest httpServiceTest = null;
 
-    private String getToken(){
-        if(token== null ){
-            List<Token> listT = tokenService.getAllToken();
-            if (listT != null && listT.size() > 0) {
-                token = listT.get(0);
-            }
-        }
-        if (token!= null && token.getDateExp().after(new Date())){
-            return token.getAccessToken();
-        }
 
-        //请求新的token
-        try{
-            JSONObject jsonObject = (JSONObject) httpServiceTest.getBusTest("token");
-            return jsonObject.get("access_token").toString();
+    private Token getToken(){
+//        if(token== null ){
+//            List<Token> listT = tokenService.getAllToken();
+//            if (listT != null && listT.size() > 0) {
+//                token = listT.get(0);
+//                if(token.getDateExp()==null){
+//                    token.SetDateExp();
+//                }
+//            }
+//        }
+//        return token;
+        try {
+
+            for (Map.Entry<String, String> m : topicS.entrySet()) {
+                if(!m.getKey().equalsIgnoreCase("BUS_ACCESS_TOKEN"))
+                    continue;
+
+                String[] tabAndMark = null;
+                if (m.getValue().indexOf(",") >= 0) {
+                    tabAndMark = m.getValue().split(",");
+                }
+//                String tableNm = tabAndMark == null ? m.getValue() : tabAndMark[0];
+                if (tabAndMark.length < 4) {
+                    continue;
+                }
+                String url = tabAndMark[3];
+                if(!StringUtils.isEmpty(url))
+                    accessUrl = url;
+                JSONObject jsonObject = JSONObject.parseObject(httpServiceTest.getJsonData(accessUrl, "utf-8", ""));
+                token = new Token();
+                token.setAccessToken(jsonObject.get("access_token").toString());
+                token.setDataTm(new Date());
+                token.setExpiresIn(Integer.parseInt(jsonObject.get("expires_in").toString()));
+                token.SetDateExp();
+
+//                if(tabAndMark[3].indexOf("Token?")>-1){//获取公交访问令牌
+                if (url.indexOf("Token") > -1) {//获取公交访问令牌
+                    SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2], jsonObject.toJSONString());
+
+//                        executorService.execute(saveDataStatic);
+                    saveDataStatic.run();
+                }
+                break;
+            }
         }catch (Exception e){
-            return null;
+            e.printStackTrace();
+        }finally {
+            return token;
         }
     }
 
@@ -90,11 +127,12 @@ public class StaticJob implements BaseJob {
 //        _log.error("New Job执行时间: " + new Date());
 
 //
-        ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
+//        ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
         if(httpServiceTest==null)
             httpServiceTest = new HttpServiceTest();
         try {
 //    this.jsonStr = httpServiceTest.getJsonData("http://localhost/httpService/sendGetData?RayData=CurrTotlCnt", "utf-8");
+            token = getToken();
             for (Map.Entry<String, String> m : topicS.entrySet()) {
 
                 String[] tabAndMark = null;
@@ -107,41 +145,86 @@ public class StaticJob implements BaseJob {
                 }
                 String url = tabAndMark[3];
 //                if(tabAndMark[3].indexOf("Token?")>-1){//获取公交访问令牌
-                if(url.indexOf("token")>-1){//获取公交访问令牌
-                    SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
-                            httpServiceTest.getJsonData(url, "utf-8",""));
-                    executorService.execute(saveDataStatic);
-                }else if(url.indexOf("route")>-1){//获取所有线路
-                    if(url.indexOf("?")>-1 ) {
-                        url += "&access_token=" + getToken();
-                    }else {
-                        url += "?access_token=" + getToken();
+                if(url.indexOf("Token")>-1 ){//获取公交访问令牌
+
+                    if(token==null|| token.getDateExp()==null ||token.getDateExp().before(new Date())) {
+
+//                        JSONObject jsonObject = JSONObject.parseObject(httpServiceTest.getJsonData(url, "utf-8",""));
+//                        token = new Token();
+//                        token.setAccessToken(jsonObject.get("access_token").toString());
+//                        token.setDataTm(new Date());
+//                        token.setExpiresIn(Integer.parseInt(jsonObject.get("expires_in").toString()));
+//                        token.SetDateExp();
+//
+//                        SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+//                                tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],jsonObject.toJSONString());
+//
+////                        executorService.execute(saveDataStatic);
+//                        saveDataStatic.run();
+//                        accessUrl = url;
                     }
+                }else if(url.indexOf("GetRoutes")>-1){//获取所有线路
+                    if(url.indexOf("?")>-1 ) {
+                        url += "&access_token=" + token.getAccessToken();
+                    }else {
+                        url += "?access_token=" + token.getAccessToken();
+                    }
+
+
+                    String getJson = httpServiceTest.getJsonData(url, "utf-8","");
+
                     SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
-                            httpServiceTest.getJsonData(url, "utf-8",""));
-                    executorService.execute(saveDataStatic);
+                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],getJson           );
+
+                    int k = 0;
+                    while(getJson.indexOf("errcode")>-1) {
+                        //token失效，再次拉取
+                        token = getToken();
+                        getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","");
+                        saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+                                tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],getJson );
+//                        token = null;
+                        if(k++>30)
+                            break;
+                    }
+
+//                    executorService.execute(saveDataStatic);
+                    saveDataStatic.run();
                 }
-                else {
+                else if(url.indexOf("Token")<0){//除令牌外
                     List<Route> listR = routeService.getAllRoute();
 
-
                     if(url.indexOf("?")>-1 ) {
-                        url += "&access_token=" + getToken();
+                        url += "&access_token=" + token.getAccessToken();
                     }else {
-                        url += "?access_token=" + getToken();
+                        url += "?access_token=" + token.getAccessToken();
                     }
+                    int k = 0;
                     for (Route r : listR) {
+                        String getJson = httpServiceTest.getJsonData(url, "utf-8",r.getId());
                         SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                                tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
-                                httpServiceTest.getJsonData(url, "utf-8", r.getId()));
-                        executorService.execute(saveDataStatic);
+                                tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
+                                getJson);
+                        int j = 0;
+                        while(getJson.indexOf("errcode")>-1) {
+                            //token失效
+                            token = getToken();
+                            k--;
+                            getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8",r.getId());
+                            saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+                                    tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
+                                    getJson);
+//                            token = null;
+                            if(j++>30)
+                                break;
+                        }
+//                        executorService.execute(saveDataStatic);
+                        saveDataStatic.run();
                     }
                 }
 
             }
-            executorService.shutdown();
+//            executorService.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }

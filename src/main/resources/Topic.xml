@@ -5,32 +5,32 @@
 
         <!-- 停车场信息/历史 -->
         <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false" isStatic="false"/>
+        <!-- 车位预约信息 -->
+        <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="true" textCode="0304" isDelete="true" isTruncate="false" isStatic="false"/>
         <!-- 车辆驶入事件 -->
         <topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="true" textCode="0302" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 车辆驶出事件 -->
         <topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0303" isDelete="false" isTruncate="false" isStatic="false"/>
-        <!-- 车位预约信息 -->
-        <topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="true" textCode="0304" isDelete="true" isTruncate="false" isStatic="false"/>
         <!-- 停车支付情况 -->
         <topic name="PARK_PAY_INFO" table="PARK_PAY_INFO" valid="true" textCode="0305" isDelete="true" isTruncate="false" isStatic="false"/>
         <!-- 车辆信息 -->
         <!-- 车辆位置信息 -->
-        <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG" valid="true" textCode="0201" isDelete="false" isTruncate="true" isStatic="false"/>
+        <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG" valid="true" textCode="0201" isDelete="true" isTruncate="false" isStatic="false"/>
         <!-- 车辆进出信息 -->
         <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="BUS_VEHIC_ARRV_DEPRT_MSG" valid="false" textCode="0202" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 令牌信息 -->
-        <topic name="BUS_ACCESS_TOKEN" table="BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="false" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=token"/>
+        <topic name="BUS_ACCESS_TOKEN" table="BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Token?appid=001&amp;secret=ABCDEFG"/>
 <!--&amp;Token?&amp;appid=APPID&amp;secret=APPSECRET"/>-->
         <!-- 线路 -->
-        <topic name="BUS_ROUTE" table="BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=route"/>
+        <topic name="BUS_ROUTE" table="BUS_ROUTE" valid="false" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetRoutes"/>
         <!-- 线路车辆 -->
-        <topic name="BUS_ROUTE_VEHICLE" table="BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=routeVehicle"/>
+        <topic name="BUS_ROUTE_VEHICLE" table="BUS_ROUTE_VEHICLE" valid="false" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetVehicles"/>
         <!-- 站点 -->
-        <topic name="BUS_STATION" table="BUS_STATION" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=station"/>
+        <topic name="BUS_STATION" table="BUS_STATION" valid="false" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetTrack"/>
         <!-- 车辆 -->
-        <topic name="BUS_VEHICLE" table="BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=vehicle"/>
+        <topic name="BUS_VEHICLE" table="BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Vehicle/Info"/>
         <!-- 线路计划时间 -->
-        <topic name="BUS_ROUTE_DISPT" table="BUS_ROUTE_DISPT" valid="true" textCode="" isDelete="true" isTruncate="true" isStatic="true" url="http://localhost:8082/httpService/getBusTestData?bus=routePlan"/>
+        <topic name="BUS_ROUTE_DISPT" table="BUS_ROUTE_DISPT" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/Times"/>
         <!-- 闸机 -->
         <!-- 闸机参展人与信息 /活动信息-->
         <topic name="GATE_EXPO_AUDI_INFO" table="GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false" isStatic="false"/>

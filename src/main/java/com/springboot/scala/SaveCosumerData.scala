@@ -28,18 +28,25 @@ object SaveCosumerData {
     Logger.getLogger("org.apache.kafka.clients.consumer").setLevel(Level.OFF)
 
     val conn = ConnectPoolUtil.getConnection //ConnectPoolUtil是我创建的一个数据库连接池，getConnection是它的一个方法
-
-    conn.setAutoCommit(false); //设为手动提交
-    val stmt = conn.createStatement()
-    args.foreach(word => {
-      //      stmt.addBatch("truncate log")
-      word.foreach(w => {
-//        stmt.addBatch("insert into log(id, name) values('" + w + "','" + w.replaceAll("'", "''") + "')")
-        stmt.addBatch(w)
+    try {
+      conn.setAutoCommit(false); //设为手动提交
+      val stmt = conn.createStatement()
+      args.foreach(word => {
+        //      stmt.addBatch("truncate log")
+        word.foreach(w => {
+          //        stmt.addBatch("insert into log(id, name) values('" + w + "','" + w.replaceAll("'", "''") + "')")
+          stmt.addBatch(w)
+        })
       })
-    })
-    stmt.executeBatch()
-    conn.commit()
-    conn.close()
+      stmt.executeBatch()
+      conn.commit()
+    } catch {
+        case e: Exception => println(e)
+          conn.rollback()
+    } finally {
+      conn.close()
+    }
+
+
   }
 }

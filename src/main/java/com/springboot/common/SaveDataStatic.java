@@ -1,8 +1,10 @@
 package com.springboot.common;
 
 import com.springboot.scala.SaveCosumerData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import scala.Dynamic;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
@@ -38,8 +40,7 @@ public class SaveDataStatic extends Thread {
 
         //System.out.println(records);
         List<String[]> reds = new ArrayList<>();
-        String []insertSql = null;
-        String []truncateSql = null;
+        List<String[]> listDynamic = new ArrayList<>();
         try {
             String[] array = JsonObjectToAttach.getJsonList(jsonString, null);
             if (array != null) {
@@ -50,12 +51,12 @@ public class SaveDataStatic extends Thread {
                             !(isDelInsert.indexOf(";") > 0 ? isDelInsert.split(";")[m] : isDelInsert).equalsIgnoreCase("false"), new HashMap(),
                             !(isTrancate.indexOf(";") > 0 ? isTrancate.split(";")[m] : isTrancate).equalsIgnoreCase("false"));
 
-                        if (!reds.contains(sql))
+                        if (!reds.contains(sql) && sql!=null)
                             reds.add(sql);
 
-                    sql = JsonObjectToAttach.getMetaSqls(topic,null);
-                    if(!reds.contains(sql))
-                        reds.add(sql);
+                    String []strDynamic = JsonObjectToAttach.getMetaSqls(topic,null,array);
+                    if(!listDynamic.contains(strDynamic)&& null != strDynamic)
+                        listDynamic.add(strDynamic);
                 }
             }
         } catch (Exception e) {
@@ -68,8 +69,15 @@ public class SaveDataStatic extends Thread {
                 SaveCosumerData.main(tmpSeq.toList());
             }
 //            Thread.sleep(50);
+            tmpSeq = JavaConverters.asScalaIteratorConverter(listDynamic.iterator()).asScala().toSeq();
+            if (tmpSeq.size() > 0) {
+                SaveCosumerData.main(tmpSeq.toList());
+            }
+
         } catch (Exception e) {
             System.out.println(e.toString());
+//            System.out.println(reds.get(0).toString());
+//            System.out.println(listDynamic.get(0));
         }
 //        }
     }

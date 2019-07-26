@@ -137,6 +137,60 @@
 
     </select>
 
+    <!-- 驶出 -->
+    <select id="T80_TA_PARK_CONSM_INFO_3" target="PARK_VEHIC_START_OUT_EVT" split="true" valid="true">
+        update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='1',PAY_AMT={Fee_Amt},PAY_MOD ={Pay_Mod}, PARK_LEAVE_TM={Start_Out_Tm}  where  PARK_STAT='0' and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
+        insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
+        Plat_No,
+        Drv_In_Tm,
+        Start_Out_Tm)
+        select Data_Tm,Plat_No,Drv_In_Tm, Start_Out_Tm  from PARK_VEHIC_START_OUT_EVT where Drv_In_Tm = {Drv_In_Tm} and Plat_No = {Plat_No} and Start_Out_Tm = {Start_Out_Tm}  and
+        Park_Lot_ID = {Park_Lot_ID} and   Park_Lot_Regn_ID= {Park_Lot_Regn_ID}
+
+    </select>
+    <!-- 驶入 -->
+    <select id="T80_TA_PARK_CONSM_INFO_2" target="PARK_VEHIC_DRV_IN_EVT" split="true" valid="true">
+       update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='0',PARK_ENTER_TM={Drv_In_Tm}  where  RESV_STAT='1' and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
+        insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
+        Plat_No,
+        Drv_In_Tm,
+        Start_Out_Tm)
+        select Data_Tm,Plat_No,Drv_In_Tm, null  from PARK_VEHIC_DRV_IN_EVT where Drv_In_Tm = {Drv_In_Tm} and Plat_No = {Plat_No} and
+        Park_Lot_ID = {Park_Lot_ID} and   Park_Lot_Regn_ID = {Park_Lot_Regn_ID}
+    </select>
+    <!-- 预约 -->
+    <select id="T80_TA_PARK_CONSM_INFO_1" target="PARK_PARK_SPC_RESV_INFO" split="true" valid="true">
+        set @aount = '';
+        select case when park_info_id is not null or count(park_info_id)>0 then @aount:='update cqyl_ta.T80_TA_PARK_CONSM_INFO set RESV_STAT='{RESV_STAT}',RESV_TM='{Resv_Arrv_Tm}' where PARK_INFO_ID='{Resv_ID}''
+        else @aount:='insert into  cqyl_ta.T80_TA_PARK_CONSM_INFO(PARK_INFO_ID,
+        PARK_LOT_ID,
+        PARK_ENTER_TM,
+        PARK_LEAVE_TM,
+        PLAT_NO,
+        PARK_STAT,
+        RESV_STAT,
+        PAY_AMT,
+        PAY_MOD,
+        RESV_TM
+        )
+        select Resv_ID,
+        Resv_Park_Lot_ID,
+        null,
+        null,
+        Plat_No,
+        null,
+        Resv_Stat,
+        null,
+        null,
+        Resv_Arrv_Tm
+        from PARK_PARK_SPC_RESV_INFO
+        where  Resv_ID = '{Resv_ID}'
+        ' end  from cqyl_ta.T80_TA_PARK_CONSM_INFO where park_info_id = {Resv_ID};
+        select @aount;
+        PREPARE stmt FROM @aount;
+        EXECUTE stmt
+    </select>
+
 </root>
 
 

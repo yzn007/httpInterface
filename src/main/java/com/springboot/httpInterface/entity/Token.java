@@ -21,17 +21,18 @@ public class Token {
     private Date dateExp;
 
     public Date getDateExp(){
+        if(dateExp == null)
+            SetDateExp();
         return this.dateExp;
     }
 
-    public Date SetDateExp(){
+    public void SetDateExp(){
         if(dataTm != null && expiresIn>0){
             Calendar cl = Calendar.getInstance();
             cl.setTime(dataTm);
             cl.add(Calendar.SECOND,expiresIn);
-            return cl.getTime();
+            this.dateExp = cl.getTime();
         }
-        return getDataTm();
     }
 
     private Date dataTm;
