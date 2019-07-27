@@ -304,12 +304,13 @@ public class HttpServiceTest {
      *
      * @param url
      * @param encoding
-     * @param routeId
+     * @param id
+     * @param value
      * @return
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public String getJsonData(String url, String encoding,String routeId) throws ClientProtocolException, IOException {
+    public String getJsonData(String url, String encoding,String id,String value) throws ClientProtocolException, IOException {
         String result = "";
 
         // 创建httpclient对象
@@ -319,11 +320,10 @@ public class HttpServiceTest {
 //        HttpGet httpGet = new HttpGet(url);
         HttpPost post = new HttpPost(url);
         post.addHeader("Content-Type", "application/json");
-        if(!StringUtils.isEmpty(routeId)){
+        if(!StringUtils.isEmpty(id)){
 
             Map<String,String> map = new HashMap();
-            map.put("RouteId",routeId);
-            map.put("RouteCode","123");
+            map.put(id,value);
 
             //设置参数发送
 //            List<BasicNameValuePair> pairs = new ArrayList<>();

@@ -37,6 +37,9 @@ import static java.util.regex.Matcher.quoteReplacement;
  */
 public class JsonObjectToAttach {
 
+    private static Document document;
+    private static  Document tplDocument;
+    private static Document preDocument;
     /**
      * 取得json数组
      * @param jsonString
@@ -165,7 +168,8 @@ public class JsonObjectToAttach {
 
         try{
             String path = ResourceUtils.getURL("classpath:").getPath()+ fileName;
-            Document document = parseDom4j(path);
+            if(document==null)
+                document = parseDom4j(path);
             Element root = document.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
@@ -217,8 +221,9 @@ public class JsonObjectToAttach {
 
 //            String path = Thread.currentThread().getClass().getResource("/").getPath() + fileName;
             String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
-            Document document = parseDom4j(path);
-            Element root = document.getRootElement();
+            if(tplDocument==null)
+                tplDocument = parseDom4j(path);
+            Element root = tplDocument.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
                 String tableName = tblEle.attribute(0).getValue();
@@ -485,8 +490,9 @@ public class JsonObjectToAttach {
 
         try{
             String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
-            Document document = parseDom4j(path);
-            Element root = document.getRootElement();
+            if(null==preDocument)
+                preDocument = parseDom4j(path);
+            Element root = preDocument.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
                 String isValid = "";

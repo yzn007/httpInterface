@@ -22,11 +22,11 @@
         <topic name="BUS_ACCESS_TOKEN" table="BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Token?appid=001&amp;secret=ABCDEFG"/>
 <!--&amp;Token?&amp;appid=APPID&amp;secret=APPSECRET"/>-->
         <!-- 线路 -->
-        <topic name="BUS_ROUTE" table="BUS_ROUTE" valid="false" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetRoutes"/>
+        <topic name="BUS_ROUTE" table="BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetRoutes"/>
         <!-- 线路车辆 -->
-        <topic name="BUS_ROUTE_VEHICLE" table="BUS_ROUTE_VEHICLE" valid="false" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetVehicles"/>
+        <topic name="BUS_ROUTE_VEHICLE" table="BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetVehicles"/>
         <!-- 站点 -->
-        <topic name="BUS_STATION" table="BUS_STATION" valid="false" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetTrack"/>
+        <topic name="BUS_STATION" table="BUS_STATION" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetTrack"/>
         <!-- 车辆 -->
         <topic name="BUS_VEHICLE" table="BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Vehicle/Info"/>
         <!-- 线路计划时间 -->

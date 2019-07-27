@@ -68,12 +68,12 @@ public class SaveDataStatic extends Thread {
             if (tmpSeq.size() > 0) {
                 SaveCosumerData.main(tmpSeq.toList());
             }
-//            Thread.sleep(50);
+            Thread.sleep(50);
             tmpSeq = JavaConverters.asScalaIteratorConverter(listDynamic.iterator()).asScala().toSeq();
             if (tmpSeq.size() > 0) {
                 SaveCosumerData.main(tmpSeq.toList());
             }
-
+            Thread.sleep(50);
         } catch (Exception e) {
             System.out.println(e.toString());
 //            System.out.println(reds.get(0).toString());
