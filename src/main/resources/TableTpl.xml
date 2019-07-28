@@ -45,6 +45,7 @@
     </table>
     <!--  线路车辆 -->
     <table name="BUS_ROUTE_VEHICLE">
+        <column id="routeId" ref="RouteId">routeId = RouteId</column>
         <column id="Position_Lat" ref="Position.Lat"></column>
         <column id="Position_Lng" ref="Position.Lng"></column>
         <column id="Position_Direct" ref="Position.Direct"></column>
@@ -81,7 +82,7 @@
 
     <!-- 车辆信息 -->
     <table name="BUS_VEHICLE">
-        <column id="id" ref="VehId"/>
+        <column id="id" ref="VehId">id = VehId</column>
         <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
         <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
@@ -98,6 +99,7 @@
 
     <!-- 车辆计划运行明细 -->
     <table name="BUS_ROUTE_DISPT_DTL">
+        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
         <column id="Times_Time" ref="Time"></column>
         <column id="Times_PlateNum" ref="PlateNum"></column>
         <column id="Times_VehNum" ref="VehNum"></column>

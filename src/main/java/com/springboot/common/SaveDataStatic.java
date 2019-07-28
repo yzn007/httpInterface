@@ -22,15 +22,15 @@ public class SaveDataStatic extends Thread {
     private String table = "web_data_profil";//表名
     private String isDelInsert = "false";
     private String isTrancate = "false";
-    private String jsonString = "";
+    private List<String> listJsonString = new ArrayList<>();
 
-    public SaveDataStatic(String topic, String table, String isDelInsert, String isTruncate, String jsonString) {
+    public SaveDataStatic(String topic, String table, String isDelInsert, String isTruncate, List<String> jsonString) {
         super();
         this.topic = topic;
         this.table = table;
         this.isDelInsert = isDelInsert;
         this.isTrancate = isTruncate;
-        this.jsonString = jsonString;
+        this.listJsonString = jsonString;
     }
 
 
@@ -42,21 +42,25 @@ public class SaveDataStatic extends Thread {
         List<String[]> reds = new ArrayList<>();
         List<String[]> listDynamic = new ArrayList<>();
         try {
-            String[] array = JsonObjectToAttach.getJsonList(jsonString, null);
-            if (array != null) {
-                //表名固定了，根据实际情况修改
-                for (int m = 0; m < this.table.split(";").length; m++) {
-                    //删除当前表数据，保留历史表数据
-                    String[] sql = JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "", "",
-                            !(isDelInsert.indexOf(";") > 0 ? isDelInsert.split(";")[m] : isDelInsert).equalsIgnoreCase("false"), new HashMap(),
-                            !(isTrancate.indexOf(";") > 0 ? isTrancate.split(";")[m] : isTrancate).equalsIgnoreCase("false"));
+//            int k = 0;
+            for(String jsonString:listJsonString) {
+                String[] array = JsonObjectToAttach.getJsonList(jsonString, null);
+                if (array != null) {
+                    //表名固定了，根据实际情况修改
+                    for (int m = 0; m < this.table.split(";").length; m++) {
+                        //删除当前表数据，保留历史表数据
+                        String[] sql = JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "", "",
+                                !(isDelInsert.indexOf(";") > 0 ? isDelInsert.split(";")[m] : isDelInsert).equalsIgnoreCase("false"), new HashMap(),
+                                !(isTrancate.indexOf(";") > 0 ? isTrancate.split(";")[m] : isTrancate).equalsIgnoreCase("false"));
 
-                        if (!reds.contains(sql) && sql!=null)
+                        if (!reds.contains(sql) && sql != null)
                             reds.add(sql);
 
-                    String []strDynamic = JsonObjectToAttach.getMetaSqls(topic,null,array);
-                    if(!listDynamic.contains(strDynamic)&& null != strDynamic)
-                        listDynamic.add(strDynamic);
+                        String[] strDynamic = JsonObjectToAttach.getMetaSqls(topic, null, array);
+                        if (!listDynamic.contains(strDynamic) && null != strDynamic)
+                            listDynamic.add(strDynamic);
+                    }
+//                    k++;//只删除一次
                 }
             }
         } catch (Exception e) {
@@ -107,6 +111,9 @@ public class SaveDataStatic extends Thread {
                 "  ]\n" +
                 "}";
 
+        List<String> listJson = new ArrayList<>();
+        listJson.add(jsonString);
+
         //取得静态数据表
         Map<String, String> topicM = JsonObjectToAttach.getValidProperties("topics", null, null,true);
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
@@ -117,7 +124,7 @@ public class SaveDataStatic extends Thread {
             }
 
             SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                    tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],jsonString);
+                    tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],listJson);
             executorService.execute(saveDataStatic);
         }
         executorService.shutdown();

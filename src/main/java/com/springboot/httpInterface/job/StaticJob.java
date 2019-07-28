@@ -1,5 +1,7 @@
 package com.springboot.httpInterface.job;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.common.JsonObjectToAttach;
 import com.springboot.common.ReadPropertiesUtils;
@@ -20,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -87,8 +86,10 @@ public class StaticJob implements BaseJob {
 
 //                if(tabAndMark[3].indexOf("Token?")>-1){//获取公交访问令牌
                 if (url.indexOf("Token") > -1) {//获取公交访问令牌
+                    List<String> arrayJson = new ArrayList<>();
+                    arrayJson.add(jsonObject.toJSONString());
                     SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2], jsonObject.toJSONString());
+                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2], arrayJson);
 
 //                        executorService.execute(saveDataStatic);
                     saveDataStatic.run();
@@ -131,7 +132,7 @@ public class StaticJob implements BaseJob {
 //        _log.error("New Job执行时间: " + new Date());
 
 //
-//        ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
+        ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         if(httpServiceTest==null)
             httpServiceTest = new HttpServiceTest();
         try {
@@ -174,26 +175,28 @@ public class StaticJob implements BaseJob {
                         url += "?access_token=" + token.getAccessToken();
                     }
 
+                    List<String> listJson = new ArrayList<>();
 
                     String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId","");
-
-                    SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],getJson           );
 
                     int k = 0;
                     while(getJson.indexOf("errcode")>-1) {
                         //token失效，再次拉取
                         token = getToken();
                         getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","RouteId","");
-                        saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                                tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],getJson );
 //                        token = null;
                         if(k++>30)
                             break;
                     }
-
-//                    executorService.execute(saveDataStatic);
-                    saveDataStatic.run();
+                    if(getJson.indexOf("errcode")<0) {
+                        listJson.add(getJson);
+                        SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+                                tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2], listJson);
+                    executorService.execute(saveDataStatic);
+//                        saveDataStatic.run();
+                    }else {
+                        System.out.println(url+"["+getJson+"]");
+                    }
                 }
                 else if(url.indexOf("Token")<0){//除令牌外
                     if(url.indexOf("Vehicle/Info")<0){//车辆信息在线路信息后取得
@@ -205,27 +208,51 @@ public class StaticJob implements BaseJob {
                             url += "?access_token=" + token.getAccessToken();
                         }
                         int k = 0;
+                        List<String> listJson = new ArrayList<>();
                         for (Route r : listR) {
                             String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId",r.getId());
-                            SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                                    tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
-                                    getJson);
                             int j = 0;
                             while(getJson.indexOf("errcode")>-1) {
                                 //token失效
                                 token = getToken();
-                                k--;
+//                                k--;
                                 getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","RouteId",r.getId());
-                                saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                                        tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
-                                        getJson);
+//                                saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+//                                        tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
+//                                        getJson);
 //                            token = null;
                                 if(j++>30)
                                     break;
                             }
-//                        executorService.execute(saveDataStatic);
-                            saveDataStatic.run();
+                            if(getJson.indexOf("errcode")<0) {
+                                if (url.indexOf("GetVehicles") > -1){//线路车辆，需要凭借线路Id，json没有返回
+                                    JSONArray jsonArray = null;
+                                    try{
+                                        jsonArray = JSONObject.parseArray(getJson);
+                                        for(Object obj:jsonArray){
+                                            JSONObject jsonObject = (JSONObject)obj;
+                                            if(null==jsonObject.get("RouteId")){
+                                                jsonObject.put("RouteId",r.getId());
+                                            }
+                                        }
+                                        getJson = JSONObject.toJSONString(jsonArray);
+                                    }catch (Exception ee){
+                                        //不是json数组的情况不处理
+                                    }
+                                }
+                                listJson.add(getJson);
+                            }
+                            else
+                                System.out.println(url+"["+getJson+"]");
+
+
                         }
+
+                        SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+                                tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
+                                listJson);
+//                        saveDataStatic.run();
+                        executorService.execute(saveDataStatic);
                     }else{
                         List<RouteVehicle> routeVehicleList = routeVehicleService.getAllVehicle();
 
@@ -235,27 +262,35 @@ public class StaticJob implements BaseJob {
                             url += "?access_token=" + token.getAccessToken();
                         }
                         int k = 0;
+                        List<String> listJson = new ArrayList<>();
                         for(RouteVehicle rv:routeVehicleList){
                             String getJson = httpServiceTest.getJsonData(url, "utf-8","VehId",rv.getId());
-                            SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                                    tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
-                                    getJson);
+
                             int j = 0;
                             while(getJson.indexOf("errcode")>-1) {
                                 //token失效
                                 token = getToken();
-                                k--;
+//                                k--;
                                 getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","VehId",rv.getId());
-                                saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                                        tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
-                                        getJson);
+//                                saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+//                                        tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
+//                                        getJson);
 //                            token = null;
                                 if(j++>30)
                                     break;
                             }
-//                        executorService.execute(saveDataStatic);
-                            saveDataStatic.run();
+                            if(getJson.indexOf("errcode")<0)
+                                listJson.add(getJson);
+                            else
+                                System.out.println(url+"["+getJson+"]");
+
+
                         }
+                        SaveDataStatic saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+                                tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
+                                listJson);
+//                        saveDataStatic.run();
+                        executorService.execute(saveDataStatic);
                     }
 
                 }
