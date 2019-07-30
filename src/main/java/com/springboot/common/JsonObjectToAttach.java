@@ -158,6 +158,46 @@ public class JsonObjectToAttach {
         }
     }
 
+    public static Map<String,String> getTableTextCode(String propertyNm,String topicPath,boolean isStatic){
+        Map <String,String>m = new HashMap();
+        String fileName = "Topic.xml";
+        if(!StringUtils.isEmpty(topicPath))
+            fileName = topicPath;
+
+        try{
+            String path = ResourceUtils.getURL("classpath:").getPath()+ fileName;
+            if(document==null)
+                document = parseDom4j(path);
+            Element root = document.getRootElement();
+            for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
+                Element tblEle = (Element) iterator.next();
+                if (tblEle.attribute(0).getValue().equals(propertyNm)) {
+                    for (Element e : tblEle.elements()) {
+                        if(  e.attribute(2).getValue().toLowerCase().equals("true")) {
+                            if (Boolean.parseBoolean(e.attribute(6).getValue().toString()) == isStatic) {
+                                String tbs = e.attribute(1).getValue();//table多个
+                                String cds = e.attribute(3).getValue();//textCode包含多个
+                                if (cds.indexOf(";") > -1 && tbs.indexOf(";")>-1) {//一个topic多个textCode
+                                    String []tblArray = tbs.split(";");
+                                    String []cdArray = cds.split(";");
+                                    for (int k=0;k<tblArray.length;k++) {
+                                        if(cdArray.length>k)
+                                            m.put(tblArray[k], cdArray[k]);
+                                        else
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                     }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return m;
+    }
+
     public static Map<String,String> getValidProperties(String propertyNm,String topicPath,String code,boolean isStatic){
         Map <String,String>m = new HashMap();
         String fileName = "Topic.xml";
@@ -177,14 +217,26 @@ public class JsonObjectToAttach {
                     for (Element e : tblEle.elements()) {
                         if(  e.attribute(2).getValue().toLowerCase().equals("true"))
                             if(Boolean.parseBoolean(e.attribute(6).getValue().toString())==isStatic) {
-                                if (!StringUtils.isEmpty(code) && code.equals(e.attribute(3).getValue()))//生产者topic取得
-                                    m.put(e.attribute(0).getValue(), e.attribute(1).getValue());
-                                else if (StringUtils.isEmpty(code))//返回消费者topics
-                                    if(!isStatic)
-                                        m.put(e.attribute(0).getValue(), e.attribute(1).getValue() + "," + e.attribute(4).getValue() + "," + e.attribute(5).getValue());
-                                    else
-                                        m.put(e.attribute(0).getValue(), e.attribute(1).getValue() + "," + e.attribute(4).getValue() + "," + e.attribute(5).getValue()+ "," + e.attribute(7).getValue());
+
+                                    if (!StringUtils.isEmpty(code)){//生产者topic取得
+                                        String cds = e.attribute(3).getValue();//textCode
+                                        if(cds.indexOf(";")>-1){//一个topic多个textCode
+                                            for(String cd:cds.split(";")){
+                                                if (!StringUtils.isEmpty(cd) && cd.equals(code)) {//生产者topic取得
+                                                    m.put(e.attribute(0).getValue(), e.attribute(1).getValue());
+                                                    break;
+                                                }
+                                            }
+                                        }else if(code.equals(cds))
+                                            m.put(e.attribute(0).getValue(), e.attribute(1).getValue());
+                                    }
+                                    else //返回消费者topics
+                                        if (!isStatic)
+                                            m.put(e.attribute(0).getValue(), e.attribute(1).getValue() + "," + e.attribute(4).getValue() + "," + e.attribute(5).getValue());
+                                        else
+                                            m.put(e.attribute(0).getValue(), e.attribute(1).getValue() + "," + e.attribute(4).getValue() + "," + e.attribute(5).getValue() + "," + e.attribute(7).getValue());
                             }
+
                     }
                 }
             }
@@ -332,6 +384,11 @@ public class JsonObjectToAttach {
         else {
             rets = new String[whereStr.size() + 1];
             j = 1;
+            //替换表字段，防止特殊字符
+            String []keys = tm.split(",");
+            for(String key:keys){
+                tm = replace(tm,key,"`"+key+"`","");
+            }
             rets[0] = tm;
         }
 

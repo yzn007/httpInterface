@@ -40,6 +40,9 @@ public class MyJob implements BaseJob {
     //取得有效主题
     static Map<String, String> topicM = new HashMap<>();
 
+    //取得table对应的code
+    static Map<String,String> tblCd = new HashedMap();
+
     //消费者
     static Map<String,Consumer> consumerMap = new HashedMap();
 
@@ -50,6 +53,8 @@ public class MyJob implements BaseJob {
         try {
             if (config.size() == 0)
                 config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
+            if(tblCd.size()==0)
+                tblCd = JsonObjectToAttach.getTableTextCode("topics",null,false);
             if (topicM.size() == 0)
                 //取得有效主题
                 topicM = JsonObjectToAttach.getValidProperties("topics", null, null,false);
@@ -65,7 +70,7 @@ public class MyJob implements BaseJob {
 
                     if(kafakData.get(m.getKey())==null)
                         kafakData.put(m.getKey(), new KafkaSaveData(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],c));
+                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],tblCd,c));
                 }
             }
         } catch (IOException e) {
@@ -92,7 +97,7 @@ public class MyJob implements BaseJob {
                 }
 
                  kafkaSaveData = new KafkaSaveData(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-                        tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2], consumerMap.get(m.getKey()));
+                        tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],null, consumerMap.get(m.getKey()));
             }
             executorService.execute(kafkaSaveData);
         }

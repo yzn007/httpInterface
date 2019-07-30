@@ -54,15 +54,20 @@ public class KafkaProducer extends Thread {
     
     public void run() {
         BufferedReader br = null;
+        // 创建生产者
+        Producer<Integer, String> producer = null;
         try {
             // 创建生产者
-            Producer<Integer, String> producer = createProducer();
+            producer = createProducer();
             if (!StringUtils.isEmpty(value)) {
-                System.out.println("生产数据为：" + value);
+//                System.out.println("生产数据为：" + value);
                 producer.send(new ProducerRecord<Integer, String>(topic, value + "\n"));
             }
         }catch (Exception e){
+
             System.out.print(e.toString());
+        }finally {
+            producer.close();
         }
     }
 

@@ -15,6 +15,7 @@ import javax.lang.model.util.Elements;
 import javax.xml.crypto.dsig.XMLObject;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -80,8 +81,10 @@ public class CxfWebService {
 
             }
             String xmlString = sw.toString();
+            int k = 0;
            while(true) {
                String code = "";
+               String msg = "";
                objects = client.invoke("writeObject", "39", "39W01", "21849186864529442191419884887906", terminalCode, terminalNm, terminalId, terminalXY, enKey, xmlString);
 //               System.out.println("返回数据:" + objects[0]);
                Document retDoc = DocumentHelper.parseText(objects[0].toString());
@@ -94,15 +97,18 @@ public class CxfWebService {
                        for (Element s : els) {
                            if (s.getName().equals("code")) {
                                code = s.getText();
-                               break;
                            }
+                           if(s.getName().equalsIgnoreCase("message"))
+                               msg = s.getText();
                        }
-                       System.out.println("调用webservice返回code:"+code);
+                       System.out.println("调用webservice返回code:"+code+"["+ URLDecoder.decode(msg)+"]");
                    }
                }
                if(code.equalsIgnoreCase("1"))
                    break;
                Thread.sleep(1000);
+               if(k++>50)
+                   break;
            }
         } catch (java.lang.Exception e) {
             e.printStackTrace();

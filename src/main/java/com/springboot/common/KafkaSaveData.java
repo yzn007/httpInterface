@@ -1,12 +1,15 @@
 package com.springboot.common;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.scala.SaveCosumerData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
+import sun.awt.SunHints;
 
 import java.io.IOException;
 import java.util.*;
@@ -22,15 +25,17 @@ public class KafkaSaveData extends Thread {
     private String table ="web_data_profil";//表名
     private String isDelInsert = "false";
     private String isTrancate = "false";
+    private Map textCode = null;
     private  Consumer<String, String> consumer = null;
 
-    public KafkaSaveData(String topic,String table,String isDelInsert,String isTruncate,Consumer consumer ) {
+    public KafkaSaveData(String topic,String table,String isDelInsert,String isTruncate,Map textCode,Consumer consumer ) {
         super();
         this.topic = topic;
         this.table = table;
         this.isDelInsert = isDelInsert;
         this.isTrancate = isTruncate;
         this.consumer = consumer;
+        this.textCode = textCode;
     }
 
     //创建消费者
@@ -69,7 +74,7 @@ public class KafkaSaveData extends Thread {
 //        System.out.println("消费者对象1：" + consumer);
 
 //        while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(100);
+            ConsumerRecords<String, String> records = consumer.poll(1000);
             //System.out.println(records);
             List<String[]> reds = new ArrayList<>();
             List<String[]> sqlListDyc = new ArrayList<>();
@@ -81,6 +86,18 @@ public class KafkaSaveData extends Thread {
                     if (array != null) {
                         //表名固定了，根据实际情况修改
                         for(int m=0;m<this.table.split(";").length;m++){
+                            if(textCode!=null && textCode.size()>0){
+                                JSONObject jsonObject = null;
+                                try{
+                                    String code = textCode.get(table.split(";")[m]).toString();
+                                    jsonObject = JSONObject.parseObject(record.value());
+                                    if(jsonObject.get("tx_code")!=null && !StringUtils.isEmpty(code)&& !jsonObject.get("tx_code").equals(code))
+                                        continue;
+                                }catch (Exception exx){
+
+                                }
+
+                            }
                             //删除当前表数据，保留历史表数据
                             String[] sql =JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "","",
                                     !(isDelInsert.indexOf(";")>0?isDelInsert.split(";")[m]:isDelInsert).equalsIgnoreCase("false"),new HashMap(),
@@ -141,7 +158,7 @@ public class KafkaSaveData extends Thread {
             }
 
             KafkaSaveData kafkaSaveData = new KafkaSaveData(m.getKey(),tabAndMark==null?m.getValue():tabAndMark[0],
-                    tabAndMark==null?"false":tabAndMark[1],tabAndMark==null?"false":tabAndMark[2],createConsumer());
+                    tabAndMark==null?"false":tabAndMark[1],tabAndMark==null?"false":tabAndMark[2],null,createConsumer());
             executorService.execute(kafkaSaveData);
         }
         executorService.shutdown();

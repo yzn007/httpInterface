@@ -138,7 +138,7 @@
     </select>
 
     <!-- 驶出 -->
-    <select id="T80_TA_PARK_CONSM_INFO_3" target="PARK_VEHIC_START_OUT_EVT" split="true" valid="true">
+    <select id="T80_TA_PARK_CONSM_INFO_3" target="PARK_CONSM_INFO" split="true" valid="true">
         update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='1',PAY_AMT={Fee_Amt},PAY_MOD ={Pay_Mod}, PARK_LEAVE_TM={Start_Out_Tm}  where  PARK_STAT='0' and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
         insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
         Plat_No,
@@ -149,7 +149,7 @@
 
     </select>
     <!-- 驶入 -->
-    <select id="T80_TA_PARK_CONSM_INFO_2" target="PARK_VEHIC_DRV_IN_EVT" split="true" valid="true">
+    <select id="T80_TA_PARK_CONSM_INFO_2" target="PARK_CONSM_INFO" split="true" valid="true">
        update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='0',PARK_ENTER_TM={Drv_In_Tm}  where  RESV_STAT='1' and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
         insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
         Plat_No,
@@ -159,7 +159,7 @@
         Park_Lot_ID = {Park_Lot_ID} and   Park_Lot_Regn_ID = {Park_Lot_Regn_ID}
     </select>
     <!-- 预约 -->
-    <select id="T80_TA_PARK_CONSM_INFO_1" target="PARK_PARK_SPC_RESV_INFO" split="true" valid="true">
+    <select id="T80_TA_PARK_CONSM_INFO_1" target="PARK_CONSM_INFO" split="true" valid="true">
         set @aount = '';
         select case when park_info_id is not null or count(park_info_id)>0 then @aount:='update cqyl_ta.T80_TA_PARK_CONSM_INFO set RESV_STAT='{RESV_STAT}',RESV_TM='{Resv_Arrv_Tm}' where PARK_INFO_ID='{Resv_ID}''
         else @aount:='insert into  cqyl_ta.T80_TA_PARK_CONSM_INFO(PARK_INFO_ID,
