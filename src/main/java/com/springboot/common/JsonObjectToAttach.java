@@ -125,9 +125,9 @@ public class JsonObjectToAttach {
                 subStr = subStr.substring(i+1>subStr.length()?subStr.length():i+1);
                 if(StringUtils.isEmpty(subStr))
                     break;
-                if(++k%2==0)//保留前两个
-                    firstS = firstC;
                 firstC +=i+1;
+                if(++k%2==0 && firstC<firstInx)//保留前两个
+                    firstS = firstC;
             }
             headStr = strSplit.substring(0,firstS-1>0?firstS-1:0);
             midStr = strSplit.substring(firstS,tailInx);

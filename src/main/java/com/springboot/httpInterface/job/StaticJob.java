@@ -77,7 +77,7 @@ public class StaticJob implements BaseJob {
                 String url = tabAndMark[3];
                 if(!StringUtils.isEmpty(url))
                     accessUrl = url;
-                JSONObject jsonObject = JSONObject.parseObject(httpServiceTest.getJsonData(accessUrl, "utf-8", "RouteId",""));
+                JSONObject jsonObject = JSONObject.parseObject(httpServiceTest.getJsonData(accessUrl, "utf-8", "RouteId","",false));
                 token = new Token();
                 token.setAccessToken(jsonObject.get("access_token").toString());
                 token.setDataTm(new Date());
@@ -177,13 +177,13 @@ public class StaticJob implements BaseJob {
 
                     List<String> listJson = new ArrayList<>();
 
-                    String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId","");
+                    String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId","",true);
 
                     int k = 0;
                     while(getJson.indexOf("errcode")>-1) {
                         //token失效，再次拉取
                         token = getToken();
-                        getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","RouteId","");
+                        getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","RouteId","",true);
 //                        token = null;
                         if(k++>30)
                             break;
@@ -210,13 +210,13 @@ public class StaticJob implements BaseJob {
                         int k = 0;
                         List<String> listJson = new ArrayList<>();
                         for (Route r : listR) {
-                            String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId",r.getId());
+                            String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId",r.getId(),false);
                             int j = 0;
                             while(getJson.indexOf("errcode")>-1) {
                                 //token失效
                                 token = getToken();
 //                                k--;
-                                getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","RouteId",r.getId());
+                                getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","RouteId",r.getId(),false);
 //                                saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
 //                                        tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
 //                                        getJson);
@@ -264,14 +264,14 @@ public class StaticJob implements BaseJob {
                         int k = 0;
                         List<String> listJson = new ArrayList<>();
                         for(RouteVehicle rv:routeVehicleList){
-                            String getJson = httpServiceTest.getJsonData(url, "utf-8","VehId",rv.getId());
+                            String getJson = httpServiceTest.getJsonData(url, "utf-8","VehId",rv.getId(),false);
 
                             int j = 0;
                             while(getJson.indexOf("errcode")>-1) {
                                 //token失效
                                 token = getToken();
 //                                k--;
-                                getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","VehId",rv.getId());
+                                getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","VehId",rv.getId(),false);
 //                                saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
 //                                        tabAndMark == null || k++ > 0 ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],
 //                                        getJson);

@@ -219,6 +219,10 @@ public class HttpServiceTest {
             m.put("Gate","1");
             m.put("Curr_Enter_Cnt","1");
             result.add(m);
+        }else if (param.equals("ParkPrecnQty")){//停车场当前车位预约中数量
+            m.put("Park","2");
+            m.put("Precn_Qty","200");
+            result.add(m);
         }else if (param.equals("CurrTotlCnt")){//当前闸机进入总人数
             m.put("Curr_Totl_Cnt","2");
             result.add(m);
@@ -243,10 +247,10 @@ public class HttpServiceTest {
             m.put("Next_Day_Weat","7");
             result.add(m);
         }else if (param.equals("Rout")){//周边交通路线
-            m.put("Rout_ID","1");
-            m.put("Rout_Code","8");
+//            m.put("Rout_ID","1");
+//            m.put("Rout_Code","8");
             m.put("Rout_Nm","1");
-            m.put("Begn_Stat","1");
+//            m.put("Begn_Stat","1");
             m.put("Term_Stat","1");
             result.add(m);
         }else if (param.equals("ParkCurrUseQty")){//停车位当前使用数量
@@ -306,11 +310,12 @@ public class HttpServiceTest {
      * @param encoding
      * @param id
      * @param value
+     * @param needTrack
      * @return
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public String getJsonData(String url, String encoding,String id,String value) throws ClientProtocolException, IOException {
+    public String getJsonData(String url, String encoding,String id,String value,boolean needTrack) throws ClientProtocolException, IOException {
         String result = "";
 
         // 创建httpclient对象
@@ -323,7 +328,11 @@ public class HttpServiceTest {
         if(!StringUtils.isEmpty(id)){
 
             Map<String,String> map = new HashMap();
-            map.put(id,value);
+
+            if(needTrack)
+                map.put("NeedTrack",Boolean.toString(needTrack));
+            else
+                map.put(id,value);
 
             //设置参数发送
 //            List<BasicNameValuePair> pairs = new ArrayList<>();

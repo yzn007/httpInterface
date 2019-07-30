@@ -47,12 +47,12 @@ public class CxfWebService {
             String terminalXY = "192,234";
             String enKey = "DfeDFEFDxXUF&*%*##*(#$JJFK";
             Document document = DocumentHelper.createDocument();
-            DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-            Element root = document.addElement("wrObjects");
+            Element root = document.addElement("root");
 
             for(int i=0;i<1;i++){
-                Element wrObject = root.addElement("wrObject");
+                Element wrObject = root.addElement("WriteCondition");
                 Element hpzl = wrObject.addElement("hpzl");
                 hpzl.setText("02");
                 Element hphm = wrObject.addElement("hphm");
