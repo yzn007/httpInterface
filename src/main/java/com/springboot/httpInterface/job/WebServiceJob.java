@@ -38,15 +38,16 @@ public class WebServiceJob implements BaseJob {
     private String table = "BUS_VEHIC_LCTN_MSG";
 
 
-
+    final String topicName = WebServiceJob.class.getSimpleName();
+    final String configName = "project.properties";
 
     public WebServiceJob() {
         try {
             if (config.size() == 0)
-                config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
+                config.putAll(ReadPropertiesUtils.readConfig(configName));
             if (topicS.size() == 0)
                 //取得静态表
-                topicS = JsonObjectToAttach.getValidProperties("topics", null, null, true);
+                topicS = JsonObjectToAttach.getValidProperties(topicName, null, null, true);
 
 
 

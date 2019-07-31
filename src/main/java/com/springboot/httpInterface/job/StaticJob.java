@@ -41,6 +41,9 @@ public class StaticJob implements BaseJob {
     //令牌地址
     static String accessUrl = "http://39.108.107.62:8087/api/Token?appid=001&secret=ABCDEFG";
 
+    final String topicName = StaticJob.class.getSimpleName();
+    final String configName = "project.properties";
+
     @Autowired
     TokenService tokenService;
 
@@ -108,10 +111,10 @@ public class StaticJob implements BaseJob {
 //        this.table = table;
         try {
             if (config.size() == 0)
-                config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
+                config.putAll(ReadPropertiesUtils.readConfig(configName));
             if (topicS.size() == 0)
                 //取得静态表
-                topicS = JsonObjectToAttach.getValidProperties("StaticJob", null, null, true);
+                topicS = JsonObjectToAttach.getValidProperties(topicName, null, null, true);
 
 //            HttpServiceTest httpServiceTest = new HttpServiceTest();
 //            this.jsonStr = httpServiceTest.getJsonData("http://localhost/httpService/sendGetData?RayData=CurrTotlCnt", "utf-8");

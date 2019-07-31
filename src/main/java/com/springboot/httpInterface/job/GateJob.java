@@ -32,6 +32,9 @@ public class GateJob implements BaseJob {
 //        _log.info("hello,my first springboot job!" + context.getJobDetail().getKey());
     }
 
+    final String topicName = GateJob.class.getSimpleName();
+    final String configName = "project.properties";
+
     private static Logger _log = LoggerFactory.getLogger(GateJob.class);
 
     final static int NUM_PROCESS = 6;
@@ -52,12 +55,12 @@ public class GateJob implements BaseJob {
     public GateJob() {
         try {
             if (config.size() == 0)
-                config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
+                config.putAll(ReadPropertiesUtils.readConfig(configName));
             if(tblCd.size()==0)
-                tblCd = JsonObjectToAttach.getTableTextCode("GateJob",null,false);
+                tblCd = JsonObjectToAttach.getTableTextCode(topicName,null,false);
             if (topicM.size() == 0)
                 //取得有效主题
-                topicM = JsonObjectToAttach.getValidProperties("GateJob", null, null,false);
+                topicM = JsonObjectToAttach.getValidProperties(topicName, null, null,false);
 //            if(consumerMap.size() == 0){
 //                for (Map.Entry<String,String> m :topicM.entrySet()){
 ////                    Consumer c =KafkaSaveData.createConsumer();
@@ -98,7 +101,7 @@ public class GateJob implements BaseJob {
 
                  kafkaSaveData = new KafkaSaveData(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
 //                        tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],null, consumerMap.get(m.getKey()));
-                         tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],null, null);
+                         tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],tblCd, null);
             }
             executorService.execute(kafkaSaveData);
         }

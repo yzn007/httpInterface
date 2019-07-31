@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-    <topics name="topics">
-        <!-- topic列表： 名称 表名(多表用;分割) 是否有效 生产者编码(多个用;分割) 是否删除后再插入 是否清空表 是否静态数据 静态数据访问url-->
 
-        <!-- 停车场信息/历史 -->
-        <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false" isStatic="false"/>
-        <!--&lt;!&ndash; 车位预约信息 &ndash;&gt;-->
-        <!--<topic name="PARK_PARK_SPC_RESV_INFO" table="PARK_PARK_SPC_RESV_INFO" valid="true" textCode="0304" isDelete="true" isTruncate="false" isStatic="false"/>-->
-        <!--&lt;!&ndash; 车辆驶入事件 &ndash;&gt;-->
-        <!--<topic name="PARK_VEHIC_DRV_IN_EVT" table="PARK_VEHIC_DRV_IN_EVT" valid="true" textCode="0302" isDelete="false" isTruncate="false" isStatic="false"/>-->
-        <!--&lt;!&ndash; 车辆驶出事件 &ndash;&gt;-->
-        <!--<topic name="PARK_VEHIC_START_OUT_EVT" table="PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0303" isDelete="false" isTruncate="false" isStatic="false"/>-->
+    <!-- topic列表： 名称 表名(多表用;分割) 是否有效 生产者编码(多个用;分割) 是否删除后再插入 是否清空表 是否静态数据 静态数据访问url-->
+
+    <!-- 闸机事件(1次/5s) -->
+    <topics name="Per5SJob">
+        <!-- 闸机事件 -->
+        <topic name="GATE_GATE_EVT" table="GATE_GATE_EVT" valid="true" textCode="0102" isDelete="false" isTruncate="false" isStatic="false"/>
+    </topics>
+
+    <!-- 停车场预约 (1次/10s)-->
+    <topics name="Per10SJob">
         <!-- 车位预约信息/车辆驶入事件/车辆驶出事件 -->
         <topic name="PARK_CONSM_INFO" table="PARK_PARK_SPC_RESV_INFO;PARK_VEHIC_DRV_IN_EVT;PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0304;0302;0303" isDelete="true;false;false" isTruncate="false" isStatic="false"/>
+        <!-- 交警总队-->
+
+    </topics>
+
+    <!--停车场信息/历史（1次/30s)-->
+    <topics name="Per30SJob">
+        <!-- 停车场信息/历史 -->
+        <topic name="PARK_PARKING_LOT" table="PARK_PARKING_LOT;PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false" isStatic="false"/>
+    </topics>
+
+    <!-- 公交车辆、位置、闸机注册、停车场支付情况(1次/1min)-->
+    <topics name="topics">
+
         <!-- 停车支付情况 -->
         <topic name="PARK_PAY_INFO" table="PARK_PAY_INFO" valid="true" textCode="0305" isDelete="true" isTruncate="false" isStatic="false"/>
         <!-- 车辆信息 -->
@@ -20,9 +33,22 @@
         <topic name="BUS_VEHIC_LCTN_MSG" table="BUS_VEHIC_LCTN_MSG" valid="true" textCode="0201" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 车辆进出信息 -->
         <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="BUS_VEHIC_ARRV_DEPRT_MSG" valid="true" textCode="0202" isDelete="false" isTruncate="false" isStatic="false"/>
+        <!-- 闸机 -->
+        <!-- 闸机参展人与信息 /活动信息-->
+        <topic name="GATE_EXPO_AUDI_INFO" table="GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false" isStatic="false"/>
+
+    </topics>
+
+    <!-- 图聚、设备 (1次/1hour)-->
+    <topics name="Per1HourJob">
+
+    </topics>
+
+    <!-- 公交静态数据 (1次/3hour) -->
+    <topics name="StaticJob">
+        <!-- topic列表： 名称 表名(多表用;分割) 是否有效 生产者编码(多个用;分割) 是否删除后再插入 是否清空表 是否静态数据 静态数据访问url-->
         <!-- 令牌信息 -->
         <topic name="BUS_ACCESS_TOKEN" table="BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Token?appid=001&amp;secret=ABCDEFG"/>
-<!--&amp;Token?&amp;appid=APPID&amp;secret=APPSECRET"/>-->
         <!-- 线路 -->
         <topic name="BUS_ROUTE" table="BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/GetRoutes"/>
         <!-- 线路车辆 -->
@@ -33,15 +59,17 @@
         <topic name="BUS_VEHICLE" table="BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Vehicle/Info"/>
         <!-- 线路计划时间 -->
         <topic name="BUS_ROUTE_DISPT" table="BUS_ROUTE_DISPT" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://39.108.107.62:8087/api/Route/Times"/>
+
+    </topics>
+
+    <topics name="GateJob">
+        <!-- topic列表： 名称 表名(多表用;分割) 是否有效 生产者编码(多个用;分割) 是否删除后再插入 是否清空表 是否静态数据 静态数据访问url-->
+
         <!-- 闸机 -->
-        <!-- 闸机参展人与信息 /活动信息-->
-        <topic name="GATE_EXPO_AUDI_INFO" table="GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false" isStatic="false"/>
-        <!-- 闸机事件 -->
-        <topic name="GATE_GATE_EVT" table="GATE_GATE_EVT" valid="true" textCode="0102" isDelete="false" isTruncate="false" isStatic="false"/>
-        <!-- 登录区域与闸机关系 -->
-        <topic name="GATE_AREA_INFO" table="GATE_AREA_INFO" valid="false" textCode="0103" isDelete="false" isTruncate="false" isStatic="false"/>
-        <!-- 参展人员信息 -->
-        <topic name="CQEXPOAPP_EXPO_AUDI_INFO" table="CQEXPOAPP_EXPO_AUDI_INFO" valid="false" textCode="0103" isDelete="true" isTruncate="false"  isStatic="false"/>
+        <!--&lt;!&ndash; 登录区域与闸机关系 &ndash;&gt;-->
+        <!--<topic name="GATE_AREA_INFO" table="GATE_AREA_INFO" valid="true" textCode="0103" isDelete="false" isTruncate="false" isStatic="false"/>-->
+        <!--&lt;!&ndash; 参展人员信息 &ndash;&gt;-->
+        <!--<topic name="CQEXPOAPP_EXPO_AUDI_INFO" table="CQEXPOAPP_EXPO_AUDI_INFO" valid="true" textCode="0103" isDelete="true" isTruncate="false"  isStatic="false"/>-->
 
     </topics>
 </root>

@@ -119,7 +119,7 @@ public class KafkaSaveData extends Thread {
                             if (!reds.contains(sql) && null != sql)
                                 reds.add(sql);
 
-                            String[] sqlDyc = JsonObjectToAttach.getMetaSqls(topic, "", array);
+                            String[] sqlDyc = JsonObjectToAttach.getMetaSqls(table.split(";")[m], "", array);
                             if (null != sqlDyc && !sqlListDyc.contains(sqlDyc))
                                 sqlListDyc.add(sqlDyc);
                         }
