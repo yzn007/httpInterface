@@ -1,10 +1,10 @@
 package com.springboot.httpInterface.job;
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 
-public interface BaseJob extends Job {
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution
+public interface BaseJob extends Job{
 	public void execute(JobExecutionContext context) throws JobExecutionException;
 }
 

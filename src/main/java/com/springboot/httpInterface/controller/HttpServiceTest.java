@@ -414,7 +414,7 @@ public class HttpServiceTest {
 
 
     /**
-     * 定时推送数据
+     * （对方=》生产者）定时推送数据
      * @param request
      * @param response
      * @param requestBody
@@ -441,8 +441,8 @@ public class HttpServiceTest {
             jsonString = jsonArray.toJSONString();
         }
 
-        //取得有效主题
-        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,textCode,false);
+        //取得有效主题（全部生产者）
+        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("",null,textCode,false);
         if(topicM.keySet().size()>0) {
             ExecutorService executorService = Executors.newFixedThreadPool(6);
             for (Map.Entry<String, String> map : topicM.entrySet()) {

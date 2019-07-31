@@ -39,7 +39,7 @@ public class KafkaSaveData extends Thread {
     }
 
     //创建消费者
-    public static Consumer<String, String> createConsumer() {
+    public  Consumer<String, String> createConsumer() {
 
         try {
             if (config.keySet().size() <= 0)
@@ -71,51 +71,63 @@ public class KafkaSaveData extends Thread {
             consumer = createConsumer();
         //主题数map
         consumer.subscribe(Arrays.asList(topic));
-//        System.out.println("消费者对象1：" + consumer);
+//        try {
+//            Thread.sleep(123000);
+//            System.out.println("消费者对象1：" + consumer+"["+new Date()+"]");
+//        }catch (Exception e){
+//
+//        }
+
 
 //        while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(1000);
+        ConsumerRecords<String, String> records = null;
+        try {
+            records = consumer.poll(Integer.parseInt(config.get("pollNum")));
+        }finally {
+            consumer.commitSync();
+            consumer.close();
+            consumer = null;
+        }
             //System.out.println(records);
             List<String[]> reds = new ArrayList<>();
             List<String[]> sqlListDyc = new ArrayList<>();
+
             for (ConsumerRecord<String, String> record : records) {
                 System.out.println("接收到: " + record.offset() + record.key() + record.value());
                 String[] nameValue = {String.valueOf(record.offset()), record.value()};
                 try {
-                    String[] array = JsonObjectToAttach.getJsonList(record.value(),null);
+                    String[] array = JsonObjectToAttach.getJsonList(record.value(), null);
                     if (array != null) {
                         //表名固定了，根据实际情况修改
-                        for(int m=0;m<this.table.split(";").length;m++){
-                            if(textCode!=null && textCode.size()>0){
+                        for (int m = 0; m < this.table.split(";").length; m++) {
+                            if (textCode != null && textCode.size() > 0) {
                                 JSONObject jsonObject = null;
-                                try{
+                                try {
                                     String code = textCode.get(table.split(";")[m]).toString();
                                     jsonObject = JSONObject.parseObject(record.value());
-                                    if(jsonObject.get("tx_code")!=null && !StringUtils.isEmpty(code)&& !jsonObject.get("tx_code").equals(code))
+                                    if (jsonObject.get("tx_code") != null && !StringUtils.isEmpty(code) && !jsonObject.get("tx_code").equals(code))
                                         continue;
-                                }catch (Exception exx){
+                                } catch (Exception exx) {
 
                                 }
 
                             }
                             //删除当前表数据，保留历史表数据
-                            String[] sql =JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "","",
-                                    !(isDelInsert.indexOf(";")>0?isDelInsert.split(";")[m]:isDelInsert).equalsIgnoreCase("false"),new HashMap(),
-                                    !(isTrancate.indexOf(";")>0?isTrancate.split(";")[m]:isTrancate).equalsIgnoreCase("false"));
-                           if(!reds.contains(sql) && null != sql)
+                            String[] sql = JsonObjectToAttach.getBatchStatement(array, table.split(";")[m], "", "",
+                                    !(isDelInsert.indexOf(";") > 0 ? isDelInsert.split(";")[m] : isDelInsert).equalsIgnoreCase("false"), new HashMap(),
+                                    !(isTrancate.indexOf(";") > 0 ? isTrancate.split(";")[m] : isTrancate).equalsIgnoreCase("false"));
+                            if (!reds.contains(sql) && null != sql)
                                 reds.add(sql);
 
-                            String [] sqlDyc = JsonObjectToAttach.getMetaSqls(topic,"",array);
-                           if( null != sqlDyc && !sqlListDyc.contains(sqlDyc))
-                               sqlListDyc.add(sqlDyc);
+                            String[] sqlDyc = JsonObjectToAttach.getMetaSqls(topic, "", array);
+                            if (null != sqlDyc && !sqlListDyc.contains(sqlDyc))
+                                sqlListDyc.add(sqlDyc);
                         }
 
                     }
+
                 } catch (Exception e) {
                     System.out.println(e.toString());
-                }
-                finally {
-                    consumer.commitSync();
                 }
             }
 
@@ -158,7 +170,7 @@ public class KafkaSaveData extends Thread {
             }
 
             KafkaSaveData kafkaSaveData = new KafkaSaveData(m.getKey(),tabAndMark==null?m.getValue():tabAndMark[0],
-                    tabAndMark==null?"false":tabAndMark[1],tabAndMark==null?"false":tabAndMark[2],null,createConsumer());
+                    tabAndMark==null?"false":tabAndMark[1],tabAndMark==null?"false":tabAndMark[2],null,null);
             executorService.execute(kafkaSaveData);
         }
         executorService.shutdown();

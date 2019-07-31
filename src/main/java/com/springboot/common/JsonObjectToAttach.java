@@ -213,7 +213,7 @@ public class JsonObjectToAttach {
             Element root = document.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
-                if (tblEle.attribute(0).getValue().equals(propertyNm)) {
+                if (tblEle.attribute(0).getValue().equals(propertyNm)||StringUtils.isEmpty(propertyNm)) {//为空表示全部获取（生产者）
                     for (Element e : tblEle.elements()) {
                         if(  e.attribute(2).getValue().toLowerCase().equals("true"))
                             if(Boolean.parseBoolean(e.attribute(6).getValue().toString())==isStatic) {

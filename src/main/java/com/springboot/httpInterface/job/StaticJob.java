@@ -111,7 +111,7 @@ public class StaticJob implements BaseJob {
                 config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
             if (topicS.size() == 0)
                 //取得静态表
-                topicS = JsonObjectToAttach.getValidProperties("topics", null, null, true);
+                topicS = JsonObjectToAttach.getValidProperties("StaticJob", null, null, true);
 
 //            HttpServiceTest httpServiceTest = new HttpServiceTest();
 //            this.jsonStr = httpServiceTest.getJsonData("http://localhost/httpService/sendGetData?RayData=CurrTotlCnt", "utf-8");

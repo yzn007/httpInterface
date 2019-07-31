@@ -115,7 +115,7 @@ public class SaveDataStatic extends Thread {
         listJson.add(jsonString);
 
         //取得静态数据表
-        Map<String, String> topicM = JsonObjectToAttach.getValidProperties("topics", null, null,true);
+        Map<String, String> topicM = JsonObjectToAttach.getValidProperties("StaticJob", null, null,true);
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
         for (Map.Entry<String, String> m : topicM.entrySet()) {
             String[] tabAndMark = null;

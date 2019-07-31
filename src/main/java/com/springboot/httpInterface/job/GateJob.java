@@ -4,6 +4,7 @@ import com.springboot.common.JsonObjectToAttach;
 import com.springboot.common.KafkaSaveData;
 import com.springboot.common.ReadPropertiesUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -14,13 +15,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.kafka.clients.consumer.*;
 
 
 /**
  * Created by yzn00 on 2019/7/4.
  */
-public class MyJob implements BaseJob {
+public class GateJob implements BaseJob {
 //    @Autowired
 //    PersonService personService;
 
@@ -32,7 +32,7 @@ public class MyJob implements BaseJob {
 //        _log.info("hello,my first springboot job!" + context.getJobDetail().getKey());
     }
 
-    private static Logger _log = LoggerFactory.getLogger(MyJob.class);
+    private static Logger _log = LoggerFactory.getLogger(GateJob.class);
 
     final static int NUM_PROCESS = 6;
     static Map<String, String> config = new HashMap<String, String>();
@@ -49,15 +49,15 @@ public class MyJob implements BaseJob {
     //保存消费信息
     static Map<String,KafkaSaveData> kafakData = new HashedMap();
 
-    public MyJob() {
+    public GateJob() {
         try {
             if (config.size() == 0)
                 config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
             if(tblCd.size()==0)
-                tblCd = JsonObjectToAttach.getTableTextCode("topics",null,false);
+                tblCd = JsonObjectToAttach.getTableTextCode("GateJob",null,false);
             if (topicM.size() == 0)
                 //取得有效主题
-                topicM = JsonObjectToAttach.getValidProperties("topics", null, null,false);
+                topicM = JsonObjectToAttach.getValidProperties("GateJob", null, null,false);
 //            if(consumerMap.size() == 0){
 //                for (Map.Entry<String,String> m :topicM.entrySet()){
 ////                    Consumer c =KafkaSaveData.createConsumer();
