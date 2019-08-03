@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper
 public interface PersonMapper {
     public List<Person> selectAllPerson();
-    public int updatePerson();
+    public int updatePerson(Person person);
     public int insertPerson();
 
 }

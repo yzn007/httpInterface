@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface PersonService {
     public int insertPerson();
-    public int updatePerson();
+    public int updatePerson(Person person);
     public List<Person>selectAllPerson();
 }

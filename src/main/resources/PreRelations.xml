@@ -18,7 +18,8 @@
         LGTD,
         LTTD,
         BIZ_TM,
-        USE_STAT
+        USE_STAT,
+        Resv_Park_Spc_Qty
         )
         select pp.Park_Lot_ID,
         max(pl.PARK_LOT_NM),
@@ -32,28 +33,54 @@
         max(pl.LGTD),
         max(pl.LTTD),
         max(pl.BIZ_TM),
-        max(pl.USE_STAT)
+        max(pl.USE_STAT),
+        pp.Resv_Park_Spc_Qty
         from PARK_PARKING_LOT pp right join PARK_LOT_STATIC_INFO pl on pp.Park_Lot_ID = pl.PARK_LOT_ID and
         pp.Park_Lot_Regn_ID = pl.PARK_LOT_REGN_ID group by pl.PARK_LOT_ID
     </select>
 
     <!-- 停车位使用数量 -->
     <select id="T80_RD_LARG_SCRN_INDX" target="PARK_PARKING_LOT" split="true" valid="true">
-        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX;
+        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID='102003' and STATT_DT=date_format(now(),'%Y-%m-%d');
         insert into cqyl_rd.T80_RD_LARG_SCRN_INDX (RPT_ID,
         RPT_NM,
         INDX_ID,
         INDX_NM,
         GRP_ID,
         GRP_NM,
-        INDX_VAL)
+        INDX_VAL,
+        STATT_DT)
         select '102',
         '停车位数量',
         '102003',
         '停车位当前使用数量',
         PARK_LOT_ID,
         PARK_LOT_NM,
-        PARK_SPC_TOTL_QTY-REMN_PARK_SPC_QTY
+        PARK_SPC_TOTL_QTY-REMN_PARK_SPC_QTY,
+        date_format(now(),'%Y-%m-%d')
+        from cqyl_ta.T80_TA_PARK_LOT_INFO
+
+    </select>
+
+    <!-- 停车位当前使用数量 -->
+    <select id="T80_RD_LARG_SCRN_INDX_2" target="PARK_PARKING_LOT" split="true" valid="true">
+        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID='102004' and STATT_DT=date_format(now(),'%Y-%m-%d');
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX (RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT)
+        select '102',
+        '停车位数量',
+        '102004',
+        '停车场当前预约车位数量',
+        PARK_LOT_ID,
+        PARK_LOT_NM,
+        Resv_Park_Spc_Qty,
+        date_format(now(),'%Y-%m-%d')
         from cqyl_ta.T80_TA_PARK_LOT_INFO
 
     </select>
@@ -112,26 +139,29 @@
         Sites_Lng,
         '0',
         Sites_Attr,
-        Track
-        from BUS_STATION bs join bus_route_station br on bs.ROUTEID = br.ROUTEID
+        ru.Track
+        from BUS_STATION bs join bus_route_station br on bs.ROUTEID = br.ROUTEID join bus_route ru on bs.routeid = ru.id
 
     </select>
 
-    <select id="T80_RD_LARG_SCRN_INDX" target="BUS_STATION;BUS_ROUTE" split="false" valid="true">
+    <select id="T80_RD_LARG_SCRN_INDX_3" target="BUS_STATION;BUS_ROUTE" split="false" valid="true">
+        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID ='106001' and STATT_DT=date_format(now(),'%Y-%m-%d');
         insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
         RPT_NM,
         INDX_ID,
         INDX_NM,
         GRP_ID,
         GRP_NM,
-        INDX_VAL)
+        INDX_VAL,
+        STATT_DT)
         select '106',
         '公交数据',
         '106001',
         '临时站点数量',
         null,
         null,
-        count(bs.RouteId)
+        count(bs.RouteId),
+        date_format(now(),'%Y-%m-%d')
         from BUS_STATION bs join BUS_ROUTE br on bs.RouteId = br.ID and br.State = '1'
         group by bs.RouteId
 
@@ -191,6 +221,223 @@
         EXECUTE stmt
     </select>
 
+    <!-- 参展人员信息-->
+    <select id="T80_RD_LARG_SCRN_INDX_4" target="GATE_EXPO_AUDI_INFO" split="true" valid="true">
+        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID in( '105001','105003','105004','107001','107002') and STATT_DT=date_format(now(),'%Y-%m-%d');
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT)
+        select '105',
+        '预约观展人数统计',
+        '105001',
+        '预约观展人数',
+        null,
+        null,
+        count(a.act_id),
+        date_format(now(),'%Y-%m-%d')
+        from GATE_EXPO_AUDI_INFO g join  GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        group by g.id;
+
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT)
+        select '105',
+        '预约观展人数统计',
+        '105003',
+        '公共交通出行人数',
+        null,
+        null,
+        count(a.act_id),
+        date_format(now(),'%Y-%m-%d')
+        from GATE_EXPO_AUDI_INFO g join GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        where travel IN('轨道交通','公交')
+        group by g.id;
+
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT)
+        select '105',
+        '预约观展人数统计',
+        '105004',
+        '自驾出行人数',
+        null,
+        null,
+        count(a.act_id),
+        date_format(now(),'%Y-%m-%d')
+        from GATE_EXPO_AUDI_INFO g join GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        where travel ='自驾'
+        group by g.id;
+
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT)
+        select '107',
+        '参展人员统计',
+        '107001',
+        '安保人员数量',
+        null,
+        null,
+        count(a.act_id),
+        date_format(now(),'%Y-%m-%d')
+        from GATE_EXPO_AUDI_INFO g join  GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        where g.ROLETYPE='9'
+        group by g.id;
+
+        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT)
+        select '107',
+        '参展人员统计',
+        '107002',
+        '工作人员数量',
+        null,
+        null,
+        count(a.act_id),
+        date_format(now(),'%Y-%m-%d')
+        from GATE_EXPO_AUDI_INFO g join  GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        where g.ROLETYPE='4'
+        group by g.id
+
+    </select>
+
+    <!-- 闸机事件-->
+    <select id="T80_RD_GATE_TMP_EVT" target="GATE_GATE_EVT" split="true" valid="true">
+        DELETE FROM CQYL_RD.T80_RD_GATE_TMP_EVT WHERE 1=1;
+        INSERT INTO CQYL_RD.T80_RD_GATE_TMP_EVT(ID,
+        Gate_ID,
+        Entrc_ID,
+        Entrc_Nm,
+        Data_Tm) SELECT T1.USERID,T1.ACCESSPOINT,T2.ACCESSAREA,T2.ACCESSAREA_NM,T1.Data_Tm FROM CQYL_PRE.GATE_GATE_TMP_EVT T1 LEFT JOIN CQYL_PRE.GATE_AREA_INFO T2 ON T2.ACCESSPOINT=T1.ACCESSPOINT;
+
+        DELETE FROM CQYL_RD.T80_RD_LARG_SCRN_INDX WHERE INDX_ID IN('100001','100002') and STATT_DT=date_format(now(),'%Y-%m-%d');
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '100','实时人数统计','100001','登录口实时人数',ENTRC_ID,ENTRC_NM,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_TMP_EVT GROUP BY ENTRC_ID,ENTRC_NM;
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '100','实时人数统计','100002','当前总人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_TMP_EVT;
+
+        DELETE FROM CQYL_RD.T80_RD_GATE_TMP_EVT WHERE 1=1;
+        INSERT INTO CQYL_RD.T80_RD_GATE_TMP_EVT(ID,
+        Gate_ID,
+        Entrc_ID,
+        Entrc_Nm,
+        Data_Tm) SELECT T1.USERID,T1.ACCESSPOINT,T2.ACCESSAREA,T2.ACCESSAREA_NM,T1.Data_Tm FROM CQYL_PRE.GATE_GATE_TMP_EVT T1 LEFT JOIN CQYL_PRE.GATE_AREA_INFO T2 ON T2.ACCESSPOINT=T1.ACCESSPOINT;
+
+        DELETE FROM CQYL_RD.T80_RD_LARG_SCRN_INDX WHERE INDX_ID IN('100001','100002') and STATT_DT=date_format(now(),'%Y-%m-%d');
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '100','实时人数统计','100001','登录口实时人数',ENTRC_ID,ENTRC_NM,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_TMP_EVT GROUP BY ENTRC_ID,ENTRC_NM;
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '100','实时人数统计','100002','当前总人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_TMP_EVT;
+
+        INSERT INTO CQYL_RD.T80_RD_GATE_EVT(ID,
+        Role_Typ,
+        Role_Typ_Desc,
+        Gate_ID,
+        Entrc_ID,
+        Entrc_Nm,
+        Trvl_Way,
+        Data_Tm
+        )
+        SELECT T1.ID,T2.ROLETYPE,T3.CODE_VAL_DESC,T1.GATE_ID,T1.ENTRC_ID,T1.ENTRC_NM,T2.TRAVEL,T1.Data_Tm
+        FROM CQYL_RD.T80_RD_GATE_TMP_EVT T1
+        LEFT JOIN CQYL_PRE.GATE_EXPO_AUDI_INFO T2 ON T2.ID=T1.ID
+        LEFT JOIN CQYL_RD.T80_RD_DIC T3 ON T2.ROLETYPE=T3.CODE_VAL AND T3.CODE_ID='10001';
+
+        DELETE FROM CQYL_RD.T80_RD_LARG_SCRN_INDX WHERE INDX_ID IN('101001','101002','101003','101004','105002') and STATT_DT=date_format(now(),'%Y-%m-%d');
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '101','累计人数统计','101001','各登录口人数',ENTRC_ID,ENTRC_NM,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0 GROUP BY ENTRC_ID,ENTRC_NM;
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT)  SELECT '101','累计人数统计','101002','按角色类型统计登录人数',ROLE_TYP,ROLE_TYP_DESC,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0 GROUP BY ROLE_TYP,ROLE_TYP_DESC;
+
+
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '101','累计人数统计','101004','今日观展人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0;
+
+
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '101','累计人数统计','101003','昨日观展人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(DATE_SUB(now(),INTERVAL  1 day),'%Y-%m-%d'))>0;
+
+        INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
+        RPT_NM,
+        INDX_ID,
+        INDX_NM,
+        GRP_ID,
+        GRP_NM,
+        INDX_VAL,
+        STATT_DT) SELECT '101','累计人数统计','105002','已接待预约人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0
+    </select>
 </root>
 
 

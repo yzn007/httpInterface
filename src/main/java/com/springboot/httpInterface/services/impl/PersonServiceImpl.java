@@ -21,8 +21,8 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public int updatePerson() {
-        return personMapper.updatePerson();
+    public int updatePerson(Person person) {
+        return personMapper.updatePerson(person);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.springboot.common;
 
 import com.springboot.httpInterface.services.CxfWebService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,6 +13,7 @@ public class WebServiceWrite extends Thread {
     @Override
     public void run() {
         Logger.getLogger(this.getClass().getName()).setLevel(Level.OFF);
-        CxfWebService.cl2();
+        CxfWebService cxfWebService = new CxfWebService();
+        cxfWebService.cl2();
     }
 }

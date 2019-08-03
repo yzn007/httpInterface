@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springboot.httpInterface.dao.RyDataLargeMapper">
+    <resultMap type="com.springboot.httpInterface.entity.RyDataLarge" id="ryData">
+        <result property="rptId" column="RPT_ID"/>
+        <result property="rptNm" column="RPT_NM"/>
+        <result property="indexId" column="INDX_ID" />
+        <result property="indexNm" column="INDX_NM" />
+        <result property="groupId" column="GRP_ID" />
+        <result property="groupNm" column="GRP_NM" />
+        <result property="indexVal" column="INDX_VAL" />
+    </resultMap>
+
+    <select id="getRyDataById" resultMap="ryData" parameterType="hashMap">
+      select *from cqyl_rd.T80_RD_LARG_SCRN_INDX
+        <where>
+            indx_id IN
+            <foreach item = "item" index = "index" collection="indexId"
+                     open = "("  separator=","  close =")"  >
+                ${item}
+            </foreach>
+
+            <if test="groupId!=null and groupId!= ''">
+                and GRP_ID = ${groupId}
+            </if>
+        </where>
+
+    </select>
+
+    <resultMap type="java.util.Map" id="routeMap">
+        <result property="routeNm" column="Rout_Nm"/>
+        <result property="termStat" column="Term_Stat"/>
+    </resultMap>
+
+    <select id="getAllRoute" resultMap="routeMap" parameterType="hashMap">
+      select * from cqyl_rd.T80_RD_ROUTE
+        <choose>
+            <when test="limit!=null and limit!=''">
+                limit #{limit}
+            </when>
+            <otherwise>
+                limit 100
+            </otherwise>
+        </choose>
+    </select>
+
+    <resultMap type="java.util.Map" id="parkMap">
+        <result property="platNo" column="Plat_No"/>
+        <result property="drvInTm" column="Drv_In_Tm"/>
+        <result property="startOutTm" column="Start_Out_Tm"/>
+    </resultMap>
+
+    <select id="getAllPark" resultMap="parkMap" parameterType="hashMap">
+        select * from (select plat_no,date_format(Drv_In_Tm,'%Y-%m-%d %T') Drv_In_Tm ,date_format(Start_Out_Tm,'%Y-%m-%d %T') Start_Out_Tm
+        from cqyl_rd.T80_RD_PARK_EVT
+        <where>
+            instr(Data_Tm ,date_format(now(),'%Y-%m-%d'))>0
+        </where>
+        order by Data_Tm desc) a
+        <choose>
+            <when test="limit!=null and limit!=''">
+                limit #{limit}
+            </when>
+            <otherwise>
+                limit 10
+            </otherwise>
+        </choose>
+    </select>
+
+    <resultMap type="java.util.Map" id="webServiceMap">
+        <result property="tpHpzl" column="TP_HPZL"/>
+        <result property="tpHphm" column="TP_HPHM"/>
+        <result property="tpTxrqq" column="TP_TXRQQ"/>
+        <result property="tpTxrqz" column="TP_TXRQZ"/>
+        <result property="tpTxfw" column="TP_TXFW"/>
+        <result property="tpTxyy" column="TP_TXYY"/>
+        <result property="tpCzlx" column="TP_CZLX"/>
+        <result property="tpJksqm" column="TP_JKSQM"/>
+    </resultMap>
+    <select id="getWebServiceData" resultMap="webServiceMap" parameterType="hashMap">
+        select TP_HPZL,
+        TP_HPHM,
+        TP_TXRQQ,
+        TP_TXRQZ,
+        TP_TXFW,
+        case when trim(TP_TXYY)='' or TP_TXYY is null then '预约车辆' ELSE TP_TXYY end TP_TXYY ,
+        TP_CZLX,
+        TP_JKSQM
+        from TP_VEH_INFO
+        <where>
+            tp_stat = '0' or tp_stat is null or trim(tp_stat) = '' -- 0:未发送或发送失败 1：发送成功
+        </where>
+        order by TP_TXRQQ
+        <if test="limit!=null and limit!=''">
+            limit #{limit}
+        </if>
+    </select>
+    <update id="updateWebService" parameterType="java.util.Map">
+        <if test="tpHpzl!=null and tpHphm!=null and tpTxrqq!=null and tpTxrqz!=null">
+            update TP_VEH_INFO
+            <set>
+              tp_stat = '1'
+            </set>
+            where tp_hpzl =#{tpHpzl} and
+            tp_hphm = #{tpHphm} and
+            tp_txrqq = #{tpTxrqq} and
+            tp_txrqq = #{tpTxrqq} and
+            (tp_stat = '0'or tp_stat is null or trim(tp_stat) = '')
+        </if>
+    </update>
+</mapper>

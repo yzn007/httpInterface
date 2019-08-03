@@ -22,8 +22,7 @@ import scala.tools.nsc.transform.patmat.Logic;
 import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -89,9 +88,10 @@ public class JsonObjectToAttach {
     public static Document parseDom4j(String fileName) {
         try {
             // 创建dom4j解析器
-            File file = new File(fileName);
+//            File file = new File(fileName);
             SAXReader reader = new SAXReader();
-            Document document = reader.read(file);
+
+            Document document = reader.read(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName));
 //            System.out.println("Root element :" + document.getRootElement().getName());
             return document;
         } catch (DocumentException e) {
@@ -165,9 +165,9 @@ public class JsonObjectToAttach {
             fileName = topicPath;
 
         try{
-            String path = ResourceUtils.getURL("classpath:").getPath()+ fileName;
+//            String path = ResourceUtils.getURL("classpath:").getPath()+ fileName;
             if(document==null)
-                document = parseDom4j(path);
+                document = parseDom4j(fileName);
             Element root = document.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
@@ -207,9 +207,9 @@ public class JsonObjectToAttach {
 
 
         try{
-            String path = ResourceUtils.getURL("classpath:").getPath()+ fileName;
+//            String path = ResourceUtils.getURL("classpath:").getPath()+ fileName;
             if(document==null)
-                document = parseDom4j(path);
+                document = parseDom4j(fileName);
             Element root = document.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
@@ -272,9 +272,9 @@ public class JsonObjectToAttach {
         try {
 
 //            String path = Thread.currentThread().getClass().getResource("/").getPath() + fileName;
-            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
+//            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
             if(tplDocument==null)
-                tplDocument = parseDom4j(path);
+                tplDocument = parseDom4j(fileName);
             Element root = tplDocument.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();
@@ -546,9 +546,9 @@ public class JsonObjectToAttach {
             fileName = tmpFile;
 
         try{
-            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
+//            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
             if(null==preDocument)
-                preDocument = parseDom4j(path);
+                preDocument = parseDom4j(fileName);
             Element root = preDocument.getRootElement();
             for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
                 Element tblEle = (Element) iterator.next();

@@ -19,8 +19,9 @@ object ConnectPoolUtil {
     */
   def getDataSource():BasicDataSource={
     val properties = new Properties()
-    val path = Thread.currentThread().getContextClassLoader.getResource("project.properties").getPath //文件要放到resource文件夹下
-    properties.load(new FileInputStream(path))
+//    val path = Thread.currentThread().getContextClassLoader.getResource("project.properties").getPath //文件要放到resource文件夹下
+//    properties.load(new FileInputStream(path))
+    properties.load(Thread.currentThread().getContextClassLoader.getResourceAsStream("project.properties"))
     if(bs==null){
       bs = new BasicDataSource()
       bs.setDriverClassName(properties.getProperty("DriverClassName"))

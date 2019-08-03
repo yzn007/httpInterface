@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.springboot.common.JsonObjectToAttach;
 import com.springboot.common.KafkaProducer;
 import com.springboot.common.Ret;
+import com.springboot.httpInterface.entity.RyDataLarge;
 import com.springboot.httpInterface.services.PersonService;
+import com.springboot.httpInterface.services.RyDataLargeService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -19,10 +21,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import scala.annotation.meta.param;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -211,91 +215,258 @@ public class HttpServiceTest {
         return jsonObject;
     }
 
+    @Autowired
+    RyDataLargeService ryDataLargeService;
+
     private List getResultTable(String param){
         List<Map> result = new ArrayList<>();
-        Map <String,String> m = new HashMap();
+
         //每个闸机当前进入人数
         if(param.equals("CurrEnterCnt")){
-            m.put("Gate","1");
-            m.put("Curr_Enter_Cnt","1");
-            result.add(m);
+            String gate = "";
+            String currEnterCnt = "";
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("100001");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                gate =y.getGroupNm();
+                currEnterCnt = y.getIndexVal();
+                Map <String,String> m = new HashMap();
+                m.put("Gate",gate);
+                m.put("Curr_Enter_Cnt",currEnterCnt);
+                result.add(m);
+            }
+
         }else if (param.equals("ParkPrecnQty")){//停车场当前车位预约中数量
-            m.put("Park","2");
-            m.put("Precn_Qty","200");
-            result.add(m);
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("102004");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            String park = "";
+            String precnQty = "";
+            for(RyDataLarge y:listRyData){
+                park = y.getGroupNm();
+                precnQty = y.getIndexVal();
+                Map <String,String> m = new HashMap();
+                m.put("Park",park);
+                m.put("Precn_Qty",precnQty);
+                result.add(m);
+            }
+
         }else if (param.equals("CurrTotlCnt")){//当前闸机进入总人数
-            m.put("Curr_Totl_Cnt","2");
-            result.add(m);
+            String currTotlCnt = "";
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("100002");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for (RyDataLarge y :listRyData){
+                Map <String,String> m = new HashMap();
+                currTotlCnt =y.getIndexVal();
+                m.put("Curr_Totl_Cnt",currTotlCnt);
+                result.add(m);
+            }
+
         }else if (param.equals("GateAccmEnterCnt")){//每个闸机当日累计进入人数
-            m.put("Gate","1");
-            m.put("Today_Accm_Enter_Cnt","3");
-            result.add(m);
-        }else if (param.equals("CertAccmEnterCnt")){//按证件当日累计进入人数
-            m.put("Cert","1");
-            m.put("Today_Accm_Enter_Cnt","4");
-            result.add(m);
-        }else if (param.equals("ParkTotlQty")){//停车位总数量
-            m.put("Park","1");
-            m.put("Park_Totl_Qty","5");
-            result.add(m);
-        }else if (param.equals("MetroInOutCnt")){//周边轨道交通情况
-            m.put("Stat","1");
-            m.put("Metro_Enter_Cnt","6");
-            m.put("Metro_Leave_Cnt","1");
-            result.add(m);
+            String todayAccmEnterCnt = "";
+            String gate = "";
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("101001");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                todayAccmEnterCnt =y.getIndexVal();
+                gate = y.getGroupNm();
+                Map m = new HashedMap();
+                m.put("Gate",gate);
+                m.put("Today_Accm_Enter_Cnt",todayAccmEnterCnt);
+                result.add(m);
+            }
+
+        }else if (param.equals("CertAccmEnterCnt")){//按证件当日累计进入人数-list
+            Map map = new HashedMap();
+            String todayAccmEnterCnt = "";
+            String cert = "";
+            map.put("indexId",new ArrayList<String>(){{add("101002");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                todayAccmEnterCnt =y.getIndexVal();
+                cert = y.getGroupNm();
+                Map m = new HashedMap();
+                m.put("Cert",cert);
+                m.put("Today_Accm_Enter_Cnt",todayAccmEnterCnt);
+                result.add(m);
+            }
+
+        }else if (param.equals("ParkTotlQty")){//停车位总数量-删除
+//            m.put("Park","1");
+//            m.put("Park_Totl_Qty","5");
+//            result.add(m);
+        }else if (param.equals("MetroInOutCnt")){//周边轨道交通情况-删除
+//            m.put("Stat","1");
+//            m.put("Metro_Enter_Cnt","6");
+//            m.put("Metro_Leave_Cnt","1");
+//            result.add(m);
         }else if (param.equals("NextDayWeat")){//天气情况
+            Map m = new HashedMap();
             m.put("Next_Day_Weat","7");
             result.add(m);
         }else if (param.equals("Rout")){//周边交通路线
-//            m.put("Rout_ID","1");
-//            m.put("Rout_Code","8");
-            m.put("Rout_Nm","1");
-//            m.put("Begn_Stat","1");
-            m.put("Term_Stat","1");
-            result.add(m);
+            Map map = new HashedMap();
+            map.put("limit",1000);//返回最后1000条记录
+            List<Map> listRoute = ryDataLargeService.getAllRoute(map);
+            for(Map ma:listRoute){
+                Map m = new HashedMap();
+                m.put("Rout_Nm",ma.get("routeNm"));
+                m.put("Term_Stat",ma.get("termStat"));
+                result.add(m);
+            }
         }else if (param.equals("ParkCurrUseQty")){//停车位当前使用数量
-            m.put("Park","1");
-            m.put("Park_Curr_Use_Qty","9");
-            result.add(m);
+            String park = "";
+            String parkCurrUseQty = "";
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("102003");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                parkCurrUseQty =y.getIndexVal();
+                park = y.getGroupNm();
+                Map m = new HashedMap();
+                m.put("Park",park);
+                m.put("Park_Curr_Use_Qty",parkCurrUseQty);
+                result.add(m);
+            }
+
         }else if (param.equals("ParkLicnEvent")){//停车场车辆进出数据
-            m.put("Licn","1");
-            m.put("Enter_Tm","10");
-            m.put("Leave_Tm","1");
-            result.add(m);
-        }else if (param.equals("SecuQty")){//安保人员数量
-            m.put("Secu_Qty","11");
-            result.add(m);
+            Map map = new HashedMap();
+            map.put("limit",10);//返回最后10条记录
+            List<Map> listRyData = ryDataLargeService.getAllPark(map);
+            for(Map ma:listRyData){
+                Map m = new HashedMap();
+                m.put("Licn",ma.get("platNo"));
+                m.put("Enter_Tm",ma.get("drvInTm"));
+                m.put("Leave_Tm",ma.get("startOutTm"));
+                result.add(m);
+            }
+        }else if (param.equals("SecuQty")){//安保人员数量-9
+            Map map = new HashedMap();
+            String todayAccmEnterCnt = "";
+            map.put("indexId",new ArrayList<String>(){{add("101002");}});
+            map.put("groupId","9");//安保角色
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData) {
+                todayAccmEnterCnt = y.getIndexVal();
+                Map m = new HashedMap();
+                m.put("Secu_Qty",todayAccmEnterCnt);
+                result.add(m);
+            }
+
         }else if (param.equals("ExhiCnt")){//昨日、今日累计人数
-            m.put("Yestd_Accm_Cnt","1");
-            m.put("Today_Accm_Cnt","12");
-            result.add(m);
+            String yestdAccmCnt = "";
+            String todayAccmCnt = "";
+            Map map = new HashedMap();
+            List<String> ids = new ArrayList<String>();
+            ids.add("101003");
+            ids.add("101004");
+            map.put("indexId",ids);
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            Map m = new HashedMap();
+            int i= 0;
+            for(RyDataLarge y:listRyData){
+                if(y.getIndexId().equalsIgnoreCase("101003")){
+                    yestdAccmCnt =y.getIndexVal();
+                    m.put("Yestd_Accm_Cnt",yestdAccmCnt);
+                }
+                else {
+                    todayAccmCnt = y.getIndexVal();
+                    m.put("Today_Accm_Cnt", todayAccmCnt);
+                }
+                i++;
+                if(i%2==0) {
+                    result.add(m);
+                    m = new HashedMap();
+                }
+            }
         }else if (param.equals("TodayPrecnExhiCnt")){//当日预约观展人数
-            m.put("Today_Precn_Exhi_Cnt","13");
-            result.add(m);
+            String todayPrecnExhiCnt = "";
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("105001");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                todayPrecnExhiCnt =y.getIndexVal();
+                Map m = new HashedMap();
+                m.put("Today_Precn_Exhi_Cnt",todayPrecnExhiCnt);
+                result.add(m);
+            }
+
         }else if (param.equals("TodayExhiCnt")){//当日观展人数
-            m.put("Today_Exhi_Cnt","14");
-            result.add(m);
+            String todayExhiCnt = "";
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("101004");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                todayExhiCnt =y.getIndexVal();
+                Map m = new HashedMap();
+                m.put("Today_Exhi_Cnt",todayExhiCnt);
+                result.add(m);
+            }
+
         }else if (param.equals("StffTotlCnt")){//工作人员总数
-            m.put("Stff_Totl_Cnt","15");
-            result.add(m);
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("107002");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                String stffTotlCnt =y.getIndexVal();
+                Map m = new HashedMap();
+                m.put("Stff_Totl_Cnt",stffTotlCnt);
+                result.add(m);
+            }
+
         }else if (param.equals("CurrSecuQty")){//当前安保人员数量
-            m.put("Curr_Secu_Qty","16");
-            result.add(m);
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("107001");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                String currSecuQty =y.getIndexVal();
+                Map m = new HashedMap();
+                m.put("Curr_Secu_Qty",currSecuQty);
+                result.add(m);
+            }
+
         }else if (param.equals("PubTrafCnt")){//观展人员到达方式（当日驾车人数、当日公共交通人数）
-            m.put("Today_Driv_Cnt","1");
-            m.put("Today_Pub_Traf_Cnt","17");
-            result.add(m);
+            Map m = new HashedMap();
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("105003");add("105004");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            int k = 0;
+            for(RyDataLarge y:listRyData){
+                if(y.getIndexId().equalsIgnoreCase("105003")){
+                    m.put("Today_Pub_Traf_Cnt",y.getIndexVal());
+                }else {
+                    m.put("Today_Driv_Cnt",y.getIndexVal());
+                }
+                k++;
+                if(k%2==0){
+                    result.add(m);
+                    m = new HashedMap();
+                }
+            }
+
         }else if (param.equals("TmpStatQty")){//临时站点数量
-            m.put("Tmp_Stat_Qty","18");
-            result.add(m);
-        }else if (param.equals("TodayDispCnt")){//公交当日调度次数
-            m.put("Today_Disp_Cnt","19");
-            result.add(m);
-        }else if (param.equals("VenCurrCnt")){//各场馆实时人数
-            m.put("Ven","1");
-            m.put("Curr_Cnt","20");
-            result.add(m);
+            String tmpStatQty = "";
+            Map map = new HashedMap();
+            map.put("indexId",new ArrayList<String>(){{add("106001");}});
+            List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            for(RyDataLarge y:listRyData){
+                tmpStatQty =y.getIndexVal();
+                Map m = new HashedMap();
+                m.put("Tmp_Stat_Qty",tmpStatQty);
+                result.add(m);
+            }
+        }else if (param.equals("TodayDispCnt")){//公交当日调度次数-删除
+//            m.put("Today_Disp_Cnt","19");
+//            result.add(m);
+        }else if (param.equals("VenCurrCnt")){//各场馆实时人数-删除
+//            m.put("Ven","1");
+//            m.put("Curr_Cnt","20");
+//            result.add(m);
         }else{//其它
+            Map m = new HashedMap();
             m.put("Gate","0");
             m.put("Curr_Enter_Cnt","0");
             result.add(m);
