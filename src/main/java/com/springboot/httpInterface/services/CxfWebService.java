@@ -1,6 +1,7 @@
 package com.springboot.httpInterface.services;
 
 
+import com.springboot.httpInterface.SpringContextUtil;
 import com.springboot.httpInterface.StaticContext;
 import com.springboot.httpInterface.entity.JobAndTrigger;
 import com.github.pagehelper.PageInfo;
@@ -14,6 +15,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.spark_project.jetty.server.handler.ContextHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,8 +34,7 @@ public class CxfWebService {
 
 
 
-//        @Autowired
-        static RyDataLargeService ryDataLargeService;
+    static RyDataLargeService ryDataLargeService;
     //    public static void main(String []args){
     //        cl2();
     //    }
@@ -63,7 +64,8 @@ public class CxfWebService {
 
                 Map mm = new HashedMap();
                 if(ryDataLargeService == null)
-                    ryDataLargeService =  StaticContext.getContext().getBean(RyDataLargeService.class);
+//                    ryDataLargeService =  StaticContext.getContext().getBean(RyDataLargeService.class);
+                    ryDataLargeService = (RyDataLargeService)SpringContextUtil.getBean(RyDataLargeService.class);
                 List<Map> listWeb = ryDataLargeService.getWebServiceData(mm);
 
                 for(Map m :listWeb){

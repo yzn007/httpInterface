@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Created by yzn00 on 2019/8/1.
  */
-@Service
+@Service("ryDataLargeService")
 public class RyDataLargeServiceImpl implements RyDataLargeService {
 
 

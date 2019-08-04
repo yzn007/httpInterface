@@ -63,13 +63,13 @@ public class WebServiceJob implements BaseJob {
 //        _log.error("New Job执行时间: " + new Date());
 
 //
-//        ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
+        ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
 
         try {
 //    this.jsonStr = httpServiceTest.getJsonData("http://localhost/httpService/sendGetData?RayData=CurrTotlCnt", "utf-8");
             WebServiceWrite we = new WebServiceWrite();
-            we.run();
-//            executorService.shutdown();
+            executorService.execute(we);
+            executorService.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }

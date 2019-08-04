@@ -5,7 +5,7 @@
     <!-- 目标表名 主题 是否拆分sql 是否有效-->
      <!-- 执行sql -->
 
-    <select id="T80_TA_PARK_LOT_INFO" target="PARK_PARKING_LOT" split="false"  valid="true">
+    <select id="T80_TA_PARK_LOT_INFO" target="PARK_PARKING_LOT" split="true"  valid="true">
         insert into cqyl_ta.T80_TA_PARK_LOT_INFO(PARK_LOT_ID,
         PARK_LOT_NM,
         PARK_LOT_CHARC,
@@ -121,7 +121,7 @@
 
     </select>
     <!-- 站点 -->
-    <select id="T80_TA_PUB_TRAF_STAT_INFO" target="BUS_STATION" split="false" valid="true">
+    <select id="T80_TA_PUB_TRAF_STAT_INFO" target="BUS_STATION" split="true" valid="true">
         insert into cqyl_ta.T80_TA_PUB_TRAF_STAT_INFO(PUB_TRAF_ID,
         STAT_NM,
         ROUT_DRCT,
@@ -144,7 +144,7 @@
 
     </select>
 
-    <select id="T80_RD_LARG_SCRN_INDX_3" target="BUS_STATION;BUS_ROUTE" split="false" valid="true">
+    <select id="T80_RD_LARG_SCRN_INDX_3" target="BUS_STATION;BUS_ROUTE" split="true" valid="true">
         delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID ='106001' and STATT_DT=date_format(now(),'%Y-%m-%d');
         insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
         RPT_NM,
