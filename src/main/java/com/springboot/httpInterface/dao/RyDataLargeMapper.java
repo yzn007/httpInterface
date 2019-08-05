@@ -19,4 +19,5 @@ public interface RyDataLargeMapper {
     List<Map>getAllRoute(Map m);
     List<Map>getWebServiceData(Map m);
     void updateWebService(Map m);
+    List<Map>getWeather(Map m);
 }

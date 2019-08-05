@@ -5,6 +5,9 @@ import com.springboot.httpInterface.entity.RyDataLarge;
 import com.springboot.httpInterface.services.RyDataLargeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +42,13 @@ public class RyDataLargeServiceImpl implements RyDataLargeService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,timeout=36000,rollbackFor=Exception.class)
     public void updateWebService(Map m) {
         ryDataLargeMapper.updateWebService(m);
+    }
+
+    @Override
+    public List<Map> getWeather(Map m) {
+        return ryDataLargeMapper.getWeather(m);
     }
 }

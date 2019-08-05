@@ -304,9 +304,15 @@ public class HttpServiceTest {
 //            m.put("Metro_Leave_Cnt","1");
 //            result.add(m);
         }else if (param.equals("NextDayWeat")){//天气情况
-            Map m = new HashedMap();
-            m.put("Next_Day_Weat","7");
-            result.add(m);
+            Map map = new HashedMap();
+            map.put("limit",1);//返回明天天气温度
+            List<Map> listRoute = ryDataLargeService.getWeather(map);
+            for(Map ma:listRoute){
+                Map m = new HashedMap();
+                m.put("Next_Day_Weat",ma.get("tempt"));
+                result.add(m);
+            }
+
         }else if (param.equals("Rout")){//周边交通路线
             Map map = new HashedMap();
             map.put("limit",1000);//返回最后1000条记录

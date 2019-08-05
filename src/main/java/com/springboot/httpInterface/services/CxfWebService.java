@@ -6,6 +6,7 @@ import com.springboot.httpInterface.StaticContext;
 import com.springboot.httpInterface.entity.JobAndTrigger;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.dom4j.Document;
@@ -32,7 +33,12 @@ import static java.net.URLDecoder.decode;
 
 public class CxfWebService {
 
-
+    private String toString(Object o){
+        if(o!=null)
+            return o.toString().trim();
+        else
+            return "";
+    }
 
     static RyDataLargeService ryDataLargeService;
     //    public static void main(String []args){
@@ -57,88 +63,89 @@ public class CxfWebService {
                 String terminalXY = "192,234";
                 String enKey = "DfeDFEFDxXUF&*%*##*(#$JJFK";
                 String license = "21849186864529442191419884887906";
-                Document document = DocumentHelper.createDocument();
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-                Element root = document.addElement("root");
+//                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
                 Map mm = new HashedMap();
                 if(ryDataLargeService == null)
 //                    ryDataLargeService =  StaticContext.getContext().getBean(RyDataLargeService.class);
                     ryDataLargeService = (RyDataLargeService)SpringContextUtil.getBean(RyDataLargeService.class);
                 List<Map> listWeb = ryDataLargeService.getWebServiceData(mm);
-
-                for(Map m :listWeb){
+                if(listWeb.size()<=0)
+                    return null;
+                for(Map m :listWeb) {
+                    Document document = DocumentHelper.createDocument();
+                    Element root = document.addElement("root");
                     Element wrObject = root.addElement("WriteCondition");
                     Element hpzl = wrObject.addElement("hpzl");
-    //                hpzl.setText("02");
-                    hpzl.setData(m.get("tpHpzl"));
+                    //                hpzl.setText("02");
+                    hpzl.setText(toString(m.get("tpHpzl")));
                     Element hphm = wrObject.addElement("hphm");
-                    hphm.setData(m.get("tpHphm"));
+                    hphm.setText(toString(m.get("tpHphm")));
                     Element txrqq = wrObject.addElement("txrqq");
-                    txrqq.setData(m.get("tpTxrqq"));
+                    txrqq.setText(toString(m.get("tpTxrqq")));
                     Element txrqz = wrObject.addElement("txrqz");
-                    txrqz.setData(m.get("tpTxrqz"));
+                    txrqz.setText(toString(m.get("tpTxrqz")));
                     Element txfw = wrObject.addElement("txfw");
-                    txfw.setData(m.get("tpTxfw"));
+                    txfw.setText(toString(m.get("tpTxfw")));
                     Element txyy = wrObject.addElement("txyy");
-                    txyy.setData(m.get("tpTxyy"));
+                    txyy.setText(toString(m.get("tpTxyy")));
                     Element bz = wrObject.addElement("bz");
                     bz.setText("");
                     Element czlx = wrObject.addElement("czlx");
-//                    czlx.setData(m.get("tpCzlx"));
-                    czlx.setData("1");
+//                    czlx.setText(toString(m.get("tpCzlx")));
+                    czlx.setText("1");
                     Element jksqm = wrObject.addElement("jksqm");
-                    if(null != m.get("tpJksqm"))
-                        jksqm.setData(m.get("tpJksqm"));
+                    if (null != m.get("tpJksqm") && !StringUtils.isEmpty(toString(m.get("tpJksqm"))))
+                        jksqm.setText(m.get("tpJksqm").toString());
                     else
                         jksqm.setText(license);
+
+                    StringWriter sw = new StringWriter();
+                    OutputFormat opf = OutputFormat.createPrettyPrint();
+                    opf.setEncoding("UTF-8");
+                    XMLWriter xmlWriter = new XMLWriter(sw,opf);
+                    try{
+                        xmlWriter.write(document);
+                    }catch (Exception e){
+
+                    }
+                    String xmlString = sw.toString();
+                    int k = 0;
+                    while(true) {
+                        String code = "";
+                        String msg = "";
+                        objects = client.invoke("writeObject", "39", "39W01", license, terminalCode, terminalNm, terminalId, terminalXY, enKey, xmlString);
+                        //               System.out.println("返回数据:" + objects[0]);
+                        Document retDoc = DocumentHelper.parseText(objects[0].toString());
+                        root = retDoc.getRootElement();
+                        for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
+                            Element ele = (Element) iterator.next();
+                            if (ele.getName().equalsIgnoreCase("head")) {
+                                List<Element> els = ele.elements();
+
+                                for (Element s : els) {
+                                    if (s.getName().equals("code")) {
+                                        code = s.getText();
+                                    }
+                                    if(s.getName().equalsIgnoreCase("message") ||
+                                            s.getName().equalsIgnoreCase("msg") )
+                                        msg = s.getText();
+                                }
+                                System.out.println("调用webservice返回code:"+code+"["+ decode(msg,"UTF-8")+"]");
+                            }
+                        }
+    //                        System.out.println("调用webservice返回xml:"+"["+decode(objects[0].toString()+"]","UTF-8"));
+                        if(code.equalsIgnoreCase("1")){
+//                            for(Map m :listWeb)
+                                ryDataLargeService.updateWebService(m);
+                            break;
+                        }
+                        Thread.sleep(5000);
+                        if(k++>5)
+                            break;
+                    }
                 }
-
-                StringWriter sw = new StringWriter();
-                OutputFormat opf = OutputFormat.createPrettyPrint();
-                opf.setEncoding("UTF-8");
-                XMLWriter xmlWriter = new XMLWriter(sw,opf);
-                try{
-                    xmlWriter.write(document);
-                }catch (Exception e){
-
-                }
-                String xmlString = sw.toString();
-                int k = 0;
-               while(true) {
-                   String code = "";
-                   String msg = "";
-                   objects = client.invoke("writeObject", "39", "39W01", license, terminalCode, terminalNm, terminalId, terminalXY, enKey, xmlString);
-    //               System.out.println("返回数据:" + objects[0]);
-                   Document retDoc = DocumentHelper.parseText(objects[0].toString());
-                   root = retDoc.getRootElement();
-                   for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
-                       Element ele = (Element) iterator.next();
-                       if (ele.getName().equalsIgnoreCase("head")) {
-                           List<Element> els = ele.elements();
-
-                           for (Element s : els) {
-                               if (s.getName().equals("code")) {
-                                   code = s.getText();
-                               }
-                               if(s.getName().equalsIgnoreCase("message"))
-                                   msg = s.getText();
-                           }
-                           System.out.println("调用webservice返回code:"+code+"["+ decode(msg,"UTF-8")+"]");
-                       }
-                   }
-    //               System.out.println("调用webservice返回xml:"+"["+objects[0].toString()+"]");
-                   if(code.equalsIgnoreCase("1")){
-                       for(Map m :listWeb) {
-                           ryDataLargeService.updateWebService(m);
-                       }
-                       break;
-                   }
-                   Thread.sleep(5000);
-                   if(k++>5)
-                       break;
-               }
             } catch (Exception e) {
                 e.printStackTrace();
             }

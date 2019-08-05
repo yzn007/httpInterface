@@ -14,4 +14,5 @@ public interface RyDataLargeService {
     List<Map>getAllPark(Map map);
     List<Map>getWebServiceData(Map m);
     void updateWebService(Map m);
+    List<Map>getWeather(Map m);
 }

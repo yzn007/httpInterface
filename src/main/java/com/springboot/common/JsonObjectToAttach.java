@@ -608,7 +608,7 @@ public class JsonObjectToAttach {
                         if (isSplit.equalsIgnoreCase("true")) {//需求分割sql
                             String[] sqls = sqlStr.split(";");
                             for (String s : sqls) {
-                                att.add(s);
+                                att.add(s.replaceAll("；",";"));
                             }
                         } else {
                             att.add(sqlStr);
