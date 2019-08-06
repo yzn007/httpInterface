@@ -10,7 +10,7 @@
     </resultMap>
 
     <select id="getAllVehicles" resultMap="routeVehicle">
-      select * from BUS_ROUTE_VEHICLE;
+      select * from cqyl_pre.BUS_ROUTE_VEHICLE
     </select>
 
 </mapper>

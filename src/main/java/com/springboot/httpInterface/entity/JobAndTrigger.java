@@ -12,7 +12,16 @@ public class JobAndTrigger {
 	private BigInteger TIMES_TRIGGERED;
 	private String CRON_EXPRESSION;
 	private String TIME_ZONE_ID;
-	
+	private String TRIGGER_STATE;
+
+	public String getTRIGGER_STATE() {
+		return TRIGGER_STATE;
+	}
+
+	public void setTRIGGER_STATE(String TRIGGER_STATE) {
+		this.TRIGGER_STATE = TRIGGER_STATE;
+	}
+
 	public String getJOB_NAME() {
 		return JOB_NAME;
 	}

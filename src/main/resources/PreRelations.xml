@@ -35,7 +35,7 @@
         max(pl.BIZ_TM),
         max(pl.USE_STAT),
         pp.Resv_Park_Spc_Qty
-        from PARK_PARKING_LOT pp right join PARK_LOT_STATIC_INFO pl on pp.Park_Lot_ID = pl.PARK_LOT_ID and
+        from cqyl_pre.PARK_PARKING_LOT pp right join cqyl_pre.PARK_LOT_STATIC_INFO pl on pp.Park_Lot_ID = pl.PARK_LOT_ID and
         pp.Park_Lot_Regn_ID = pl.PARK_LOT_REGN_ID group by pl.PARK_LOT_ID
     </select>
 
@@ -98,7 +98,7 @@
         Name,
         StartSite_Name,
         EndSite_Name
-        from BUS_ROUTE
+        from cqyl_pre.BUS_ROUTE
 
     </select>
     <select id="T80_TA_PUB_TRAF_INFO" target="BUS_ROUTE" split="true" valid="true">
@@ -117,7 +117,7 @@
         DepartTime,
         ReturnTime,
         TicketPrice
-        from BUS_ROUTE
+        from cqyl_pre.BUS_ROUTE
 
     </select>
     <!-- 站点 -->
@@ -140,7 +140,7 @@
         '0',
         Sites_Attr,
         ru.Track
-        from BUS_STATION bs join bus_route_station br on bs.ROUTEID = br.ROUTEID join bus_route ru on bs.routeid = ru.id
+        from cqyl_pre.BUS_STATION bs join cqyl_pre.bus_route_station br on bs.ROUTEID = br.ROUTEID join cqyl_pre.bus_route ru on bs.routeid = ru.id
 
     </select>
 
@@ -162,7 +162,7 @@
         null,
         count(bs.RouteId),
         date_format(now(),'%Y-%m-%d')
-        from BUS_STATION bs join BUS_ROUTE br on bs.RouteId = br.ID and br.State = '1'
+        from cqyl_pre.BUS_STATION bs join cqyl_pre.BUS_ROUTE br on bs.RouteId = br.ID and br.State = '1'
         group by bs.RouteId
 
     </select>
@@ -174,7 +174,7 @@
         Plat_No,
         Drv_In_Tm,
         Start_Out_Tm)
-        select Data_Tm,Plat_No,Drv_In_Tm, Start_Out_Tm  from PARK_VEHIC_START_OUT_EVT where Drv_In_Tm = {Drv_In_Tm} and Plat_No = {Plat_No} and Start_Out_Tm = {Start_Out_Tm}  and
+        select Data_Tm,Plat_No,Drv_In_Tm, Start_Out_Tm  from cqyl_pre.PARK_VEHIC_START_OUT_EVT where Drv_In_Tm = {Drv_In_Tm} and Plat_No = {Plat_No} and Start_Out_Tm = {Start_Out_Tm}  and
         Park_Lot_ID = {Park_Lot_ID} and   Park_Lot_Regn_ID= {Park_Lot_Regn_ID}
 
     </select>
@@ -185,18 +185,18 @@
         Plat_No,
         Drv_In_Tm,
         Start_Out_Tm)
-        select Data_Tm,Plat_No,Drv_In_Tm, null  from PARK_VEHIC_DRV_IN_EVT where Drv_In_Tm = {Drv_In_Tm} and Plat_No = {Plat_No} and
+        select Data_Tm,Plat_No,Drv_In_Tm, null  from cqyl_pre.PARK_VEHIC_DRV_IN_EVT where Drv_In_Tm = {Drv_In_Tm} and Plat_No = {Plat_No} and
         Park_Lot_ID = {Park_Lot_ID} and   Park_Lot_Regn_ID = {Park_Lot_Regn_ID}
     </select>
     <!-- 预约 动态语句中的sql-交警webService用数据-->
     <select id="TP_VEH_INFO" target="PARK_PARK_SPC_RESV_INFO" split="true" valid="true">
         set @aount = '';
         select case when RESV_ID is not null or count(RESV_ID)>0 then @aount:='
-        update TP_VEH_INFO set TP_CZLX = ''2''
+        update cqyl_pre.TP_VEH_INFO set TP_CZLX = ''2''
         where TP_HPHM = '{Plat_No}' and TP_HPZL = '{Veh_Typ}' and TP_CZLX =''1'' and
         TP_TXRQQ = date_format('{Resv_Arrv_Tm}',''%Y-%m-%d'') '
         else @aount:='
-        insert into TP_VEH_INFO(TP_HPZL,
+        insert into cqyl_pre.TP_VEH_INFO(TP_HPZL,
         TP_HPHM,
         TP_TXRQQ,
         TP_TXRQZ,
@@ -210,7 +210,7 @@
         ''1'',
         ''预约车辆'',
         ''1''
-        from PARK_PARK_SPC_RESV_INFO
+        from cqyl_pre.PARK_PARK_SPC_RESV_INFO
         where  Resv_ID = '{Resv_ID}'
         ' end  from cqyl_ta.T80_TA_PARK_CONSM_INFO where RESV_ID = {Resv_ID};
         select @aount;
@@ -249,7 +249,7 @@
         Usr_ID,
         Usr_Nm,
         Veh_Typ
-        from PARK_PARK_SPC_RESV_INFO
+        from cqyl_pre.PARK_PARK_SPC_RESV_INFO
         where  Resv_ID = '{Resv_ID}'
         ' end  from cqyl_ta.T80_TA_PARK_CONSM_INFO where RESV_ID = {Resv_ID};
         select @aount;
@@ -276,7 +276,7 @@
         null,
         count(a.act_id),
         date_format(now(),'%Y-%m-%d')
-        from GATE_EXPO_AUDI_INFO g join  GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        from cqyl_pre.GATE_EXPO_AUDI_INFO g join  cqyl_pre.GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
         group by g.id;
 
         insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
@@ -295,7 +295,7 @@
         null,
         count(a.act_id),
         date_format(now(),'%Y-%m-%d')
-        from GATE_EXPO_AUDI_INFO g join GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        from cqyl_pre.GATE_EXPO_AUDI_INFO g join cqyl_pre.GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
         where travel IN('轨道交通','公交')
         group by g.id;
 
@@ -315,7 +315,7 @@
         null,
         count(a.act_id),
         date_format(now(),'%Y-%m-%d')
-        from GATE_EXPO_AUDI_INFO g join GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        from cqyl_pre.GATE_EXPO_AUDI_INFO g join cqyl_pre.GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
         where travel ='自驾'
         group by g.id;
 
@@ -335,7 +335,7 @@
         null,
         count(a.act_id),
         date_format(now(),'%Y-%m-%d')
-        from GATE_EXPO_AUDI_INFO g join  GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        from cqyl_pre.GATE_EXPO_AUDI_INFO g join  cqyl_pre.GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
         where g.ROLETYPE='9'
         group by g.id;
 
@@ -355,7 +355,7 @@
         null,
         count(a.act_id),
         date_format(now(),'%Y-%m-%d')
-        from GATE_EXPO_AUDI_INFO g join  GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
+        from cqyl_pre.GATE_EXPO_AUDI_INFO g join  cqyl_pre.GATE_PRTC_ACT_INFO a on g.id = a.id and instr(a.joinTime,DATE_FORMAT(now(),'%Y-%m-%d'))>0
         where g.ROLETYPE='4'
         group by g.id
 

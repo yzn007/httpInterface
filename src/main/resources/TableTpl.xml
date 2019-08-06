@@ -3,30 +3,30 @@
 
     <!-- 参展人员信息/活动信息 -->
     <!-- 子表配置参数 json字段 子表list表名 关联主表字段-->
-    <table name="GATE_EXPO_AUDI_INFO">
+    <table name="cqyl_pre.GATE_EXPO_AUDI_INFO">
         <column id="id" ref="id">id = roleType + id</column>
-        <column id="datas" ref="[list]GATE_Prtc_Act_Info" linkId="id"/>
+        <column id="datas" ref="[list]cqyl_pre.GATE_Prtc_Act_Info" linkId="id"/>
     </table>
 
-    <table name="GATE_Prtc_Act_Info">
+    <table name="cqyl_pre.GATE_Prtc_Act_Info">
         <column id="act_Id" ref="id">id = id</column>
     </table>
 
     <!-- 停车场信息 -->
-    <table name="PARK_PARKING_LOT">
+    <table name="cqyl_pre.PARK_PARKING_LOT">
         <column id="Park_Lot_Regn_ID" ref="Park_Lot_Regn_ID">Park_Lot_Regn_ID = Park_Lot_Regn_ID</column>
     </table>
 
-    <table name="PARK_PAY_INFO">
+    <table name="cqyl_pre.PARK_PAY_INFO">
         <column id="PAY_ID" ref="PAY_ID">PAY_ID = PAY_ID</column>
     </table>
 
-    <table name="PARK_PARK_SPC_RESV_INFO">
+    <table name="cqyl_pre.PARK_PARK_SPC_RESV_INFO">
         <column id="Resv_ID" ref="Resv_ID">Resv_ID = Resv_ID</column>
     </table>
 
     <!-- 车辆位置信息 -->
-    <table name="BUS_VEHIC_LCTN_MSG">
+    <table name="cqyl_pre.BUS_VEHIC_LCTN_MSG">
         <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
         <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
@@ -35,7 +35,7 @@
         <column id="RunRoute_Code" ref="RunRoute.Code"></column>
     </table>
     <!-- 车辆进出站信息 -->
-    <table name="BUS_VEHIC_ARRV_DEPRT_MSG">
+    <table name="cqyl_pre.BUS_VEHIC_ARRV_DEPRT_MSG">
         <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
         <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
@@ -44,7 +44,7 @@
         <column id="RunRoute_Code" ref="RunRoute.Code"></column>
     </table>
     <!--  线路车辆 -->
-    <table name="BUS_ROUTE_VEHICLE">
+    <table name="cqyl_pre.BUS_ROUTE_VEHICLE">
         <column id="routeId" ref="RouteId">routeId = RouteId</column>
         <column id="Position_Lat" ref="Position.Lat"></column>
         <column id="Position_Lng" ref="Position.Lng"></column>
@@ -53,12 +53,12 @@
     </table>
 
     <!-- 站点 -->
-    <table name="BUS_STATION">
+    <table name="cqyl_pre.BUS_STATION">
         <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
-        <column id="Sites" ref="[list]BUS_ROUTE_STATION" linkId="RouteId"/>
+        <column id="Sites" ref="[list]cqyl_pre.BUS_ROUTE_STATION" linkId="RouteId"/>
     </table>
 
-    <table name="BUS_ROUTE_STATION">
+    <table name="cqyl_pre.BUS_ROUTE_STATION">
         <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
         <column id="Sites_Id" ref="Id"></column>
         <column id="Sites_Name" ref="Name"></column>
@@ -71,7 +71,7 @@
     </table>
 
     <!-- 线路 -->
-    <table name="BUS_ROUTE">
+    <table name="cqyl_pre.BUS_ROUTE">
         <column id="StartSite_Name" ref="StartSite.Name"></column>
         <column id="StartSite_Latitude" ref="StartSite.Latitude"></column>
         <column id="StartSite_Longitude" ref="StartSite.Longitude"></column>
@@ -81,7 +81,7 @@
     </table>
 
     <!-- 车辆信息 -->
-    <table name="BUS_VEHICLE">
+    <table name="cqyl_pre.BUS_VEHICLE">
         <column id="id" ref="VehId">id = VehId</column>
         <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
         <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
@@ -92,13 +92,13 @@
     </table>
 
     <!-- 车辆计划运行 -->
-    <table name="BUS_ROUTE_DISPT">
+    <table name="cqyl_pre.BUS_ROUTE_DISPT">
         <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
         <column id="Times" ref="[list]BUS_ROUTE_DISPT_DTL" linkId="RouteId"/>
     </table>
 
     <!-- 车辆计划运行明细 -->
-    <table name="BUS_ROUTE_DISPT_DTL">
+    <table name="cqyl_pre.BUS_ROUTE_DISPT_DTL">
         <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
         <column id="Times_Time" ref="Time"></column>
         <column id="Times_PlateNum" ref="PlateNum"></column>

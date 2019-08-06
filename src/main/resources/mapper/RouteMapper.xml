@@ -13,7 +13,7 @@
     </resultMap>
 
     <select id="getAllRoute" resultMap="route">
-      select *from BUS_ROUTE
+      select *from cqyl_pre.BUS_ROUTE
     </select>
 
 </mapper>

@@ -8,7 +8,7 @@
         <result property="tempt" column="tempt"/>
     </resultMap>
     <select id="getWeather" resultMap="weather" parameterType="hashMap">
-        select *from weather_weat_fore
+        select *from cqyl_pre.weather_weat_fore
         <where>
             instr(ppi,DATE_FORMAT(DATE_ADD(now(),INTERVAL 1 day),'%Y%m%d'))>0
         </where>
@@ -107,7 +107,7 @@
         case when trim(TP_TXYY)='' or TP_TXYY is null then '预约车辆' ELSE TP_TXYY end TP_TXYY ,
         TP_CZLX,
         TP_JKSQM
-        from TP_VEH_INFO
+        from cqyl_pre.TP_VEH_INFO
         <where>
             tp_stat = '0' or tp_stat is null or trim(tp_stat) = '' -- 0:未发送或发送失败 1：发送成功
         </where>
@@ -118,7 +118,7 @@
     </select>
     <update id="updateWebService" parameterType="java.util.Map">
         <if test="tpHpzl!=null and tpHphm!=null and tpTxrqq!=null and tpTxrqz!=null">
-            update TP_VEH_INFO
+            update cqyl_pre.TP_VEH_INFO
             <set>
               tp_stat = '1'
             </set>

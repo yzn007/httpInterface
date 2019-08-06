@@ -11,7 +11,7 @@
 
     <select id="getAllToken" resultMap="token">
 select * from (
-        SELECT DATA_TM,EXPIRES_IN, ACCESS_TOKEN, DATE_ADD(DATA_TM,INTERVAL EXPIRES_IN SECOND) DATE_EXP FROM bus_access_token order by data_tm desc) a limit 1;
+        SELECT DATA_TM,EXPIRES_IN, ACCESS_TOKEN, DATE_ADD(DATA_TM,INTERVAL EXPIRES_IN SECOND) DATE_EXP FROM cqyl_pre.bus_access_token order by data_tm desc) a limit 1;
     </select>
 
 </mapper>
