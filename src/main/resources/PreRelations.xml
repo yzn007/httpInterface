@@ -6,7 +6,7 @@
      <!-- 执行sql -->
 
     <select id="T80_TA_PARK_LOT_INFO" target="cqyl_pre.PARK_PARKING_LOT" split="true"  valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),'T80_TA_PARK_LOT_INFO','0';
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_LOT_INFO'),'0';
         delete from cqyl_ta.T80_TA_PARK_LOT_INFO where PARK_LOT_ID = {PARK_LOT_ID};
         insert into cqyl_ta.T80_TA_PARK_LOT_INFO(PARK_LOT_ID,
         PARK_LOT_NM,
@@ -105,7 +105,7 @@
 
     </select>
     <select id="T80_TA_PUB_TRAF_INFO" target="cqyl_pre.BUS_ROUTE" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),'T80_TA_PUB_TRAF_INFO','0';
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PUB_TRAF_INFO'),'0';
         delete from cqyl_ta.T80_TA_PUB_TRAF_INFO;
         insert into cqyl_ta.T80_TA_PUB_TRAF_INFO(PUB_TRAF_ID,
         PUB_TRAF_NM,
@@ -174,7 +174,7 @@
 
     <!-- 驶出 -->
     <select id="T80_TA_PARK_CONSM_INFO_3" target="cqyl_pre.PARK_VEHIC_START_OUT_EVT" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),'T80_TA_PARK_CONSM_INFO','0';
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_CONSM_INFO'),'0';
         update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='1',PAY_AMT={Fee_Amt},PAY_MOD ={Pay_Mod}, PARK_LEAVE_TM={Start_Out_Tm},upd_tm=now()  where  PARK_STAT='0' and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
         insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
         Plat_No,
@@ -186,8 +186,8 @@
     </select>
     <!-- 驶入 -->
     <select id="T80_TA_PARK_CONSM_INFO_2" target="cqyl_pre.PARK_VEHIC_DRV_IN_EVT" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),'T80_TA_PARK_CONSM_INFO','0';
-        update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='0',PARK_ENTER_TM={Drv_In_Tm} ,upd_tm=now() where  RESV_STAT='1' and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_CONSM_INFO'),'0';
+        update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='0',PARK_ENTER_TM={Drv_In_Tm} ,upd_tm=now(),PARK_LEAVE_TM=null where  instr(RESV_TM,date_format(now(),'%Y-%m-%d'))>0  and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
         insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
         Plat_No,
         Drv_In_Tm,
@@ -262,10 +262,13 @@
         select @aount;
         PREPARE stmt FROM @aount;
         EXECUTE stmt;
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select @update_time,'T80_TA_PARK_CONSM_INFO','0'
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select @update_time,lower('T80_TA_PARK_CONSM_INFO'),'0'
     </select>
 
     <!-- 参展人员信息-->
+    <select id="T80_TA_EXPO_AUDI_INFO" target="cqyl_ta.T80_TA_EXPO_AUDI_INFO" split="true" valid="true">
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_EXPO_AUDI_INFO'),'0'
+    </select>
     <select id="T80_RD_LARG_SCRN_INDX_4" target="cqyl_pre.GATE_EXPO_AUDI_INFO" split="true" valid="true">
         delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID in( '105001','105003','105004','107001','107002') and STATT_DT=date_format(now(),'%Y-%m-%d');
         insert into cqyl_rd.T80_RD_LARG_SCRN_INDX(RPT_ID,
@@ -367,12 +370,12 @@
 
     <!-- 闸机事件-->
     <select id="T80_RD_GATE_TMP_EVT" target="cqyl_pre.GATE_GATE_EVT" split="true" valid="true">
-        DELETE FROM CQYL_RD.T80_RD_GATE_TMP_EVT WHERE 1=1;
+
         INSERT INTO CQYL_RD.T80_RD_GATE_TMP_EVT(ID,
         Gate_ID,
         Entrc_ID,
         Entrc_Nm,
-        Data_Tm) SELECT T1.USERID,T1.ACCESSPOINT,T2.ACCESSAREA,T2.ACCESSAREA_NM,T1.Data_Tm FROM CQYL_PRE.GATE_GATE_TMP_EVT T1 LEFT JOIN CQYL_PRE.GATE_AREA_INFO T2 ON T2.ACCESSPOINT=T1.ACCESSPOINT;
+        Data_Tm) SELECT T1.USERID,T1.ACCESSPOINT,T2.ACCESSAREA,T2.ACCESSAREA_NM,T1.checkTime FROM CQYL_PRE.GATE_GATE_TMP_EVT T1 LEFT JOIN CQYL_PRE.GATE_AREA_INFO T2 ON T2.ACCESSPOINT=T1.ACCESSPOINT;
 
         DELETE FROM CQYL_RD.T80_RD_LARG_SCRN_INDX WHERE INDX_ID IN('100001','100002') and STATT_DT=date_format(now(),'%Y-%m-%d');
         INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
@@ -397,7 +400,7 @@
         INDX_VAL,
         STATT_DT) SELECT '100','实时人数统计','100002','当前总人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_TMP_EVT;
 
-        # 没有数据插入0
+
         select case when ROW_COUNT() = 0 then
         @noRowFetch := 'INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
         RPT_NM,
@@ -410,13 +413,6 @@
         ' else @noRowFetch := ' select * from CQYL_RD.T80_RD_LARG_SCRN_INDX where INDX_ID = ''100002'' '  end;
         PREPARE mys from @noRowFetch;
         EXECUTE mys;
-
-        DELETE FROM CQYL_RD.T80_RD_GATE_TMP_EVT WHERE 1=1;
-        INSERT INTO CQYL_RD.T80_RD_GATE_TMP_EVT(ID,
-        Gate_ID,
-        Entrc_ID,
-        Entrc_Nm,
-        Data_Tm) SELECT T1.USERID,T1.ACCESSPOINT,T2.ACCESSAREA,T2.ACCESSAREA_NM,T1.Data_Tm FROM CQYL_PRE.GATE_GATE_TMP_EVT T1 LEFT JOIN CQYL_PRE.GATE_AREA_INFO T2 ON T2.ACCESSPOINT=T1.ACCESSPOINT;
 
 
         INSERT INTO CQYL_RD.T80_RD_GATE_EVT(ID,
@@ -490,9 +486,10 @@
         GRP_NM,
         INDX_VAL,
         STATT_DT) SELECT '101','累计人数统计','105002','已接待预约人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0;
-        # 临时表清数据
+
         delete from CQYL_RD.T80_RD_GATE_TMP_EVT;
         delete from CQYL_PRE.GATE_GATE_TMP_EVT
+
     </select>
 </root>
 

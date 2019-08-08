@@ -39,7 +39,7 @@ public class StaticJob implements BaseJob {
     private String jsonStr = "";
     private String table = "BUS_VEHIC_LCTN_MSG";
     //令牌地址
-    static String accessUrl = "http://39.108.107.62:8087/api/Token?appid=001&secret=ABCDEFG";
+    static String accessUrl = "http://183.66.65.155:9002/api/Token?appid=001&secret=ABCDEFG";
 
     final String topicName = StaticJob.class.getSimpleName();
     final String configName = "project.properties";
