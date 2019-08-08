@@ -1,6 +1,15 @@
-
+http:
+  port: 80
 server:
-  port: 8082
+  ssl:
+    key-alias: _.chongqingexpo.com
+    key-store: classpath:chongqingexpo.com.jks
+    key-store-password: 93zgk1o96j
+    key-store-type: JKS
+    enabled: true
+  port: 10101
+
+
 
 spring:
     datasource:

@@ -6,7 +6,7 @@
     <!-- 闸机事件(1次/5s) -->
     <topics name="Per5SJob">
         <!-- 闸机事件 -->
-        <topic name="GATE_GATE_EVT" table="cqyl_pre.GATE_GATE_EVT" valid="true" textCode="0102" isDelete="false" isTruncate="false" isStatic="false"/>
+        <topic name="GATE_GATE_EVT" table="cqyl_pre.GATE_GATE_EVT;cqyl_pre.GATE_GATE_TMP_EVT" valid="true" textCode="0102" isDelete="false" isTruncate="false" isStatic="false"/>
     </topics>
 
     <!-- 停车场预约 (1次/10s)-->

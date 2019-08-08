@@ -147,6 +147,7 @@ public class JsonObjectToAttach {
             }
             StringBuffer statement = new StringBuffer();
             for (int i = 0; i < ars.length; i++) {
+                ars[i] = ars[i].replaceAll("，",",");
                 if (i == 0)
                     statement.append("'" + ars[i] + "','");
                 else if (i < ars.length - 1)
@@ -462,7 +463,8 @@ public class JsonObjectToAttach {
         jsonObject.entrySet().iterator().forEachRemaining(s ->
                 a[0] = (!StringUtils.isEmpty(a[0]) ? a[0] : "") + (noContains.get(s.getKey().toString())!=null?"":
                         (isCol ?  s.getKey() : ky.get(s.getKey())==null|| (!ky.get(s.getKey()).equals(linkId) && !StringUtils.isEmpty(linkId)
-                        )?s.getValue():ky.get(s.getKey())) + ","));
+                        )?s.getValue().toString().replaceAll(",","，"):
+                                ky.get(s.getKey()).toString().replaceAll(",","，")) + ","));
 
         if(!isCol) {
 
@@ -479,7 +481,7 @@ public class JsonObjectToAttach {
                             System.out.println("error【"+v.getKey()+"】:" +josnM);
                             return "";
                         }
-                        values += value + ",";
+                        values += value.indexOf(",")>-1?value.replaceAll(",","，"):value + ",";
                     }
                     String subStr = jsonObject.get(m.getKey()).toString();
                     String head = a[0].substring(0,a[0].indexOf(subStr)+subStr.length());
@@ -751,51 +753,8 @@ public class JsonObjectToAttach {
     public static void  main(String args[]){
         String stat = "";
         stat = replace("vehnum_routeid,times_routeid,time,vehnum","time1","times_id",",");
-        String  jsonValue ="{\n" +
-                "\t\"results\":[\n" +
-                "        {\n" +
-                "            \n" +
-                "\t\t\t\"id\":\"1234557788\",\n" +
-                "\t\t\t\"cname\":\"中南海\",\n" +
-                "\t\t\t\"ename\":\"yyyy\",\n" +
-                "\t\t\t\"nationality\":\"86\",\n" +
-                "\t\t\t\"certificateNum\":\"00\",\n" +
-                "\t\t\t\"certificateType\":\"12347898778\",\n" +
-                "\t\t\t\"gender\":\"f\",\n" +
-                "\t\t\t\"institution\":\"重庆市悦来集团投资有限公司\",\n" +
-                "\t\t\t\"phone\":\"13818189988\",\n" +
-                "\t\t\t\"position\":\"经理\",\n" +
-                "\t\t\t\"headUrl\":\"http://localhost\",\t\t\t\n" +
-                "\t\t\t\"roleType\":\"01\",\n" +
-                "\t\t\t\"vapName\":\"zhangsan\",\n" +
-                "\t\t\t\"vapPhone\":\"12345678901\",\n" +
-                "\t\t\t\"certificateLevel\":\"1\",\n" +
-                "\t\t\t\"isMeeting\":\"0101\",\n" +
-                "\t\t\t\"dockingOrgUserName\":\"对接人\",\n" +
-                "\t\t\t\"dockingOrgUserphone\":\"23433344\",\n" +
-                "\t\t\t\"dockingOrgName\":\"对接人公司\",\n" +
-                "\t\t\t\"travel\":\"步行加公交\",\n" +
-                "\t\t\t\"carnumber\":\"渝B88888\",\n" +
-                "\t\t\t\"datas\":[\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\n" +
-                "\t\t\t\t\t\"id\":\"3432423434\",\n" +
-                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
-                "\t\t\t\t\t\"joinTime\":\"2019-06-30 09:00\"\n" +
-                "\t\t\t\t},\n" +
-                "\t\t\t\t{\n" +
-                "\t\t\t\t\t\n" +
-                "\t\t\t\t\t\"id\":\"897897897\",\n" +
-                "\t\t\t\t\t\"activityName\":\"参加展览\",\n" +
-                "\t\t\t\t\t\"joinTime\":\"2019-07-01 09:00\"\n" +
-                "\t\t\t\t}\n" +
-                "\t\t\t\t]\n" +
-                "\n" +
-                "        }\n" +
-                "        ],\n" +
-                "        \"tx_code\":\"0101\"\n" +
-                "}";
-        String tablePre = "GATE_EXPO_AUDI_INFO";
+        String  jsonValue ="";
+        String tablePre = "cqyl_pre.GATE_EXPO_AUDI_INFO";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {
@@ -807,7 +766,7 @@ public class JsonObjectToAttach {
 //        new KafkaSaveData("bingfu","web_data_profil").start();
 
         //取得有效主题
-        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,null,false);
+        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topic",null,null,false);
 
         for(Map.Entry<String, String> m : topicM.entrySet()){
             String []tabAndMark = null;
@@ -821,6 +780,7 @@ public class JsonObjectToAttach {
             String isDelInsert = tabAndMark[1];
             String isTrancate = tabAndMark[2];
             List<String[]> reds = new ArrayList<>();
+            List<String[]> sqlListDyc = new ArrayList<>();
 
             //表名固定了，根据实际情况修改
             for(int k=0;k<table.split(";").length;k++){
@@ -830,6 +790,11 @@ public class JsonObjectToAttach {
                         !(isTrancate.indexOf(";")>0?isTrancate.split(";")[k]:isTrancate).equalsIgnoreCase("false"));
                 if(!reds.contains(sql))
                     reds.add(sql);
+
+                String[] sqlDyc = JsonObjectToAttach.getMetaSqls(table.split(";")[k], "", array);
+                if (null != sqlDyc && !sqlListDyc.contains(sqlDyc))
+                    sqlListDyc.add(sqlDyc);
+
             }
 
             try {
@@ -837,6 +802,7 @@ public class JsonObjectToAttach {
                 if (tmpSeq.size() > 0) {
                     SaveCosumerData.main(tmpSeq.toList());
                 }
+
             } catch (Exception e) {
                 System.out.println(e.toString());
             }

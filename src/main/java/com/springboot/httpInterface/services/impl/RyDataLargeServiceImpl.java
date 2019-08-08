@@ -51,4 +51,12 @@ public class RyDataLargeServiceImpl implements RyDataLargeService {
     public List<Map> getWeather(Map m) {
         return ryDataLargeMapper.getWeather(m);
     }
+
+    @Override
+    public List<Map> getUpdateTableInfo(Map m) {return ryDataLargeMapper.getUpdateTableInfo(m);}
+
+    @Override
+    public void deleteUpdateTableInfo(Map m) {
+        ryDataLargeMapper.deleteUpdateTableInfo(m);
+    }
 }

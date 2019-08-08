@@ -53,7 +53,7 @@ public class KafkaSaveData extends Thread {
         properties.put("zookeeper.connect", config.get("zkQuorum"));
         //必须要使用别的组名称， 如果生产者和消费者都在同一组，则不能访问同一组内的topic数据
         //当前消费者的组名称
-        properties.put("group.id", "group1");
+        properties.put("group.id", config.get("group"));
         properties.put("zookeeper.session.timeout.ms", "10000");
         properties.put("enable.auto.commit",config.get("enable.auto.commit"));
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.get("metadata.broker.list"));
