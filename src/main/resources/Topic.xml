@@ -35,7 +35,7 @@
         <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="cqyl_pre.BUS_VEHIC_ARRV_DEPRT_MSG" valid="true" textCode="0202" isDelete="false" isTruncate="false" isStatic="false"/>
         <!-- 闸机 -->
         <!-- 闸机参展人与信息 /活动信息-->
-        <topic name="GATE_EXPO_AUDI_INFO" table="cqyl_pre.GATE_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false" isStatic="false"/>
+        <topic name="GATE_EXPO_AUDI_INFO" table="cqyl_pre.GATE_EXPO_AUDI_INFO;cqyl_ta.T80_TA_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false" isStatic="false"/>
 
     </topics>
 

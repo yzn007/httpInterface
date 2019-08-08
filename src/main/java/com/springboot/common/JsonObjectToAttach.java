@@ -753,8 +753,35 @@ public class JsonObjectToAttach {
     public static void  main(String args[]){
         String stat = "";
         stat = replace("vehnum_routeid,times_routeid,time,vehnum","time1","times_id",",");
-        String  jsonValue ="";
-        String tablePre = "cqyl_pre.GATE_EXPO_AUDI_INFO";
+        String  jsonValue ="{\n" +
+                "    \"tx_code\": \"0101\",\n" +
+                "    \"results\": [\n" +
+                "        {\n" +
+                "            \"id\": \"039EC87A-4691-4FF8-A828-B1E2F0220387\",\n" +
+                "            \"cname\": \"sdfds\",\n" +
+                "            \"ename\": \"sdfsdf\",\n" +
+                "            \"nationality\": \"\",\n" +
+                "            \"certificateNum\": \"\",\n" +
+                "            \"certificateType\": 0,\n" +
+                "            \"gender\": \"男\",\n" +
+                "            \"institution\": \"sdf\",\n" +
+                "            \"phone\": \"c2Rm\",\n" +
+                "            \"position\": \"sfd\",\n" +
+                "            \"headUrl\": \"\",\n" +
+                "            \"roleType\": 0,\n" +
+                "            \"vapName\": \"dfdf\",\n" +
+                "            \"vapPhone\": \"12312312312\",\n" +
+                "            \"certificateLevel\":\"\",\n" +
+                "            \"isMeeting\": \"是\",\n" +
+                "            \"dockingOrgUserName\":\"\",\n" +
+                "            \"dockingOrgUserphone\":\"\",\n" +
+                "            \"dockingOrgName\":\"\",\n" +
+                "            \"travel\": 4,\n" +
+                "            \"visitDate\": \"2019-08-26\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+        String tablePre = "cqyl_ta.T80_TA_EXPO_AUDI_INFO";
         String [] array = getJsonList(jsonValue,"");
         Map<String, String> config = new HashMap<String, String>();
         try {
@@ -766,7 +793,7 @@ public class JsonObjectToAttach {
 //        new KafkaSaveData("bingfu","web_data_profil").start();
 
         //取得有效主题
-        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topic",null,null,false);
+        Map<String,String> topicM = JsonObjectToAttach.getValidProperties("topics",null,null,false);
 
         for(Map.Entry<String, String> m : topicM.entrySet()){
             String []tabAndMark = null;

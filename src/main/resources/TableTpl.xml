@@ -9,6 +9,30 @@
         <!--<column id="datas" ref="[list]cqyl_pre.GATE_Prtc_Act_Info" linkId="id"/>-->
     </table>
 
+    <table name="cqyl_ta.T80_TA_EXPO_AUDI_INFO">
+        <column id="ID" ref="id">ID = id</column>
+        <column id="CN_NM" ref="cname"></column>
+        <column id="EN_NM" ref="ename"></column>
+        <column id="NATION" ref="nationality"></column>
+        <column id="CERT_NUM" ref="certificateNum"></column>
+        <column id="GENDER" ref="gender"></column>
+        <column id="MOBL_NO" ref="phone"></column>
+        <column id="WORK_CORP" ref="institution"></column>
+        <column id="POS" ref="position"></column>
+        <column id="ROLE_TYP" ref="roleType"></column>
+        <column id="CONTR_TEL" ref="vapPhone"></column>
+        <column id="CONTR" ref="vapName"></column>
+        <column id="GUEST_GRADE" ref="certificateLevel"></column>
+        <column id="IS_VIST" ref="isMeeting"></column>
+        <column id="DOCK_ORG_USR_NM" ref="dockingOrgUserName"></column>
+        <column id="DOCK_ORG_USR_MOBL" ref="dockingOrgUserphone"></column>
+        <column id="DOCK_ORG_NM" ref="dockingOrgName"></column>
+        <column id="VIST_TM" ref="visitDate"></column>
+        <column id="TRVL_WAY" ref="travel"></column>
+        <column id="CERT_TYP" ref="certificateType"></column>
+        <column id="CERT_HEAD_URL" ref="headUrl"></column>
+    </table>
+
     <!--<table name="cqyl_pre.GATE_Prtc_Act_Info">-->
         <!--<column id="act_Id" ref="id">id = id</column>-->
     <!--</table>-->
