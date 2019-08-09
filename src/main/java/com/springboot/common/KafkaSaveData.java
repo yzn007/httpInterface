@@ -141,6 +141,9 @@ public class KafkaSaveData extends Thread {
                 if (null != sqlDyc && !sqlListDyc.contains(sqlDyc))
                     sqlListDyc.add(sqlDyc);
             }
+            //推送更新数据
+           UpdTblProducter u =  new UpdTblProducter(table.split(";")[m]);
+           u = null;
         }
 
 

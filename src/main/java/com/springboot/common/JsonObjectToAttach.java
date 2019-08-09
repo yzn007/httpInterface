@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.springboot.scala.SaveCosumerData;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.server.api.protocolrecords.UpdateNodeResourceRequest;
 import org.beetl.ext.fn.Print;
@@ -621,7 +622,7 @@ public class JsonObjectToAttach {
                                 att.add(sqlStr);
                             }
                             //闸机事件退出
-                            if(!oneExecute.contains(topic))
+                            if(!manyExecute.contains(topic))
                                 break;
                         }
                     if(!isExist && topic.equalsIgnoreCase(KafkaSaveData.GATE_EVENT_TBL)){
@@ -653,11 +654,13 @@ public class JsonObjectToAttach {
         return  ret;
     }
 
-    static  final List<String>  oneExecute = new ArrayList(){
+    static  final List<String>  manyExecute = new ArrayList(){
         {add("cqyl_pre.PARK_VEHIC_START_OUT_EVT")
         ;add("cqyl_pre.PARK_VEHIC_DRV_IN_EVT");
             add("cqyl_pre.PARK_PARK_SPC_RESV_INFO");}
     };
+
+
     /**
      * 生成插入或删除语句
      *

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yzn00 on 2019/7/11.
@@ -19,5 +20,10 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public List<Route> getAllRoute() {
         return routeMapper.getAllRoute();
+    }
+
+    @Override
+    public void deleAllRec(Map m) {
+        routeMapper.deleAllRec(m);
     }
 }

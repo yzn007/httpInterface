@@ -6,13 +6,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.springboot.common.JsonObjectToAttach;
 import com.springboot.common.ReadPropertiesUtils;
 import com.springboot.common.SaveDataStatic;
+import com.springboot.common.UpdTblProducter;
 import com.springboot.httpInterface.controller.HttpServiceTest;
+import com.springboot.httpInterface.dao.RouteMapper;
 import com.springboot.httpInterface.entity.Route;
 import com.springboot.httpInterface.entity.RouteVehicle;
 import com.springboot.httpInterface.entity.Token;
 import com.springboot.httpInterface.services.RouteService;
 import com.springboot.httpInterface.services.RouteVehicleService;
 import com.springboot.httpInterface.services.TokenService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -141,6 +144,7 @@ public class StaticJob implements BaseJob {
         try {
 //    this.jsonStr = httpServiceTest.getJsonData("http://localhost/httpService/sendGetData?RayData=CurrTotlCnt", "utf-8");
             token = getToken();
+            Date insertDate = null;
             for (Map.Entry<String, String> m : topicS.entrySet()) {
 
                 String[] tabAndMark = null;
@@ -178,6 +182,10 @@ public class StaticJob implements BaseJob {
                         url += "?access_token=" + token.getAccessToken();
                     }
 
+                    Map map =new HashedMap();
+                    map.put("table_name",(tabAndMark == null ? m.getValue(): tabAndMark[0]));
+                    routeService.deleAllRec(map);
+
                     List<String> listJson = new ArrayList<>();
 
                     String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId","",true);
@@ -202,8 +210,19 @@ public class StaticJob implements BaseJob {
                     }
                 }
                 else if(url.indexOf("Token")<0){//除令牌外
+                    Map map =new HashedMap();
+                    map.put("table_name",(tabAndMark == null ? m.getValue(): tabAndMark[0]));
+                    routeService.deleAllRec(map);
                     if(url.indexOf("Vehicle/Info")<0){//车辆信息在线路信息后取得
                         List<Route> listR = routeService.getAllRoute();
+                        int ret = 0;
+                        while(listR==null ||listR.size()==0 ){
+                            Thread.sleep(1000);
+                            listR = routeService.getAllRoute();
+                            if(ret ++ > 1000)
+                                break;
+                        }
+                        insertDate = listR != null && listR.size()>0 ?listR.get(0).getDataTm():null;
 
                         if(url.indexOf("?")>-1 ) {
                             url += "&access_token=" + token.getAccessToken();
@@ -212,6 +231,7 @@ public class StaticJob implements BaseJob {
                         }
                         int k = 0;
                         List<String> listJson = new ArrayList<>();
+
                         for (Route r : listR) {
                             String getJson = httpServiceTest.getJsonData(url, "utf-8","RouteId",r.getId(),false);
                             int j = 0;
@@ -258,6 +278,13 @@ public class StaticJob implements BaseJob {
                         executorService.execute(saveDataStatic);
                     }else{
                         List<RouteVehicle> routeVehicleList = routeVehicleService.getAllVehicle();
+                        int rt = 0;
+                        while (routeVehicleList== null ||routeVehicleList.size()==0){
+                            Thread.sleep(1000);
+                            routeVehicleList = routeVehicleService.getAllVehicle();
+                            if(rt++ >1000)
+                                break;
+                        }
 
                         if(url.indexOf("?")>-1 ) {
                             url += "&access_token=" + token.getAccessToken();
@@ -297,8 +324,13 @@ public class StaticJob implements BaseJob {
                     }
 
                 }
-
+                //站点后执行写入更新信息
+                if(m.getKey().equalsIgnoreCase("BUS_STATION")) {
+                    UpdTblProducter updTblProducter = new UpdTblProducter(tabAndMark == null ? m.getValue() : tabAndMark[0], insertDate);
+                    updTblProducter = null;
+                }
             }
+
 //            executorService.shutdown();
         } catch (Exception e) {
             e.printStackTrace();

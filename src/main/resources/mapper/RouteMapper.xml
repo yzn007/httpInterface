@@ -15,5 +15,9 @@
     <select id="getAllRoute" resultMap="route">
       select *from cqyl_pre.BUS_ROUTE
     </select>
+    
+    <delete id="deleAllRec" parameterType="hashMap">
+        DELETE  from  ${table_name}
+    </delete>
 
 </mapper>

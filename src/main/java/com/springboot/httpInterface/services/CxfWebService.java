@@ -93,13 +93,16 @@ public class CxfWebService {
                     Element bz = wrObject.addElement("bz");
                     bz.setText("");
                     Element czlx = wrObject.addElement("czlx");
-//                    czlx.setText(toString(m.get("tpCzlx")));
-                    czlx.setText("1");
+                    czlx.setText(toString(m.get("tpCzlx")));
+//                    czlx.setText("1");
+
                     Element jksqm = wrObject.addElement("jksqm");
-                    if (null != m.get("tpJksqm") && !StringUtils.isEmpty(toString(m.get("tpJksqm"))))
-                        jksqm.setText(m.get("tpJksqm").toString());
-                    else
+//                    if (null != m.get("tpJksqm") && !StringUtils.isEmpty(toString(m.get("tpJksqm"))))
+//                        jksqm.setText(m.get("tpJksqm").toString());
+//                    else
                         jksqm.setText(license);
+                    Element bh = wrObject.addElement("bh");
+                    bh.setText(toString(m.get("tpValue")));
 
                     StringWriter sw = new StringWriter();
                     OutputFormat opf = OutputFormat.createPrettyPrint();
@@ -115,6 +118,7 @@ public class CxfWebService {
                     while(true) {
                         String code = "";
                         String msg = "";
+                        String value = "";
                         objects = client.invoke("writeObject", "39", "39W01", license, terminalCode, terminalNm, terminalId, terminalXY, enKey, xmlString);
                         //               System.out.println("返回数据:" + objects[0]);
                         Document retDoc = DocumentHelper.parseText(objects[0].toString());
@@ -128,22 +132,27 @@ public class CxfWebService {
                                     if (s.getName().equals("code")) {
                                         code = s.getText();
                                     }
-                                    if(s.getName().equalsIgnoreCase("message") ||
+                                    else if(s.getName().equalsIgnoreCase("message") ||
                                             s.getName().equalsIgnoreCase("msg") )
                                         msg = s.getText();
+                                    else
+                                        value = s.getText();
                                 }
                                 System.out.println("调用webservice返回code:"+code+"["+ decode(msg,"UTF-8")+"]");
                             }
                         }
-    //                        System.out.println("调用webservice返回xml:"+"["+decode(objects[0].toString()+"]","UTF-8"));
+//                            System.out.println("调用webservice返回xml:"+"["+decode(objects[0].toString()+"]","UTF-8"));
                         if(code.equalsIgnoreCase("1")){
-//                            for(Map m :listWeb)
-                                ryDataLargeService.updateWebService(m);
-                            break;
+                            m.put("tpValue",value);
+                            ryDataLargeService.updateWebService(m);
+                        }else{
+                            m.put("tpMsg",decode(objects[0].toString(),"UTF-8"));
+                            ryDataLargeService.updateWebService(m);
                         }
-                        Thread.sleep(5000);
-                        if(k++>5)
-                            break;
+                        break;
+//                        Thread.sleep(5000);
+//                        if(k++>5)
+//                            break;
                     }
                 }
             } catch (Exception e) {

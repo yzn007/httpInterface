@@ -199,9 +199,9 @@
     <select id="TP_VEH_INFO" target="cqyl_pre.PARK_PARK_SPC_RESV_INFO" split="true" valid="true">
         set @aount = '';
         select case when RESV_ID is not null or count(RESV_ID)>0 then @aount:='
-        update cqyl_pre.TP_VEH_INFO set TP_CZLX = ''2''
-        where TP_HPHM = '{Plat_No}' and TP_HPZL = '{Veh_Typ}' and TP_CZLX =''1'' and
-        TP_TXRQQ = date_format('{Resv_Arrv_Tm}',''%Y-%m-%d'') '
+        update cqyl_pre.TP_VEH_INFO set TP_CZLX = ''3'', tp_stat = ''0''
+        where TP_HPHM = '{Plat_No}' and TP_HPZL = '{Veh_Typ}' and TP_CZLX =''1'' and tp_stat = ''1''
+        and TP_TXRQQ = date_format('{Resv_Arrv_Tm}',''%Y-%m-%d'') '
         else @aount:='
         insert into cqyl_pre.TP_VEH_INFO(TP_HPZL,
         TP_HPHM,
