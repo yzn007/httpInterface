@@ -11,7 +11,8 @@
 				qrtz_triggers.TRIGGER_GROUP,
 				qrtz_cron_triggers.CRON_EXPRESSION,
 				qrtz_cron_triggers.TIME_ZONE_ID,
-				qrtz_triggers.TRIGGER_STATE
+				qrtz_triggers.TRIGGER_STATE,
+				date_format(FROM_UNIXTIME(qrtz_triggers.NEXT_FIRE_TIME/1000),'%Y-%m-%d %T') TRIGGER_NEXT_FIRE_TIME
 			FROM
 				quartz.qrtz_job_details qrtz_job_details
 			JOIN quartz.qrtz_triggers qrtz_triggers

@@ -135,11 +135,15 @@ public class KafkaSaveData extends Thread {
                 }
             }
 
-            if(!isRecordExists){//闸机执行没数据操作
+        for (int m = 0; m < this.table.split(";").length; m++) {
+            if(!isRecordExists && table.split(";")[m].equalsIgnoreCase(GATE_EVENT_TBL)){//闸机执行没数据操作
                 String[] sqlDyc = JsonObjectToAttach.getMetaSqls(GATE_EVENT_TBL, "", null);
                 if (null != sqlDyc && !sqlListDyc.contains(sqlDyc))
                     sqlListDyc.add(sqlDyc);
             }
+        }
+
+
 
             try {
                 Seq<String[]> tmpSeq = JavaConverters.asScalaIteratorConverter(reds.iterator()).asScala().toSeq();

@@ -13,6 +13,15 @@ public class JobAndTrigger {
 	private String CRON_EXPRESSION;
 	private String TIME_ZONE_ID;
 	private String TRIGGER_STATE;
+	private String TRIGGER_NEXT_FIRE_TIME;
+
+	public String getTRIGGER_NEXT_FIRE_TIME() {
+		return TRIGGER_NEXT_FIRE_TIME;
+	}
+
+	public void setTRIGGER_NEXT_FIRE_TIME(String TRIGGER_NEXT_FIRE_TIME) {
+		this.TRIGGER_NEXT_FIRE_TIME = TRIGGER_NEXT_FIRE_TIME;
+	}
 
 	public String getTRIGGER_STATE() {
 		return TRIGGER_STATE;

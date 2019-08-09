@@ -220,9 +220,9 @@
         from cqyl_pre.PARK_PARK_SPC_RESV_INFO
         where  Resv_ID = '{Resv_ID}'
         ' end  from cqyl_ta.T80_TA_PARK_CONSM_INFO where RESV_ID = {Resv_ID};
-        select @aount;
-        PREPARE stmt FROM @aount;
-        EXECUTE stmt
+
+        PREPARE stmtsql FROM @aount;
+        EXECUTE stmtsql
     </select>
 
     <!-- 预约 动态语句中的不能嵌套多个执行语句-->
@@ -259,7 +259,7 @@
         from cqyl_pre.PARK_PARK_SPC_RESV_INFO
         where  Resv_ID = '{Resv_ID}'
         ' end  from cqyl_ta.T80_TA_PARK_CONSM_INFO where RESV_ID = {Resv_ID};
-        select @aount;
+
         PREPARE stmt FROM @aount;
         EXECUTE stmt;
         insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select @update_time,lower('T80_TA_PARK_CONSM_INFO'),'0'
