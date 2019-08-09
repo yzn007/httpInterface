@@ -463,8 +463,8 @@ public class JsonObjectToAttach {
         jsonObject.entrySet().iterator().forEachRemaining(s ->
                 a[0] = (!StringUtils.isEmpty(a[0]) ? a[0] : "") + (noContains.get(s.getKey().toString())!=null?"":
                         (isCol ?  s.getKey() : ky.get(s.getKey())==null|| (!ky.get(s.getKey()).equals(linkId) && !StringUtils.isEmpty(linkId)
-                        )?s.getValue().toString().replaceAll(",","，"):
-                                ky.get(s.getKey()).toString().replaceAll(",","，")) + ","));
+                        )?(s.getValue().toString().indexOf(";")<0?s.getValue().toString().replaceAll(",","，"):s.getValue()):
+                                (ky.get(s.getKey()).toString().indexOf(";")<0?ky.get(s.getKey()).toString().replaceAll(",","，"):ky.get(s.getKey()))  ) + ","));
 
         if(!isCol) {
 
@@ -481,9 +481,9 @@ public class JsonObjectToAttach {
                             System.out.println("error【"+v.getKey()+"】:" +josnM);
                             return "";
                         }
-                        values += value.indexOf(",")>-1?value.replaceAll(",","，"):value + ",";
+                        values += value + ",";
                     }
-                    String subStr = jsonObject.get(m.getKey()).toString();
+                    String subStr = jsonObject.get(m.getKey()).toString().replaceAll(",","，");
                     String head = a[0].substring(0,a[0].indexOf(subStr)+subStr.length());
                     String tail = a[0].substring(a[0].indexOf(subStr)+subStr.length(),a[0].length());
 //                    head = head.replace(subStr,values.substring(0,values.length()-1));
@@ -573,44 +573,66 @@ public class JsonObjectToAttach {
                     }
                 }
                 if(isExists){
-                    for(int j=0;j<jsonArray.length;j++) {
-                        JSONObject jsonObject = null;
-                        try{
-                            jsonObject = JSONObject.parseObject(jsonArray[j]);
-                        }catch (Exception ex){
-                            System.out.println(ex.toString());
-                        }
-                        String isSplit = tblEle.attribute(2).getValue();
-                        String sqlStr = quoteReplacement(tblEle.getStringValue().replaceAll("\r","").replaceAll("\n",""));
+                    boolean isExist = false;//没有消费数据
+                    if(jsonArray!=null)
+                        for(int j=0;j<jsonArray.length;j++) {
+                            isExist = true;
+                            JSONObject jsonObject = null;
+                            try{
+                                jsonObject = JSONObject.parseObject(jsonArray[j]);
+                            }catch (Exception ex){
+                                System.out.println(ex.toString());
+                            }
+                            String isSplit = tblEle.attribute(2).getValue();
+                            String sqlStr = quoteReplacement(tblEle.getStringValue().replaceAll("\r","").replaceAll("\n",""));
 
-                        String subString = "";
-                        int i = 0;
-                        while(sqlStr.indexOf(quoteReplacement("{"))>-1) {
-                            subString = sqlStr.substring(sqlStr.indexOf(quoteReplacement("{")) + 1, sqlStr.indexOf(quoteReplacement("}")));
-                            String jsonKey = subString;
-                            for(Map.Entry<String,Object> m:jsonObject.entrySet()){
-                                if(m.getKey().equalsIgnoreCase(jsonKey)) {
-                                    jsonKey = m.getKey();
-                                    break;
-                                }
-                            }
-                            int jj = 0;
-                            if(null!=jsonObject.get(jsonKey)){
-                                while(sqlStr.indexOf(quoteReplacement("{"+subString+"}"))>-1) {
-                                    sqlStr = sqlStr.replace(quoteReplacement("{" + subString + "}"), getJoinString(jsonObject.get(jsonKey).toString()));
-                                    if(jj++>sqlStr.length())//防止替换失败死循环
+                            String subString = "";
+                            int i = 0;
+                            while(sqlStr.indexOf(quoteReplacement("{"))>-1) {
+                                subString = sqlStr.substring(sqlStr.indexOf(quoteReplacement("{")) + 1, sqlStr.indexOf(quoteReplacement("}")));
+                                String jsonKey = subString;
+                                for(Map.Entry<String,Object> m:jsonObject.entrySet()){
+                                    if(m.getKey().equalsIgnoreCase(jsonKey)) {
+                                        jsonKey = m.getKey();
                                         break;
+                                    }
                                 }
+                                int jj = 0;
+                                if(null!=jsonObject.get(jsonKey)){
+                                    while(sqlStr.indexOf(quoteReplacement("{"+subString+"}"))>-1) {
+                                        sqlStr = sqlStr.replace(quoteReplacement("{" + subString + "}"), getJoinString(jsonObject.get(jsonKey).toString()));
+                                        if(jj++>sqlStr.length())//防止替换失败死循环
+                                            break;
+                                    }
+                                }
+                                i++;
+                                if(i>sqlStr.length())//防止替换失败死循环
+                                    break;
                             }
-                            i++;
-                            if(i>sqlStr.length())//防止替换失败死循环
+
+                            if (isSplit.equalsIgnoreCase("true")) {//需求分割sql
+                                String[] sqls = sqlStr.split(";");
+                                for (String s : sqls) {
+                                    String repl = s.replaceAll("；",";");
+                                    if(!att.contains(repl))
+                                        att.add(repl);
+                                }
+                            } else {
+                                att.add(sqlStr);
+                            }
+                            //闸机事件退出
+                            if(!oneExecute.contains(topic))
                                 break;
                         }
-
+                    if(!isExist && topic.equalsIgnoreCase(KafkaSaveData.GATE_EVENT_TBL)){
+                        String isSplit = tblEle.attribute(2).getValue();
+                        String sqlStr = quoteReplacement(tblEle.getStringValue().replaceAll("\r","").replaceAll("\n",""));
                         if (isSplit.equalsIgnoreCase("true")) {//需求分割sql
                             String[] sqls = sqlStr.split(";");
                             for (String s : sqls) {
-                                att.add(s.replaceAll("；",";"));
+                                String repl = s.replaceAll("；",";");
+                                if(!att.contains(repl))
+                                    att.add(repl);
                             }
                         } else {
                             att.add(sqlStr);
@@ -631,6 +653,11 @@ public class JsonObjectToAttach {
         return  ret;
     }
 
+    static  final List<String>  oneExecute = new ArrayList(){
+        {add("cqyl_pre.PARK_VEHIC_START_OUT_EVT")
+        ;add("cqyl_pre.PARK_VEHIC_DRV_IN_EVT");
+            add("cqyl_pre.PARK_PARK_SPC_RESV_INFO");}
+    };
     /**
      * 生成插入或删除语句
      *
@@ -663,12 +690,17 @@ public class JsonObjectToAttach {
                         tmpLink = e.getValue();
                 }
             }
-            //取得json key
-            String column = getColumsOrValues(JSONObject.parseObject(jsons[0]), true,keyWhere,noContainCols,linkId,null);
-            Map keyMap = new HashMap<String,Map<String,String>>();
-            rets = getPropertyRelation(column, table, null,subTabs,linkId,keyMap);
+//            //取得json key
+//            String column = getColumsOrValues(JSONObject.parseObject(jsons[0]), true,keyWhere,noContainCols,linkId,null);
+//            Map keyMap = new HashMap<String,Map<String,String>>();
+//            rets = getPropertyRelation(column, table, null,subTabs,linkId,keyMap);
 
             for (String json : jsons) {
+
+                //取得json key
+                String column = getColumsOrValues(JSONObject.parseObject(json), true,keyWhere,noContainCols,linkId,null);
+                Map keyMap = new HashMap<String,Map<String,String>>();
+                rets = getPropertyRelation(column, table, null,subTabs,linkId,keyMap);
 
                 for(int k=1;k<rets.length;k++){
                     String [] vals = rets[k].split("=");
@@ -734,6 +766,9 @@ public class JsonObjectToAttach {
 
                 }
 
+                //清空条件，防止条件不一样，一直 用同一个条件的情况出现
+                keyWhere.clear();
+
             }
             if (att.size() > 0) {
                 ret = new String[att.size()];
@@ -745,8 +780,7 @@ public class JsonObjectToAttach {
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-        //清空条件，防止条件不一样，一直 用同一个条件的情况出现
-        keyWhere.clear();
+
         return ret;
     }
 
@@ -760,7 +794,7 @@ public class JsonObjectToAttach {
                 "            \"id\": \"039EC87A-4691-4FF8-A828-B1E2F0220387\",\n" +
                 "            \"cname\": \"sdfds\",\n" +
                 "            \"ename\": \"sdfsdf\",\n" +
-                "            \"nationality\": \"\",\n" +
+                "            \"nationality\": \"中国,zh\",\n" +
                 "            \"certificateNum\": \"\",\n" +
                 "            \"certificateType\": 0,\n" +
                 "            \"gender\": \"男\",\n" +

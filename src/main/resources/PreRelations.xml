@@ -39,7 +39,7 @@
         pp.Resv_Park_Spc_Qty
         from cqyl_pre.PARK_PARKING_LOT pp right join cqyl_pre.PARK_LOT_STATIC_INFO pl on pp.Park_Lot_ID = pl.PARK_LOT_ID and
         pp.Park_Lot_Regn_ID = pl.PARK_LOT_REGN_ID
-        where p1.PARK_LOT_ID = {PARK_LOT_ID}  group by pl.PARK_LOT_ID
+        where pl.PARK_LOT_ID = {PARK_LOT_ID}  group by pl.PARK_LOT_ID
     </select>
 
     <!-- 停车位使用数量 -->
@@ -401,18 +401,7 @@
         STATT_DT) SELECT '100','实时人数统计','100002','当前总人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_TMP_EVT;
 
 
-        select case when ROW_COUNT() = 0 then
-        @noRowFetch := 'INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
-        RPT_NM,
-        INDX_ID,
-        INDX_NM,
-        GRP_ID,
-        GRP_NM,
-        INDX_VAL,
-        STATT_DT) VALUES(DATE_FORMAT(now(),''%Y-%m-%d''),''100'',''实时人数统计'',''100002'',''当前总人数'',null,null,0)
-        ' else @noRowFetch := ' select * from CQYL_RD.T80_RD_LARG_SCRN_INDX where INDX_ID = ''100002'' '  end;
-        PREPARE mys from @noRowFetch;
-        EXECUTE mys;
+
 
 
         INSERT INTO CQYL_RD.T80_RD_GATE_EVT(ID,
@@ -485,12 +474,14 @@
         GRP_ID,
         GRP_NM,
         INDX_VAL,
-        STATT_DT) SELECT '101','累计人数统计','105002','已接待预约人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0;
+        STATT_DT) SELECT '101','累计人数统计','105002','已接待预约人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0
+    </select>
 
+    <select id="T80_RD_GATE_TMP_EVT_2" target="cqyl_pre.GATE_GATE_EVT" split="true" valid="true">
         delete from CQYL_RD.T80_RD_GATE_TMP_EVT;
         delete from CQYL_PRE.GATE_GATE_TMP_EVT
-
     </select>
+
 </root>
 
 

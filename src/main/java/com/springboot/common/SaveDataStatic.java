@@ -56,7 +56,7 @@ public class SaveDataStatic extends Thread {
                         if (!reds.contains(sql) && sql != null)
                             reds.add(sql);
 
-                        String[] strDynamic = JsonObjectToAttach.getMetaSqls(topic, null, array);
+                        String[] strDynamic = JsonObjectToAttach.getMetaSqls(table.split(";")[m], null, array);
                         if (!listDynamic.contains(strDynamic) && null != strDynamic)
                             listDynamic.add(strDynamic);
                     }

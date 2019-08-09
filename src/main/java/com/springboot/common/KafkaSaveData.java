@@ -27,6 +27,7 @@ public class KafkaSaveData extends Thread {
     private String isTrancate = "false";
     private Map textCode = null;
     private  Consumer<String, String> consumer = null;
+    final static String GATE_EVENT_TBL = "cqyl_pre.GATE_GATE_EVT";
 
     public KafkaSaveData(String topic,String table,String isDelInsert,String isTruncate,Map textCode,Consumer consumer ) {
         super();
@@ -92,7 +93,10 @@ public class KafkaSaveData extends Thread {
             List<String[]> reds = new ArrayList<>();
             List<String[]> sqlListDyc = new ArrayList<>();
 
+            boolean isRecordExists = false;//没有消费数据
+
             for (ConsumerRecord<String, String> record : records) {
+                isRecordExists = true;
                 System.out.println("接收到: " + record.offset() + record.key() + record.value());
                 String[] nameValue = {String.valueOf(record.offset()), record.value()};
                 try {
@@ -129,6 +133,12 @@ public class KafkaSaveData extends Thread {
                 } catch (Exception e) {
                     System.out.println(e.toString());
                 }
+            }
+
+            if(!isRecordExists){//闸机执行没数据操作
+                String[] sqlDyc = JsonObjectToAttach.getMetaSqls(GATE_EVENT_TBL, "", null);
+                if (null != sqlDyc && !sqlListDyc.contains(sqlDyc))
+                    sqlListDyc.add(sqlDyc);
             }
 
             try {
