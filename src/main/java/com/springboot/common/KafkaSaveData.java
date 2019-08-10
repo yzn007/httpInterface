@@ -1,15 +1,12 @@
 package com.springboot.common;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.scala.SaveCosumerData;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
-import sun.awt.SunHints;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,6 +25,8 @@ public class KafkaSaveData extends Thread {
     private Map textCode = null;
     private  Consumer<String, String> consumer = null;
     final static String GATE_EVENT_TBL = "cqyl_pre.GATE_GATE_EVT";
+
+    protected static final Logger logger = Logger.getLogger(KafkaSaveData.class.getName());
 
     public KafkaSaveData(String topic,String table,String isDelInsert,String isTruncate,Map textCode,Consumer consumer ) {
         super();
@@ -97,7 +96,9 @@ public class KafkaSaveData extends Thread {
 
             for (ConsumerRecord<String, String> record : records) {
                 isRecordExists = true;
-                System.out.println("接收到: " + record.offset() + record.key() + record.value());
+                logger.setLevel(Level.INFO);
+                logger.info("接收到: " + record.offset() + record.key() + record.value());
+//                System.out.println("接收到: " + record.offset() + record.key() + record.value());
                 String[] nameValue = {String.valueOf(record.offset()), record.value()};
                 try {
                     String[] array = JsonObjectToAttach.getJsonList(record.value(), null);

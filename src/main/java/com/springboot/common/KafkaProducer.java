@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 
 /**
@@ -27,6 +28,8 @@ public class KafkaProducer extends Thread {
         this.topic = topic;
         this.value = value;
     }
+
+    protected static final Logger logger = Logger.getLogger(KafkaProducer.class.getName());
     
     //创建生产者
     private Producer<Integer, String> createProducer(){
@@ -61,6 +64,7 @@ public class KafkaProducer extends Thread {
             producer = createProducer();
             if (!StringUtils.isEmpty(value)) {
 //                System.out.println("生产数据为：" + value);
+                logger.info("生产数据为：" + value);
                 producer.send(new ProducerRecord<Integer, String>(topic, value + "\n"));
             }
         }catch (Exception e){

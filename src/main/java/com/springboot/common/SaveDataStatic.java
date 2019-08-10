@@ -1,9 +1,11 @@
 package com.springboot.common;
 
+import com.springboot.httpInterface.DemoApplication;
 import com.springboot.scala.SaveCosumerData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.LoggerFactory;
 import scala.Dynamic;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -24,6 +26,10 @@ public class SaveDataStatic extends Thread {
     private String isTrancate = "false";
     private List<String> listJsonString = new ArrayList<>();
 
+final static Logger logger =
+        Logger.getLogger(SaveDataStatic.class.getName());
+
+
     public SaveDataStatic(String topic, String table, String isDelInsert, String isTruncate, List<String> jsonString) {
         super();
         this.topic = topic;
@@ -36,7 +42,7 @@ public class SaveDataStatic extends Thread {
 
     @Override
     public void run() {
-        Logger.getLogger(this.getClass().getName()).setLevel(Level.OFF);
+
 
         //System.out.println(records);
         List<String[]> reds = new ArrayList<>();

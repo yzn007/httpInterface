@@ -63,7 +63,6 @@ spring:
         initialize-schema: embedded
 
 
-
 #pagehelper分页插件
 pagehelper:
     helperDialect: mysql
@@ -75,6 +74,13 @@ pagehelper:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.springboot.httpInterface.entity
+logging:
+  pattern:
+    level: '%5p'
+  path: /log
+  level:
+    root: error
+    com.springboot.common: info
 
 
 
