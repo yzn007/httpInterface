@@ -211,6 +211,15 @@ public class StaticJob implements BaseJob {
                 }
                 else if(url.indexOf("Token")<0){//除令牌外
                     Map map =new HashedMap();
+                    //删除站点明细数据
+                    if(tabAndMark[0].indexOf("cqyl_pre.BUS_STATION")>-1 ){
+                        map.put("table_name","cqyl_pre.BUS_ROUTE_STATION");
+                        routeService.deleAllRec(map);
+                    }else if(tabAndMark[0].indexOf("cqyl_pre.BUS_ROUTE_DISPT")>-1){//删除
+                        map.put("table_name","cqyl_pre.BUS_ROUTE_DISPT_DTL");
+                        routeService.deleAllRec(map);
+                    }
+
                     map.put("table_name",(tabAndMark == null ? m.getValue(): tabAndMark[0]));
                     routeService.deleAllRec(map);
                     if(url.indexOf("Vehicle/Info")<0){//车辆信息在线路信息后取得

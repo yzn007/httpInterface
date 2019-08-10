@@ -26,6 +26,7 @@ public class UpdTblProducter {
         put("cqyl_pre.BUS_ROUTE", "t80_ta_pub_traf_info");
         put("cqyl_pre.BUS_STATION", "t80_ta_pub_traf_info");
         put("cqyl_pre.PARK_VEHIC_START_OUT_EVT", "T80_TA_PARK_CONSM_INFO");
+        put("cqyl_pre.PARK_PAY_INFO","T80_TA_PAY_INFO");
     }};
 
     public UpdTblProducter(String table,Date date) {

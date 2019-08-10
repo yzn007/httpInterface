@@ -120,7 +120,7 @@
     <!-- 车辆计划运行 -->
     <table name="cqyl_pre.BUS_ROUTE_DISPT">
         <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
-        <column id="Times" ref="[list]BUS_ROUTE_DISPT_DTL" linkId="RouteId"/>
+        <column id="Times" ref="[list]cqyl_pre.BUS_ROUTE_DISPT_DTL" linkId="RouteId"/>
     </table>
 
     <!-- 车辆计划运行明细 -->

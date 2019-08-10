@@ -5,86 +5,110 @@
     <!-- 目标表名 主题 是否拆分sql 是否有效-->
      <!-- 执行sql -->
 
-    <select id="T80_TA_PARK_LOT_INFO" target="cqyl_pre.PARK_PARKING_LOT" split="true"  valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_LOT_INFO'),'0';
-        delete from cqyl_ta.T80_TA_PARK_LOT_INFO where PARK_LOT_ID = {PARK_LOT_ID};
-        insert into cqyl_ta.T80_TA_PARK_LOT_INFO(PARK_LOT_ID,
-        PARK_LOT_NM,
-        PARK_LOT_CHARC,
-        PARK_LOT_ADDR_INFO,
-        PARK_LOT_TYP,
-        PARK_SPC_TOTL_QTY,
-        REMN_PARK_SPC_QTY,
-        PARK_LOT_CHRG_TYP,
-        CHRG_STD,
-        LGTD,
-        LTTD,
-        BIZ_TM,
-        USE_STAT,
-        Resv_Park_Spc_Qty
-        )
-        select pp.Park_Lot_ID,
-        max(pl.PARK_LOT_NM),
-        '1',
-        max(pl.PARK_LOT_ADDR),
-        max(pl.PARK_LOT_CHRG_TYP),
-        sum(pp.Park_Spc_Totl_Qty),
-        sum(pp.Park_Spc_Totl_Qty)-sum(pp.Ocup_Park_Spc_Qty),
-        max(pl.PARK_LOT_CHRG_TYP),
-        max(pl.CHRG_STD),
-        max(pl.LGTD),
-        max(pl.LTTD),
-        max(pl.BIZ_TM),
-        max(pl.USE_STAT),
-        pp.Resv_Park_Spc_Qty
-        from cqyl_pre.PARK_PARKING_LOT pp right join cqyl_pre.PARK_LOT_STATIC_INFO pl on pp.Park_Lot_ID = pl.PARK_LOT_ID and
-        pp.Park_Lot_Regn_ID = pl.PARK_LOT_REGN_ID
-        where pl.PARK_LOT_ID = {PARK_LOT_ID}  group by pl.PARK_LOT_ID
-    </select>
+    <!--<select id="T80_TA_PARK_LOT_INFO" target="cqyl_pre.PARK_PARKING_LOT" split="true"  valid="true">-->
+        <!--insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_LOT_INFO'),'0';-->
+        <!--delete from cqyl_ta.T80_TA_PARK_LOT_INFO where PARK_LOT_ID = {PARK_LOT_ID};-->
+        <!--insert into cqyl_ta.T80_TA_PARK_LOT_INFO(PARK_LOT_ID,-->
+        <!--PARK_LOT_NM,-->
+        <!--PARK_LOT_CHARC,-->
+        <!--PARK_LOT_ADDR_INFO,-->
+        <!--PARK_LOT_TYP,-->
+        <!--PARK_SPC_TOTL_QTY,-->
+        <!--REMN_PARK_SPC_QTY,-->
+        <!--PARK_LOT_CHRG_TYP,-->
+        <!--CHRG_STD,-->
+        <!--LGTD,-->
+        <!--LTTD,-->
+        <!--BIZ_TM,-->
+        <!--USE_STAT,-->
+        <!--Resv_Park_Spc_Qty-->
+        <!--)-->
+        <!--select pp.Park_Lot_ID,-->
+        <!--max(pl.PARK_LOT_NM),-->
+        <!--'1',-->
+        <!--max(pl.PARK_LOT_ADDR),-->
+        <!--max(pl.PARK_LOT_CHRG_TYP),-->
+        <!--sum(pp.Park_Spc_Totl_Qty),-->
+        <!--sum(pp.Park_Spc_Totl_Qty)-sum(pp.Ocup_Park_Spc_Qty),-->
+        <!--max(pl.PARK_LOT_CHRG_TYP),-->
+        <!--max(pl.CHRG_STD),-->
+        <!--max(pl.LGTD),-->
+        <!--max(pl.LTTD),-->
+        <!--max(pl.BIZ_TM),-->
+        <!--max(pl.USE_STAT),-->
+        <!--pp.Resv_Park_Spc_Qty-->
+        <!--from cqyl_pre.PARK_PARKING_LOT pp right join cqyl_pre.PARK_LOT_STATIC_INFO pl on pp.Park_Lot_ID = pl.PARK_LOT_ID and-->
+        <!--pp.Park_Lot_Regn_ID = pl.PARK_LOT_REGN_ID-->
+        <!--where pl.PARK_LOT_ID = {PARK_LOT_ID}  group by pl.PARK_LOT_ID-->
+    <!--</select>-->
 
     <!-- 停车位使用数量 -->
-    <select id="T80_RD_LARG_SCRN_INDX" target="cqyl_pre.PARK_PARKING_LOT" split="true" valid="true">
-        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID='102003' and STATT_DT=date_format(now(),'%Y-%m-%d');
-        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX (RPT_ID,
-        RPT_NM,
-        INDX_ID,
-        INDX_NM,
-        GRP_ID,
-        GRP_NM,
-        INDX_VAL,
-        STATT_DT)
-        select '102',
-        '停车位数量',
-        '102003',
-        '停车位当前使用数量',
-        PARK_LOT_ID,
-        PARK_LOT_NM,
-        PARK_SPC_TOTL_QTY-REMN_PARK_SPC_QTY,
-        date_format(now(),'%Y-%m-%d')
-        from cqyl_ta.T80_TA_PARK_LOT_INFO
+    <!--<select id="T80_RD_LARG_SCRN_INDX" target="cqyl_pre.PARK_PARKING_LOT" split="true" valid="true">-->
+        <!--delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID='102003' and STATT_DT=date_format(now(),'%Y-%m-%d');-->
+        <!--insert into cqyl_rd.T80_RD_LARG_SCRN_INDX (RPT_ID,-->
+        <!--RPT_NM,-->
+        <!--INDX_ID,-->
+        <!--INDX_NM,-->
+        <!--GRP_ID,-->
+        <!--GRP_NM,-->
+        <!--INDX_VAL,-->
+        <!--STATT_DT)-->
+        <!--select '102',-->
+        <!--'停车位数量',-->
+        <!--'102003',-->
+        <!--'停车位当前使用数量',-->
+        <!--PARK_LOT_ID,-->
+        <!--PARK_LOT_NM,-->
+        <!--PARK_SPC_TOTL_QTY-REMN_PARK_SPC_QTY,-->
+        <!--date_format(now(),'%Y-%m-%d')-->
+        <!--from cqyl_ta.T80_TA_PARK_LOT_INFO-->
 
-    </select>
+    <!--</select>-->
 
     <!-- 停车位当前使用数量 -->
-    <select id="T80_RD_LARG_SCRN_INDX_2" target="cqyl_pre.PARK_PARKING_LOT" split="true" valid="true">
-        delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID='102004' and STATT_DT=date_format(now(),'%Y-%m-%d');
-        insert into cqyl_rd.T80_RD_LARG_SCRN_INDX (RPT_ID,
-        RPT_NM,
-        INDX_ID,
-        INDX_NM,
-        GRP_ID,
-        GRP_NM,
-        INDX_VAL,
-        STATT_DT)
-        select '102',
-        '停车位数量',
-        '102004',
-        '停车场当前预约车位数量',
+    <!--<select id="T80_RD_LARG_SCRN_INDX_2" target="cqyl_pre.PARK_PARKING_LOT" split="true" valid="true">-->
+        <!--delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID='102004' and STATT_DT=date_format(now(),'%Y-%m-%d');-->
+        <!--insert into cqyl_rd.T80_RD_LARG_SCRN_INDX (RPT_ID,-->
+        <!--RPT_NM,-->
+        <!--INDX_ID,-->
+        <!--INDX_NM,-->
+        <!--GRP_ID,-->
+        <!--GRP_NM,-->
+        <!--INDX_VAL,-->
+        <!--STATT_DT)-->
+        <!--select '102',-->
+        <!--'停车位数量',-->
+        <!--'102004',-->
+        <!--'停车场当前预约车位数量',-->
+        <!--PARK_LOT_ID,-->
+        <!--PARK_LOT_NM,-->
+        <!--Resv_Park_Spc_Qty,-->
+        <!--date_format(now(),'%Y-%m-%d')-->
+        <!--from cqyl_ta.T80_TA_PARK_LOT_INFO-->
+
+    <!--</select>-->
+
+    <!-- 支付信息表 -->
+    <select id ="T80_TA_PAY_INFO" target="cqyl_pre.PARK_PAY_INFO" split="true" valid="true">
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PAY_INFO'),'0';
+        insert into cqyl_ta.T80_TA_PAY_INFO (PAY_ID,
+        PAY_STAT,
+        TX_TYP,
+        PAY_TM,
+        PAY_AMT,
         PARK_LOT_ID,
-        PARK_LOT_NM,
-        Resv_Park_Spc_Qty,
-        date_format(now(),'%Y-%m-%d')
-        from cqyl_ta.T80_TA_PARK_LOT_INFO
+        PLAT_NO,
+        CREATE_TM)
+        select PAY_ID,
+        PAY_STAT,
+        TX_TYP,
+        PAY_TM,
+        PAY_AMT,
+        PARK_LOT_ID,
+        PLAT_NO,
+        Data_Tm
+        from cqyl_pre.PARK_PAY_INFO
+        where PAY_ID = {PAY_ID}
 
     </select>
 
