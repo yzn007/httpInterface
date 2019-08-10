@@ -769,10 +769,12 @@ public class JsonObjectToAttach {
 
                 }
 
-                //清空条件，防止条件不一样，一直 用同一个条件的情况出现
-                keyWhere.clear();
+                if(StringUtils.isEmpty(linkId))//子表不用清空
+                    keyWhere.clear();
 
             }
+            //清空条件，防止条件不一样，一直 用同一个条件的情况出现
+            keyWhere.clear();
             if (att.size() > 0) {
                 ret = new String[att.size()];
                 int i = 0;
