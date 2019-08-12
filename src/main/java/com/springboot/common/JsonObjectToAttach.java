@@ -759,8 +759,9 @@ public class JsonObjectToAttach {
 
                 for (Map.Entry<String,String> e : noContainCols.entrySet()) {
                     String[] bb = getBatchStatement(getJsonList(json, e.getKey()), e.getValue(), null,tmpLink, isModify, keyWhere,isTruncate);
-                    if (bb == null)
+                    if (bb == null) {//子表无数据都返回空
                         return null;
+                    }
                     else
                         for (int k = 0; k < bb.length; k++) {
                             if(!att.contains(bb[k]))
