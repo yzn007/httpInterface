@@ -129,7 +129,7 @@
 
     </select>
     <select id="T80_TA_PUB_TRAF_INFO" target="cqyl_pre.BUS_ROUTE" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PUB_TRAF_INFO'),'0';
+
         delete from cqyl_ta.T80_TA_PUB_TRAF_INFO;
         insert into cqyl_ta.T80_TA_PUB_TRAF_INFO(PUB_TRAF_ID,
         PUB_TRAF_NM,

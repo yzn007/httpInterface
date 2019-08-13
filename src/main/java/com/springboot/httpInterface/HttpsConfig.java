@@ -50,7 +50,7 @@ public class HttpsConfig {
         connector.setScheme("http");
         //Connector监听的http的端口号
         connector.setPort(httpPort);
-        connector.setSecure(true);
+        connector.setSecure(false);
         //监听到http的端口号后转向到的https的端口号
         connector.setRedirectPort(httpsPort);
         return connector;
