@@ -51,15 +51,20 @@
         <topic name="BUS_ACCESS_TOKEN" table="cqyl_pre.BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Token?appid=001&amp;secret=ABCDEFG"/>
         <!-- 线路 -->
         <topic name="BUS_ROUTE" table="cqyl_pre.BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/GetRoutes"/>
-        <!-- 线路车辆 -->
-        <topic name="BUS_ROUTE_VEHICLE" table="cqyl_pre.BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/GetVehicles"/>
-        <!-- 站点 -->
+       <!-- 站点 -->
         <topic name="BUS_STATION" table="cqyl_pre.BUS_STATION" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/GetTrack"/>
         <!-- 车辆 -->
         <topic name="BUS_VEHICLE" table="cqyl_pre.BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Vehicle/Info"/>
         <!-- 线路计划时间 -->
         <topic name="BUS_ROUTE_DISPT" table="cqyl_pre.BUS_ROUTE_DISPT" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/Times"/>
 
+    </topics>
+
+    <topics name = "StaticJobPer1Min">
+        <!-- 令牌信息 -->
+        <topic name="BUS_ACCESS_TOKEN" table="cqyl_pre.BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Token?appid=001&amp;secret=ABCDEFG"/>
+        <!-- 线路车辆 -->
+        <topic name="BUS_ROUTE_VEHICLE" table="cqyl_pre.BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/GetVehicles"/>
     </topics>
 
     <topics name="GateJob">
