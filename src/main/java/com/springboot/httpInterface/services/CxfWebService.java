@@ -144,9 +144,11 @@ public class CxfWebService {
 //                            System.out.println("调用webservice返回xml:"+"["+decode(objects[0].toString()+"]","UTF-8"));
                         if(code.equalsIgnoreCase("1")){
                             m.put("tpValue",value);
+                            m.put("tpStat","1"); //成功
                             ryDataLargeService.updateWebService(m);
                         }else{
                             m.put("tpMsg",decode(objects[0].toString(),"UTF-8"));
+                            m.put("tpStat","2"); //失败
                             ryDataLargeService.updateWebService(m);
                         }
                         break;

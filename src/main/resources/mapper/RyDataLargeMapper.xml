@@ -157,7 +157,7 @@
         <if test="tpHpzl!=null and tpHphm!=null and tpTxrqq!=null and tpTxrqz!=null">
             update cqyl_pre.TP_VEH_INFO
             <set>
-              tp_stat = '1'
+              tp_stat = #{tpStat}
               <if test="tpValue!=null">
                 ,tp_value = #{tpValue}
               </if>
