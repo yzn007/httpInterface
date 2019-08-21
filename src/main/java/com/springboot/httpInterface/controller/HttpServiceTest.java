@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -221,8 +222,54 @@ public class HttpServiceTest {
     private List getResultTable(String param){
         List<Map> result = new ArrayList<>();
 
+        if(param.indexOf("GuestStatus")>-1 && (
+                param.split("#")[0].split(";")[0].equals("GuestStatus") ||
+                        param.split(",")[0].split(";")[0].equalsIgnoreCase("GuestStatus") )){//嘉宾
+            Map map = new HashedMap();
+//            map.put("limit",1000);//返回最后1000条记录
+            if(param.indexOf("#")<0) {
+                map.put("checkTime", "2019-08-26");//写死8月26号
+                if(param.split(",").length>2) {
+                    map.put("start", param.split(",")[1]);
+                    map.put("endrow", param.split(",")[2]);
+                }
+                if(param.split(",")[0].split(";").length>2){
+                    map.put("BeginTime",param.split(",")[0].split(";")[1]);
+                    map.put("EndTime",param.split(",")[0].split(";")[2]);
+                }
+            }else {
+                String tmp = param.split("#")[1];
+                if(tmp.indexOf(",")>-1 && tmp.split(",").length>2){
+                    map.put("start",tmp.split(",")[1]);
+                    map.put("endrow",tmp.split(",")[2]);
+                    map.put("checkTime",tmp.split(",")[0]);
+                }else
+                    map.put("checkTime",tmp );
+                if(param.split("#")[0].split(";").length>2){
+                    map.put("BeginTime",param.split("#")[0].split(";")[1]);
+                    map.put("EndTime",param.split("#")[0].split(";")[2]);
+                }
+            }
+
+            List<Map> listGuest = ryDataLargeService.getAllGuest(map);
+//            if(listGuest!=null && listGuest.size()>0)
+//                result.add(new HashedMap(){{put("cnt",listGuest.get(0).get("cnt"));}});
+            for(Map ma:listGuest){
+                Map m = new HashedMap();
+                m.put("id",ma.get("id"));
+                m.put("cname",ma.get("cname"));
+                m.put("ename",ma.get("ename"));
+                m.put("roleType",ma.get("roleType"));
+                m.put("certificateType",ma.get("certificateType"));
+                m.put("certificateNum",ma.get("certificateNum"));
+                m.put("certificateLevel",ma.get("certificateLevel"));
+                m.put("gateStatus",ma.get("gateStatus"));
+
+                result.add(m);
+            }
+        }
         //每个闸机当前进入人数
-        if(param.equals("CurrEnterCnt")){
+        else if(param.equals("CurrEnterCnt")){
             String gate = "";
             String currEnterCnt = "";
             Map map = new HashedMap();
@@ -243,14 +290,23 @@ public class HttpServiceTest {
             List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
             String park = "";
             String precnQty = "";
+            float qty = 0.0f;
             for(RyDataLarge y:listRyData){
-                park = y.getGroupNm();
+//                park = y.getGroupNm();
                 precnQty = y.getIndexVal();
-                Map <String,String> m = new HashMap();
-                m.put("Park",park);
-                m.put("Precn_Qty",precnQty);
-                result.add(m);
+//                Map <String,String> m = new HashMap();
+//                m.put("Park",park);
+//                m.put("Precn_Qty",precnQty);
+//                result.add(m);
+                try{
+                    qty += Float.parseFloat(precnQty);
+                }catch (Exception ep){
+
+                }
             }
+            Map <String,Object> m = new HashMap();
+            m.put("Precn_Qty",qty);
+            result.add(m);
 
         }else if (param.equals("CurrTotlCnt")){//当前闸机进入总人数
             String currTotlCnt = "";
@@ -329,14 +385,22 @@ public class HttpServiceTest {
             Map map = new HashedMap();
             map.put("indexId",new ArrayList<String>(){{add("102003");}});
             List<RyDataLarge> listRyData = ryDataLargeService.getRyDataById(map);
+            float qty = 0.0f;
             for(RyDataLarge y:listRyData){
                 parkCurrUseQty =y.getIndexVal();
-                park = y.getGroupNm();
-                Map m = new HashedMap();
-                m.put("Park",park);
-                m.put("Park_Curr_Use_Qty",parkCurrUseQty);
-                result.add(m);
+//                park = y.getGroupNm();
+//                m.put("Park",park);
+//                m.put("Park_Curr_Use_Qty",parkCurrUseQty);
+
+                try{
+                    qty+= Float.parseFloat(parkCurrUseQty);
+                }catch (Exception ec){
+
+                }
             }
+            Map m = new HashedMap();
+            m.put("Park_Curr_Use_Qty",qty);
+            result.add(m);
 
         }else if (param.equals("ParkLicnEvent")){//停车场车辆进出数据
             Map map = new HashedMap();
@@ -558,13 +622,37 @@ public class HttpServiceTest {
     public Ret sendGetData(HttpServletRequest request, HttpServletResponse response) {
         String result = "调用成功：数据是 " + "name:" + request.getParameter("name") + " city:" + request.getParameter("city");
         Map m = new HashMap();
+        boolean isConstract = false;
+        String param = request.getParameter("RayData");
+        if(StringUtils.isEmpty(param)) {
+            String startTime = request.getParameter("BeginTime");
+            String endTime = request.getParameter("EndTime");
+            param = request.getParameter("Contractor") + ";"+startTime + ";"+endTime +
+                    (!StringUtils.isEmpty(request.getParameter("checkTime")) ? "#" + request.getParameter("checkTime") : "");
+            String page =  request.getParameter("page");
+            String pageCnt = request.getParameter("pagenum");
 
-        List mapLists = getResultTable(request.getParameter("RayData"));
+            try{
+                int pg = Integer.parseInt(page);
+                int cnt = Integer.parseInt(pageCnt);
+                int start = (pg-1<0?0:pg-1)*cnt;
+                int end = cnt*(pg<1?1:pg);
+                param += ","+ start + ","+end;
+            }catch (Exception e){
+
+            }
+            isConstract = true;
+        }
+        List mapLists = getResultTable(param);
 
 //        List list = personService.selectAllPerson();
 //        m.put("results",list);
         m.put("results",mapLists);
         m.put("status","ok");
+//        if(isConstract && mapLists.size()>0) {
+//            m.put("totalCount", ((Map) mapLists.get(0)).get("cnt"));
+//            mapLists.remove(0);
+//        }
 //        String listJson = JSON.toJSONString(list);
 //        return Ret.ok(listJson,"OK");
         return Ret.ok(m);

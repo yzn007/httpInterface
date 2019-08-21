@@ -11,6 +11,7 @@ import java.util.Map;
 public interface RyDataLargeService {
     List<RyDataLarge> getRyDataById(Map Id);
     List<Map>getAllRoute(Map map);
+    List<Map>getAllGuest(Map map);
     List<Map>getAllPark(Map map);
     List<Map>getWebServiceData(Map m);
     void updateWebService(Map m);

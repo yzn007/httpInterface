@@ -22,4 +22,5 @@ public interface RyDataLargeMapper {
     List<Map>getWeather(Map m);
     List<Map>getUpdateTableInfo(Map m);
     void deleteUpdateTableInfo(Map m);
+    List<Map>getAllGuest(Map m);
 }

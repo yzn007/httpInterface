@@ -56,7 +56,13 @@ public class RyDataLargeServiceImpl implements RyDataLargeService {
     public List<Map> getUpdateTableInfo(Map m) {return ryDataLargeMapper.getUpdateTableInfo(m);}
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,timeout=36000,rollbackFor=Exception.class)
     public void deleteUpdateTableInfo(Map m) {
         ryDataLargeMapper.deleteUpdateTableInfo(m);
+    }
+
+    @Override
+    public List<Map> getAllGuest(Map map) {
+        return ryDataLargeMapper.getAllGuest(map);
     }
 }

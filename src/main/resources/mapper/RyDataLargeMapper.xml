@@ -25,6 +25,62 @@
         </choose>
     </select>
 
+    <!-- 分页查询数据Sql头 -->
+    <sql id="pageDataHeader">
+        <if test="endrow != null and endrow != ''">
+            select * from (select  t1.*,@rw:=@rw+1 rw from (
+        </if>
+    </sql>
+
+    <!-- 分页查询数据Sql尾 -->
+    <sql id="pageDataEnd">
+        <if test="endrow != null and endrow != ''">
+            ) t1 ,(select @rw:=0) r) tt where rw >#{start} <![CDATA[ and rw<= #{endrow}]]>
+        </if>
+    </sql>
+
+    <resultMap type="java.util.Map" id="guestMap">
+        <result property="id" column="id"/>
+        <result property="cname" column="CNAME"/>
+        <result property="gateStatus" column="status"/>
+        <result property="cnt" column="cnt"/>
+        <result property="ename" column="ENAME"/>
+        <result property="roleType" column="ROLETYPE"/>
+        <result property="certificateType" column="CERTIFICATETYPE"/>
+        <result property="certificateNum" column="CERTIFICATENUM"/>
+        <result property="certificateLevel" column="CERTIFICATELEVEL"/>
+    </resultMap>
+    <select id="getAllGuest" resultMap="guestMap" parameterType="hashMap">
+        <include refid="pageDataHeader"/>
+        select (SELECT count(id) from cqyl_pre.gate_expo_audi_info) cnt ,
+        a.CNAME CNAME,
+        a.ENAME ENAME,
+        a.ROLETYPE ROLETYPE,
+        a.CERTIFICATETYPE CERTIFICATETYPE,
+        a.CERTIFICATENUM CERTIFICATENUM,
+        a.CERTIFICATELEVEL CERTIFICATELEVEL,
+        a.id id ,case when b.USERID is not null and trim(b.USERID)!= '' then '1' else '0' end status
+        from cqyl_pre.gate_expo_audi_info a
+        left join cqyl_pre.gate_gate_evt b on a.ID=b.USERID
+        <if test="checkTime!=null">
+            and instr(b.CHECKTIME,#{checkTime})>0
+        </if>
+        <if test="BeginTime!=null">
+            and concat (concat(date_format(b.checktime,'%Y-%m-%d'),' '),#{BeginTime}) <![CDATA[<]]>  date_format(b.checktime,'%Y-%m-%d %H:%i')
+        </if>
+        <if test="EndTime!=null">
+            and concat(concat(date_format(b.checktime,'%Y-%m-%d'),' '),#{EndTime}) >= date_format(b.checktime,'%Y-%m-%d %H:%i')
+        </if>
+        <where>
+            a.ROLETYPE = '7'
+
+        </where>
+        order by case when b.CHECKTIME is not null then b.checktime else a.id end
+        <if test="limit!=null and limit!=''">
+            limit #{limit}
+        </if>
+        <include refid="pageDataEnd"/>
+    </select>
     <delete id ="deleteUpdateTableInfo" parameterType="java.util.Map">
         DELETE from cqyl_ta.ta_data_upt_msg
         <where>
