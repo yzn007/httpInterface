@@ -191,7 +191,7 @@
         null,
         count(bs.RouteId),
         date_format(now(),'%Y-%m-%d')
-        from cqyl_pre.BUS_STATION bs join cqyl_pre.BUS_ROUTE br on bs.RouteId = br.ID and br.State = '1'
+        from cqyl_pre.BUS_route_STATION bs join cqyl_pre.BUS_ROUTE br on bs.RouteId = br.ID and br.State = '1'
         group by bs.RouteId
 
     </select>

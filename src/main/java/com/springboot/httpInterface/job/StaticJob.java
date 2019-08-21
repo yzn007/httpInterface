@@ -196,6 +196,7 @@ public class StaticJob implements BaseJob {
                         token = getToken();
                         getJson = httpServiceTest.getJsonData(url.substring(0,url.indexOf("access_token"))+"access_token="+token.getAccessToken(), "utf-8","RouteId","",true);
 //                        token = null;
+                        Thread.sleep(1000);
                         if(k++>30)
                             break;
                     }
@@ -228,7 +229,7 @@ public class StaticJob implements BaseJob {
                         while(listR==null ||listR.size()==0 ){
                             Thread.sleep(1000);
                             listR = routeService.getAllRoute();
-                            if(ret ++ > 1000)
+                            if(ret ++ > 180)//三分钟
                                 break;
                         }
                         insertDate = listR != null && listR.size()>0 ?listR.get(0).getDataTm():null;
@@ -291,7 +292,7 @@ public class StaticJob implements BaseJob {
                         while (routeVehicleList== null ||routeVehicleList.size()==0){
                             Thread.sleep(1000);
                             routeVehicleList = routeVehicleService.getAllVehicle();
-                            if(rt++ >1000)
+                            if(rt++ >180)//三分钟
                                 break;
                         }
 
