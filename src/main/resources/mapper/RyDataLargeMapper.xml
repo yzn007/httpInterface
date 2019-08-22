@@ -136,6 +136,7 @@
             <if test="groupId!=null and groupId!= ''">
                 and GRP_ID = ${groupId}
             </if>
+            and STATT_DT=date_format(now(),'%Y-%m-%d')
         </where>
 
     </select>
