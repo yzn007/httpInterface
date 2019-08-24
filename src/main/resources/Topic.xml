@@ -20,7 +20,7 @@
     <!--停车场信息/历史（1次/30s)-->
     <topics name="Per30SJob">
         <!-- 停车场信息/历史 -->
-        <topic name="PARK_PARKING_LOT" table="cqyl_pre.PARK_PARKING_LOT;cqyl_pre.PARK_PARKING_LOT_HIS" valid="false" textCode="0301" isDelete="true;false" isTruncate="false;false" isStatic="false"/>
+        <topic name="PARK_PARKING_LOT" table="cqyl_pre.PARK_PARKING_LOT;cqyl_pre.PARK_PARKING_LOT_HIS" valid="true" textCode="0301" isDelete="true;false" isTruncate="false;false" isStatic="false"/>
     </topics>
 
     <!-- 公交车辆、位置、闸机注册、停车场支付情况(1次/1min)-->

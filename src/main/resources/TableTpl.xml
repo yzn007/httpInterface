@@ -40,6 +40,11 @@
     <!-- 停车场信息 -->
     <table name="cqyl_pre.PARK_PARKING_LOT">
         <column id="Park_Lot_Regn_ID" ref="Park_Lot_Regn_ID">Park_Lot_Regn_ID = Park_Lot_Regn_ID</column>
+        <column id="Remn_Park_Spc_Qty" ref="Remn_Park_Spc_Cnt"/>
+    </table>
+
+    <table name="cqyl_pre.PARK_PARKING_LOT_HIS">
+        <column id="Remn_Park_Spc_Qty" ref="Remn_Park_Spc_Cnt"/>
     </table>
 
     <table name="cqyl_pre.PARK_PAY_INFO">
