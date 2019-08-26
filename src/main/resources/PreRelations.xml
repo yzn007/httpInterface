@@ -6,7 +6,9 @@
      <!-- 执行sql -->
 
     <select id="T80_TA_PARK_LOT_INFO" target="cqyl_pre.PARK_PARKING_LOT" split="true"  valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_LOT_INFO'),'0';
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat)
+        select * from (select now() n,lower('T80_TA_PARK_LOT_INFO') tb,'0' stat from dual) a WHERE
+        not EXISTS (select 1 from cqyl_ta.ta_data_upt_msg g where g.update_time = a.n and table_name = a.tb and g.stat = a.stat);
         delete from cqyl_ta.T80_TA_PARK_LOT_INFO where PARK_LOT_ID = {PARK_LOT_ID};
         insert into cqyl_ta.T80_TA_PARK_LOT_INFO(PARK_LOT_ID,
         PARK_LOT_NM,
@@ -90,7 +92,9 @@
 
     <!-- 支付信息表 -->
     <select id ="T80_TA_PAY_INFO" target="cqyl_pre.PARK_PAY_INFO" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PAY_INFO'),'0';
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat)
+        select * from (select now() n,lower('T80_TA_PAY_INFO') tb,'0' stat from dual) a WHERE
+        not EXISTS (select 1 from cqyl_ta.ta_data_upt_msg g where g.update_time = a.n and table_name = a.tb and g.stat = a.stat);
         insert into cqyl_ta.T80_TA_PAY_INFO (PAY_ID,
         PAY_STAT,
         TX_TYP,
@@ -286,12 +290,16 @@
 
         PREPARE stmt FROM @aount;
         EXECUTE stmt;
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select @update_time,lower('T80_TA_PARK_CONSM_INFO'),'0'
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat)
+        select * from (select @update_time n,lower('T80_TA_PARK_CONSM_INFO') tb,'0' stat from dual) a WHERE
+        not EXISTS (select 1 from cqyl_ta.ta_data_upt_msg g where g.update_time = a.n and table_name = a.tb and g.stat = a.stat)
     </select>
 
     <!-- 参展人员信息-->
     <select id="T80_TA_EXPO_AUDI_INFO" target="cqyl_ta.T80_TA_EXPO_AUDI_INFO" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_EXPO_AUDI_INFO'),'0'
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat)
+        select * from (select now() n,lower('T80_TA_EXPO_AUDI_INFO') tb,'0' stat from dual) a WHERE
+        not EXISTS (select 1 from cqyl_ta.ta_data_upt_msg g where g.update_time = a.n and table_name = a.tb and g.stat = a.stat)
     </select>
     <select id="T80_RD_LARG_SCRN_INDX_4" target="cqyl_pre.GATE_EXPO_AUDI_INFO" split="true" valid="true">
         delete from cqyl_rd.T80_RD_LARG_SCRN_INDX where INDX_ID in( '105001','105003','105004','107001','107002') and STATT_DT=date_format(now(),'%Y-%m-%d');
@@ -399,7 +407,7 @@
         Gate_ID,
         Entrc_ID,
         Entrc_Nm,
-        Data_Tm) SELECT T1.USERID,T1.ACCESSPOINT,T2.ACCESSAREA,T2.ACCESSAREA_NM,T1.checkTime FROM CQYL_PRE.GATE_GATE_TMP_EVT T1 LEFT JOIN CQYL_PRE.GATE_AREA_INFO T2 ON T2.ACCESSPOINT=T1.ACCESSPOINT;
+        Data_Tm) SELECT T1.USERID,T1.ACCESSPOINT,T2.ACCESSAREA,T2.ACCESSAREA_NM,T1.data_tm FROM CQYL_PRE.GATE_GATE_TMP_EVT T1 LEFT JOIN CQYL_PRE.GATE_AREA_INFO T2 ON T2.ACCESSPOINT=T1.ACCESSPOINT;
 
         DELETE FROM CQYL_RD.T80_RD_LARG_SCRN_INDX WHERE INDX_ID IN('100001','100002') and STATT_DT=date_format(now(),'%Y-%m-%d');
         INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
