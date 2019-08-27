@@ -70,11 +70,8 @@
     <topics name="GateJob">
         <!-- topic列表： 名称 表名(多表用;分割) 是否有效 生产者编码(多个用;分割) 是否删除后再插入 是否清空表 是否静态数据 静态数据访问url-->
 
-        <!-- 闸机 -->
-        <!--&lt;!&ndash; 登录区域与闸机关系 &ndash;&gt;-->
-        <!--<topic name="GATE_AREA_INFO" table="GATE_AREA_INFO" valid="true" textCode="0103" isDelete="false" isTruncate="false" isStatic="false"/>-->
-        <!--&lt;!&ndash; 参展人员信息 &ndash;&gt;-->
-        <!--<topic name="CQEXPOAPP_EXPO_AUDI_INFO" table="CQEXPOAPP_EXPO_AUDI_INFO" valid="true" textCode="0103" isDelete="true" isTruncate="false"  isStatic="false"/>-->
+        <!-- 展商 -->
+        <topic name="T80_TA_EXHIBITOR" table="cqyl_ta.T80_TA_EXHIBITOR" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="false"/>
 
     </topics>
 </root>

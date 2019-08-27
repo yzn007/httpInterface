@@ -8,6 +8,18 @@ server:
     key-store-type: JKS
     enabled: true
   port: 10101
+  tomcat:
+    accept-count: 500
+    max-threads: 200
+    max-connections: 10000
+    max-http-post-size: -1
+    min-spare-threads: 50
+
+
+  connection-timeout: 100
+
+
+
 
 
 
@@ -21,8 +33,8 @@ spring:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.jdbc.Driver
         filters: stat
-        maxActive: 20
-        initialSize: 1
+        maxActive: 50
+        initialSize: 10
         maxWait: 60000
         minIdle: 1
         timeBetweenEvictionRunsMillis: 60000
@@ -31,8 +43,8 @@ spring:
         testWhileIdle: true
         testOnBorrow: false
         testOnReturn: false
-        poolPreparedStatements: true
-        maxOpenPreparedStatements: 20
+        poolPreparedStatements: false
+        maxOpenPreparedStatements: -1
     mvc:
       view:
         prefix: /
@@ -55,7 +67,7 @@ spring:
               useProperties: false
             threadPool:
               class: org.quartz.simpl.SimpleThreadPool
-              threadCount: 150
+              threadCount: 1000
               threadPriority: 5
               threadsInheritContextClassLoaderOfInitializingThread: true
       job-store-type: jdbc
@@ -81,6 +93,5 @@ logging:
   level:
     root: error
     com.springboot.common: info
-
 
 

@@ -25,6 +25,8 @@ public class KafkaSaveData extends Thread {
     private Map textCode = null;
     private  Consumer<String, String> consumer = null;
     final static String GATE_EVENT_TBL = "cqyl_pre.GATE_GATE_EVT";
+    final  static  String  LOCKPRE = "pre";
+    final  static  String  LOCKMAIN = "main";
 
     protected static final Logger logger = Logger.getLogger(KafkaSaveData.class.getName());
 
@@ -54,7 +56,8 @@ public class KafkaSaveData extends Thread {
         //必须要使用别的组名称， 如果生产者和消费者都在同一组，则不能访问同一组内的topic数据
         //当前消费者的组名称
         properties.put("group.id", config.get("group"));
-        properties.put("zookeeper.session.timeout.ms", "10000");
+        properties.put("zookeeper.session.timeout.ms", "30000");
+        properties.put("max.poll.interval.ms","10000");
         properties.put("enable.auto.commit",config.get("enable.auto.commit"));
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.get("metadata.broker.list"));
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -152,12 +155,16 @@ public class KafkaSaveData extends Thread {
             try {
                 Seq<String[]> tmpSeq = JavaConverters.asScalaIteratorConverter(reds.iterator()).asScala().toSeq();
                 if (tmpSeq.size() > 0) {
-                    SaveCosumerData.main(tmpSeq.toList());
+                    synchronized (LOCKPRE) {
+                        SaveCosumerData.main(tmpSeq.toList());
+                    }
                 }
 
                 tmpSeq = JavaConverters.asScalaIteratorConverter(sqlListDyc.iterator()).asScala().toSeq();
                 if (tmpSeq.size() > 0) {
-                    SaveCosumerData.main(tmpSeq.toList());
+                    synchronized (LOCKMAIN) {
+                        SaveCosumerData.main(tmpSeq.toList());
+                    }
                 }
 
 //                Thread.sleep(500);

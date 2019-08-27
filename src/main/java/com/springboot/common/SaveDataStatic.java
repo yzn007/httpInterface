@@ -29,7 +29,9 @@ public class SaveDataStatic extends Thread {
 final static Logger logger =
         Logger.getLogger(SaveDataStatic.class.getName());
 
-
+    final  static  String  LOCKPRE = "preS";
+    final  static  String  LOCKMAIN = "mainS";
+//    static  long i = 0;
     public SaveDataStatic(String topic, String table, String isDelInsert, String isTruncate, List<String> jsonString) {
         super();
         this.topic = topic;
@@ -76,14 +78,20 @@ final static Logger logger =
         try {
             Seq<String[]> tmpSeq = JavaConverters.asScalaIteratorConverter(reds.iterator()).asScala().toSeq();
             if (tmpSeq.size() > 0) {
-                SaveCosumerData.main(tmpSeq.toList());
+                synchronized (LOCKPRE) {
+//                    logger.info( "start:"+tmpSeq.size() + new Date().toString());
+                    SaveCosumerData.main(tmpSeq.toList());
+//                    logger.info( "end  :"+i++ + new Date().toString());
+                }
             }
-            Thread.sleep(50);
+//            Thread.sleep(50);
             tmpSeq = JavaConverters.asScalaIteratorConverter(listDynamic.iterator()).asScala().toSeq();
             if (tmpSeq.size() > 0) {
-                SaveCosumerData.main(tmpSeq.toList());
+                synchronized (LOCKMAIN) {
+                    SaveCosumerData.main(tmpSeq.toList());
+                }
             }
-            Thread.sleep(50);
+//            Thread.sleep(50);
         } catch (Exception e) {
             System.out.println(e.toString());
 //            System.out.println(reds.get(0).toString());

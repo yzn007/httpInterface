@@ -136,6 +136,18 @@
         <column id="Times_VehNum" ref="VehNum"></column>
     </table>
 
+    <!-- 展商-->
+    <table name="cqyl_ta.T80_TA_EXHIBITOR">
+        <column id="EXHTR_ID" ref="id"> EXHTR_ID = id</column>
+        <column id="EXHTR_NM" ref="organizationName"></column>
+        <column id="FLR_ID" ref="flid"></column>
+        <column id="FLR_NM" ref="floorName"></column>
+        <column id="VEN_NM" ref="exhibitionHall"></column>
+        <column id="EXHTR_LCTN_NO" ref="exhibitionPosition"></column>
+        <column id="LCTN_ID" ref="featureId"></column>
+        <column id="BDID" ref="bdid"></column>
+    </table>
+
 </root>
 
 

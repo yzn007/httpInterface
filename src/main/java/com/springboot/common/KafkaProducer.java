@@ -6,9 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -67,11 +65,29 @@ public class KafkaProducer extends Thread {
                 logger.info("生产数据为：" + value);
                 producer.send(new ProducerRecord<Integer, String>(topic, value + "\n"));
             }
-        }catch (Exception e){
 
+        }catch (Exception e){
+            writeFile(topic,value);
             System.out.print(e.toString());
         }finally {
             producer.close();
+        }
+    }
+
+    public static void writeFile(String topic,String value){
+        BufferedWriter out = null;
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(topic, true)));
+            out.write(value+"\r\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

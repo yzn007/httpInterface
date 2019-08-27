@@ -1,8 +1,11 @@
 package com.springboot.httpInterface.job;
 
+import com.alibaba.fastjson.JSONObject;
 import com.springboot.common.JsonObjectToAttach;
 import com.springboot.common.KafkaSaveData;
 import com.springboot.common.ReadPropertiesUtils;
+import com.springboot.common.SaveDataStatic;
+import com.springboot.httpInterface.controller.HttpServiceTest;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.quartz.JobExecutionContext;
@@ -11,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,7 +44,7 @@ public class GateJob implements BaseJob {
 
     final static int NUM_PROCESS = 6;
     static Map<String, String> config = new HashMap<String, String>();
-
+    HttpServiceTest httpServiceTest = null;
     //取得有效主题
     static Map<String, String> topicM = new HashMap<>();
 
@@ -50,7 +55,7 @@ public class GateJob implements BaseJob {
     static Map<String,Consumer> consumerMap = new HashedMap();
 
     //保存消费信息
-    static Map<String,KafkaSaveData> kafakData = new HashedMap();
+    static Map<String,SaveDataStatic> saveDataStaticMap = new HashedMap();
 
     public GateJob() {
         try {
@@ -92,18 +97,44 @@ public class GateJob implements BaseJob {
 
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_PROCESS);
         for (Map.Entry<String, String> m : topicM.entrySet()) {
-            KafkaSaveData kafkaSaveData = kafakData.get(m.getKey());
-            if(kafkaSaveData == null) {
+            SaveDataStatic saveDataStatic = saveDataStaticMap.get(m.getKey());
+            if(saveDataStatic == null) {
                 String[] tabAndMark = null;
                 if (m.getValue().indexOf(",") >= 0) {
                     tabAndMark = m.getValue().split(",");
                 }
+                String url = "https://apiexposition.ipalmap.com/bigScreen/queryAllExhibition";
 
-                 kafkaSaveData = new KafkaSaveData(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
-//                        tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],null, consumerMap.get(m.getKey()));
-                         tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2],tblCd, null);
+                if(httpServiceTest==null)
+                    httpServiceTest = new HttpServiceTest();
+                try {
+
+                    List<String> listJson = new ArrayList<>();
+                    String getJson = httpServiceTest.getJsonData(url, "utf-8", "bdid", "04NL14", false);
+                    String[] array = JsonObjectToAttach.getJsonList(getJson, "data");
+                    if(array.length>0){
+                        array = JsonObjectToAttach.getJsonList(array[0], "exhibitionList");
+                    }
+                    for(String f : array) {
+                        JSONObject object = JSONObject.parseObject(f);
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("id",object.get("id"));
+                        jsonObject.put("organizationName",object.get("organizationName"));
+                        jsonObject.put("flid",object.get("flid"));
+                        jsonObject.put("floorName",object.get("floorName"));
+                        jsonObject.put("exhibitionHall",object.get("exhibitionHall"));
+                        jsonObject.put("featureId",object.get("featureId"));
+                        jsonObject.put("bdid",object.get("bdid"));
+                        jsonObject.put("exhibitionPosition",object.get("exhibitionPosition"));
+                        listJson.add(jsonObject.toJSONString());
+                    }
+                    saveDataStatic = new SaveDataStatic(m.getKey(), tabAndMark == null ? m.getValue() : tabAndMark[0],
+                            tabAndMark == null ? "false" : tabAndMark[1], tabAndMark == null ? "false" : tabAndMark[2], listJson);
+                }catch (Exception e){
+
+                }
             }
-            executorService.execute(kafkaSaveData);
+            executorService.execute(saveDataStatic);
         }
         executorService.shutdown();
     }
