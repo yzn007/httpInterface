@@ -68,9 +68,11 @@ public class UpdTblProducter {
             }
             KafkaProducer kafkaProducer = new KafkaProducer(topic,jsonObject.toJSONString());
             kafkaProducer.run();
-            break;
+            //删除数据
+            ryDataLargeService.deleteUpdateTableInfo(m);
+//            break;
         }
-        //删除所有表数据
-        ryDataLargeService.deleteUpdateTableInfo(mm);
+//        //删除所有表数据
+//        ryDataLargeService.deleteUpdateTableInfo(mm);
     }
 }

@@ -8,7 +8,7 @@
         <result property="table_name" column="table_name"/>
     </resultMap>
     <select id="getUpdateTableInfo" resultMap="updateTableMsg" parameterType="hashMap">
-        select *from cqyl_ta.ta_data_upt_msg
+        select distinct *from cqyl_ta.ta_data_upt_msg
         <where>
             stat = '0'
             <if test="table_name!=null and table_name!='' ">

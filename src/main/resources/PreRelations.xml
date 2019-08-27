@@ -202,7 +202,9 @@
 
     <!-- 驶出 -->
     <select id="T80_TA_PARK_CONSM_INFO_3" target="cqyl_pre.PARK_VEHIC_START_OUT_EVT" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_CONSM_INFO'),'0';
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat)
+        select * from (select now() n,lower('T80_TA_PARK_CONSM_INFO') tb,'0' stat from dual) a WHERE
+        not EXISTS (select 1 from cqyl_ta.ta_data_upt_msg g where g.update_time = a.n and table_name = a.tb and g.stat = a.stat);
         update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='1',PAY_AMT={Fee_Amt},PAY_MOD ={Pay_Mod}, PARK_LEAVE_TM={Start_Out_Tm},upd_tm=now()  where  PARK_STAT='0' and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
         insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
         Plat_No,
@@ -214,7 +216,9 @@
     </select>
     <!-- 驶入 -->
     <select id="T80_TA_PARK_CONSM_INFO_2" target="cqyl_pre.PARK_VEHIC_DRV_IN_EVT" split="true" valid="true">
-        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat) select now(),lower('T80_TA_PARK_CONSM_INFO'),'0';
+        insert into cqyl_ta.ta_data_upt_msg(update_time,table_name,stat)
+        select * from (select now() n,lower('T80_TA_PARK_CONSM_INFO') tb,'0' stat from dual) a WHERE
+        not EXISTS (select 1 from cqyl_ta.ta_data_upt_msg g where g.update_time = a.n and table_name = a.tb and g.stat = a.stat);
         update cqyl_ta.T80_TA_PARK_CONSM_INFO set PARK_STAT='0',PARK_ENTER_TM={Drv_In_Tm} ,upd_tm=now(),PARK_LEAVE_TM=null where  instr(RESV_TM,date_format(now(),'%Y-%m-%d'))>0  and PLAT_NO = {Plat_No} and PARK_LOT_ID = {Park_Lot_ID};
         insert into cqyl_rd.T80_RD_PARK_EVT(Data_Tm,
         Plat_No,
@@ -435,7 +439,7 @@
         Trvl_Way,
         Data_Tm
         )
-        SELECT T1.ID,T2.ROLETYPE,T3.CODE_VAL_DESC,T1.GATE_ID,T1.ENTRC_ID,T1.ENTRC_NM,T2.TRAVEL,T1.Data_Tm
+        SELECT T1.ID,COALESCE(T2.ROLETYPE,'-1'),COALESCE(T3.CODE_VAL_DESC,'其他'),T1.GATE_ID,T1.ENTRC_ID,T1.ENTRC_NM,COALESCE(T2.TRAVEL,'-1'),T1.Data_Tm
         FROM CQYL_RD.T80_RD_GATE_TMP_EVT T1
         LEFT JOIN CQYL_PRE.GATE_EXPO_AUDI_INFO T2 ON T2.ID=T1.ID
         LEFT JOIN CQYL_RD.T80_RD_DIC T3 ON T2.ROLETYPE=T3.CODE_VAL AND T3.CODE_ID='10001';
