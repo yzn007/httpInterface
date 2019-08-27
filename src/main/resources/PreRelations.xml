@@ -196,7 +196,6 @@
         count(bs.RouteId),
         date_format(now(),'%Y-%m-%d')
         from cqyl_pre.BUS_route_STATION bs join cqyl_pre.BUS_ROUTE br on bs.RouteId = br.ID and br.State = '1'
-        group by bs.RouteId
 
     </select>
 
@@ -422,7 +421,7 @@
         GRP_NM,
         INDX_VAL,
         STATT_DT)
-        SELECT '100','实时人数统计','100001','登录口实时人数',T1.ACCESSAREA,T1.ACCESSAREA_NM,COUNT(distinct T2.ID), date_format(now(),'%Y-%m-%d')
+        SELECT '100','实时人数统计','100001','登录口实时人数',T1.ACCESSAREA,T1.ACCESSAREA_NM,COUNT(T2.ID), date_format(now(),'%Y-%m-%d')
         FROM CQYL_PRE.GATE_AREA_INFO T1
         LEFT JOIN CQYL_RD.T80_RD_GATE_TMP_EVT T2
         ON T1.ACCESSPOINT=T2.GATE_ID
@@ -453,7 +452,7 @@
         GRP_NM,
         INDX_VAL,
         STATT_DT)
-        SELECT '101','累计人数统计','101001','各登录口人数',T1.ACCESSAREA,T1.ACCESSAREA_NM,COUNT(distinct T2.ID),date_format(now(),'%Y-%m-%d')
+        SELECT '101','累计人数统计','101001','各登录口人数',T1.ACCESSAREA,T1.ACCESSAREA_NM,COUNT(T2.ID),date_format(now(),'%Y-%m-%d')
         FROM CQYL_PRE.GATE_AREA_INFO T1
         LEFT JOIN CQYL_RD.T80_RD_GATE_EVT T2
         ON T1.ACCESSPOINT=T2.GATE_ID AND instr(T2.data_tm ,date_format(now(),'%Y-%m-%d'))>0
@@ -468,7 +467,7 @@
         GRP_NM,
         INDX_VAL,
         STATT_DT)
-        SELECT '101','累计人数统计','101002','按角色类型统计登录人数',T1.CODE_VAL,T1.CODE_VAL_DESC,COUNT(distinct T2.ID),date_format(now(),'%Y-%m-%d')
+        SELECT '101','累计人数统计','101002','按角色类型统计登录人数',T1.CODE_VAL,T1.CODE_VAL_DESC,COUNT(T2.ID),date_format(now(),'%Y-%m-%d')
         FROM cqyl_rd.T80_RD_DIC T1
         LEFT JOIN CQYL_RD.T80_RD_GATE_EVT T2
         ON T1.CODE_ID='10001' AND T1.CODE_VAL=T2.ROLE_TYP AND instr(T2.data_tm ,date_format(now(),'%Y-%m-%d'))>0
@@ -481,7 +480,7 @@
         GRP_ID,
         GRP_NM,
         INDX_VAL,
-        STATT_DT) SELECT '100','实时人数统计','100002','当前总人数',null,null,COUNT(distinct ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0;
+        STATT_DT) SELECT '100','实时人数统计','100002','当前总人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0;
 
         INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
         RPT_NM,
@@ -490,7 +489,7 @@
         GRP_ID,
         GRP_NM,
         INDX_VAL,
-        STATT_DT) SELECT '101','累计人数统计','101003','今日观展人数',null,null,COUNT(distinct ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0;
+        STATT_DT) SELECT '101','累计人数统计','101003','今日观展人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0;
 
 
         INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
@@ -500,7 +499,7 @@
         GRP_ID,
         GRP_NM,
         INDX_VAL,
-        STATT_DT) SELECT '101','累计人数统计','101004','昨日观展人数',null,null,COUNT(distinct ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(DATE_SUB(now(),INTERVAL  1 day),'%Y-%m-%d'))>0;
+        STATT_DT) SELECT '101','累计人数统计','101004','昨日观展人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(DATE_SUB(now(),INTERVAL  1 day),'%Y-%m-%d'))>0;
 
         INSERT INTO CQYL_RD.T80_RD_LARG_SCRN_INDX(RPT_ID,
         RPT_NM,
@@ -509,7 +508,7 @@
         GRP_ID,
         GRP_NM,
         INDX_VAL,
-        STATT_DT) SELECT '101','累计人数统计','105002','已接待预约人数',null,null,COUNT(distinct ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0
+        STATT_DT) SELECT '101','累计人数统计','105002','已接待预约人数',null,null,COUNT(ID),date_format(now(),'%Y-%m-%d') FROM CQYL_RD.T80_RD_GATE_EVT  where instr(data_tm ,date_format(now(),'%Y-%m-%d'))>0
     </select>
 
     <select id="T80_RD_GATE_TMP_EVT_2" target="cqyl_pre.GATE_GATE_EVT" split="true" valid="true">
