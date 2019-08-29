@@ -92,6 +92,6 @@ logging:
   path: /log
   level:
     root: error
-    com.springboot.common: info
+    com.springboot.common: error
 
 

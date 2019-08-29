@@ -128,7 +128,7 @@
         Code,
         Name,
         StartSite_Name,
-        EndSite_Name
+        concat(StartSite_Name,'&lt;--&gt;',EndSite_Name)
         from cqyl_pre.BUS_ROUTE
 
     </select>
@@ -438,7 +438,7 @@
         Trvl_Way,
         Data_Tm
         )
-        SELECT T1.ID,COALESCE(T2.ROLETYPE,'-1'),COALESCE(T3.CODE_VAL_DESC,'其他'),T1.GATE_ID,T1.ENTRC_ID,T1.ENTRC_NM,COALESCE(T2.TRAVEL,'-1'),T1.Data_Tm
+        SELECT T1.ID,COALESCE(T2.ROLETYPE,'0'),COALESCE(T3.CODE_VAL_DESC,'普通观众'),T1.GATE_ID,T1.ENTRC_ID,T1.ENTRC_NM,COALESCE(T2.TRAVEL,'3'),T1.Data_Tm
         FROM CQYL_RD.T80_RD_GATE_TMP_EVT T1
         LEFT JOIN CQYL_PRE.GATE_EXPO_AUDI_INFO T2 ON T2.ID=T1.ID
         LEFT JOIN CQYL_RD.T80_RD_DIC T3 ON T2.ROLETYPE=T3.CODE_VAL AND T3.CODE_ID='10001';

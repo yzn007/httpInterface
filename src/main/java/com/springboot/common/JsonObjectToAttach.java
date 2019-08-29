@@ -794,32 +794,32 @@ public class JsonObjectToAttach {
         String stat = "";
         stat = replace("vehnum_routeid,times_routeid,time,vehnum","time1","times_id",",");
         String  jsonValue ="{\n" +
-                "    \"tx_code\": \"0101\",\n" +
-                "    \"results\": [\n" +
-                "        {\n" +
-                "            \"id\": \"039EC87A-4691-4FF8-A828-B1E2F0220387\",\n" +
-                "            \"cname\": \"sdfds\",\n" +
-                "            \"ename\": \"sdfsdf\",\n" +
-                "            \"nationality\": \"中国,zh\",\n" +
-                "            \"certificateNum\": \"\",\n" +
-                "            \"certificateType\": 0,\n" +
-                "            \"gender\": \"男\",\n" +
-                "            \"institution\": \"sdf\",\n" +
-                "            \"phone\": \"c2Rm\",\n" +
-                "            \"position\": \"sfd\",\n" +
-                "            \"headUrl\": \"\",\n" +
-                "            \"roleType\": 0,\n" +
-                "            \"vapName\": \"dfdf\",\n" +
-                "            \"vapPhone\": \"12312312312\",\n" +
-                "            \"certificateLevel\":\"\",\n" +
-                "            \"isMeeting\": \"是\",\n" +
-                "            \"dockingOrgUserName\":\"\",\n" +
-                "            \"dockingOrgUserphone\":\"\",\n" +
-                "            \"dockingOrgName\":\"\",\n" +
-                "            \"travel\": 4,\n" +
-                "            \"visitDate\": \"2019-08-26\"\n" +
-                "        }\n" +
-                "    ]\n" +
+                "  \"tx_code\": \"0201\",\n" +
+                "  \"results\": [\n" +
+                "    {\n" +
+                "      \"dockingOrgName\": \"\",\n" +
+                "      \"gender\": \"\",\n" +
+                "      \"vapName\": \"\",\n" +
+                "      \"certificateLevel\": \"\",\n" +
+                "      \"isMeeting\": \"\",\n" +
+                "      \"dockingOrgUserphone\": \"\",\n" +
+                "      \"cname\": \"梁\",\n" +
+                "      \"headUrl\": \"http://sdjfkdfjkd.com.cn\",\n" +
+                "      \"roleType\": 0,\n" +
+                "      \"dockingOrgUserName\": \"\",\n" +
+                "      \"institution\": \"\",\n" +
+                "      \"ename\": \"\",\n" +
+                "      \"nationality\": \"CHN\",\n" +
+                "      \"phone\": \"18580866220\",\n" +
+                "      \"vapPhone\": \"\",\n" +
+                "      \"visitDate\": \"2019-08-27\",\n" +
+                "      \"id\": \"0d06af68-9d4e-4ba9-9c91-129212038c2b\",\n" +
+                "      \"position\": \"\",\n" +
+                "      \"travel\": 4,\n" +
+                "      \"certificateNum\": \"510725198604213843\",\n" +
+                "      \"certificateType\": 0\n" +
+                "    }\n" +
+                "  ]\n" +
                 "}";
         String tablePre = "cqyl_ta.T80_TA_EXPO_AUDI_INFO";
         String [] array = getJsonList(jsonValue,"");
