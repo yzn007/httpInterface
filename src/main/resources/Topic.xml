@@ -13,7 +13,12 @@
     <topics name="Per10SJob">
         <!-- 车位预约信息/车辆驶入事件/车辆驶出事件 -->
         <topic name="PARK_CONSM_INFO" table="cqyl_pre.PARK_PARK_SPC_RESV_INFO;cqyl_pre.PARK_VEHIC_DRV_IN_EVT;cqyl_pre.PARK_VEHIC_START_OUT_EVT" valid="true" textCode="0304;0302;0303" isDelete="true;false;false" isTruncate="false" isStatic="false"/>
-        <!-- 交警总队-->
+        <!-- 车辆信息 -->
+        <!-- 车辆位置信息 -->
+        <topic name="BUS_VEHIC_LCTN_MSG" table="cqyl_pre.BUS_VEHIC_LCTN_MSG" valid="true" textCode="0201" isDelete="false" isTruncate="false" isStatic="false"/>
+        <!-- 车辆进出信息 -->
+        <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="cqyl_pre.BUS_VEHIC_ARRV_DEPRT_MSG" valid="true" textCode="0202" isDelete="false" isTruncate="false" isStatic="false"/>
+
 
     </topics>
 
@@ -28,12 +33,7 @@
 
         <!-- 停车支付情况 -->
         <topic name="PARK_PAY_INFO" table="cqyl_pre.PARK_PAY_INFO" valid="true" textCode="0305" isDelete="true" isTruncate="false" isStatic="false"/>
-        <!-- 车辆信息 -->
-        <!-- 车辆位置信息 -->
-        <topic name="BUS_VEHIC_LCTN_MSG" table="cqyl_pre.BUS_VEHIC_LCTN_MSG" valid="true" textCode="0201" isDelete="false" isTruncate="false" isStatic="false"/>
-        <!-- 车辆进出信息 -->
-        <topic name="BUS_VEHIC_ARRV_DEPRT_MSG" table="cqyl_pre.BUS_VEHIC_ARRV_DEPRT_MSG" valid="true" textCode="0202" isDelete="false" isTruncate="false" isStatic="false"/>
-        <!-- 闸机 -->
+       <!-- 闸机 -->
         <!-- 闸机参展人与信息 /活动信息-->
         <topic name="GATE_EXPO_AUDI_INFO" table="cqyl_pre.GATE_EXPO_AUDI_INFO;cqyl_ta.T80_TA_EXPO_AUDI_INFO" valid="true" textCode="0101" isDelete="true" isTruncate="false" isStatic="false"/>
 

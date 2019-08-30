@@ -147,7 +147,7 @@ public class KafkaSaveData extends Thread {
             }
             //推送更新数据
            UpdTblProducter u =  new UpdTblProducter(table.split(";")[m]);
-           u = null;
+            u = null;
         }
 
 
