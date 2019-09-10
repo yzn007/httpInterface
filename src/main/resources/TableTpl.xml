@@ -85,9 +85,9 @@
 
     <!-- 站点 -->
     <table name="cqyl_pre.BUS_STATION">
-        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
-        <column id="Sites" ref="[list]cqyl_pre.BUS_ROUTE_STATION" linkId="RouteId"/>
-    </table>
+    <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
+    <column id="Sites" ref="[list]cqyl_pre.BUS_ROUTE_STATION" linkId="RouteId"/>
+</table>
 
     <table name="cqyl_pre.BUS_ROUTE_STATION">
         <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
