@@ -464,8 +464,10 @@ public class JsonObjectToAttach {
         jsonObject.entrySet().iterator().forEachRemaining(s ->
                 a[0] = (!StringUtils.isEmpty(a[0]) ? a[0] : "") + (noContains.get(s.getKey().toString())!=null?"":
                         (isCol ?  s.getKey() : ky.get(s.getKey())==null|| (!ky.get(s.getKey()).equals(linkId) && !StringUtils.isEmpty(linkId)
-                        )?(s.getValue().toString().indexOf(";")<0?s.getValue().toString().replaceAll(",","，"):s.getValue()):
-                                (ky.get(s.getKey()).toString().indexOf(";")<0?ky.get(s.getKey()).toString().replaceAll(",","，"):ky.get(s.getKey()))  ) + ","));
+                        )?(s.getValue().toString().indexOf(";")<0?s.getValue().toString().replaceAll(",","，")
+                                :s.getValue().toString()):
+                                (ky.get(s.getKey()).toString().indexOf(";")<0?ky.get(s.getKey()).toString().replaceAll(",","，")
+                                        :ky.get(s.getKey()))  ) + ","));
 
         if(!isCol) {
 
@@ -493,7 +495,7 @@ public class JsonObjectToAttach {
                 }
             }
         }
-        return a[0].substring(0, a[0].length() - 1);
+        return a[0].substring(0, a[0].length() - 1).replaceAll("'","\\\\'\r");
     }
 
 
@@ -780,7 +782,7 @@ public class JsonObjectToAttach {
                 ret = new String[att.size()];
                 int i = 0;
                 for (String t : att) {
-                    ret[i++] = t.replaceAll("''","null");
+                    ret[i++] = t.replaceAll("''","null").replaceAll("\r","");
                 }
             }
         } catch (Exception e) {
@@ -803,7 +805,7 @@ public class JsonObjectToAttach {
                 "      \"certificateLevel\": \"\",\n" +
                 "      \"isMeeting\": \"\",\n" +
                 "      \"dockingOrgUserphone\": \"\",\n" +
-                "      \"cname\": \"梁\",\n" +
+                "      \"cname\": \"'梁'''\",\n" +
                 "      \"headUrl\": \"http://sdjfkdfjkd.com.cn\",\n" +
                 "      \"roleType\": 0,\n" +
                 "      \"dockingOrgUserName\": \"\",\n" +
