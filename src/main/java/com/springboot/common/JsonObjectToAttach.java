@@ -771,8 +771,9 @@ public class JsonObjectToAttach {
                             delSt += " and " + where;
 
                         for(Object e :keyWhere.entrySet()){
-                            Map.Entry<String,String> m = (Map.Entry<String,String>)e;
-                            delSt += " and " +keyColumn.get(m.getKey()) + " = '" + m.getValue() + "'";
+                            Map.Entry<String,Object> m = (Map.Entry<String,Object>)e;
+                            if(null!=keyColumn.get(m.getKey()))
+                                delSt += " and " +keyColumn.get(m.getKey()) + " = '" + m.getValue() + "'";
                         }
 
 //                        delSt += " and " + vals[0] + " = '" + valByKeys + "'";
