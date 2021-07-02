@@ -1,7 +1,6 @@
 package com.springboot.common;
 
 
-import org.beetl.core.resource.ClasspathResource;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;

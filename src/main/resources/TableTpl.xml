@@ -74,67 +74,77 @@
         <column id="RunRoute_Code" ref="RunRoute.Code"></column>
         <column id="InoutTyp" ref="Inout"></column>
     </table>
-    <!--  线路车辆 -->
+    <!--  线路车辆(位置4.1) -->
     <table name="cqyl_pre.BUS_ROUTE_VEHICLE">
-        <column id="routeId" ref="RouteId">routeId = RouteId</column>
-        <column id="Position_Lat" ref="Position.Lat"></column>
-        <column id="Position_Lng" ref="Position.Lng"></column>
-        <column id="Position_Direct" ref="Position.Direct"></column>
-        <column id="Position_Site" ref="Position.Site"></column>
+        <column id="Id" ref="vehId"></column>
+        <column id="routeId" ref="RouteCode">routeId=RouteCode</column>
+        <column id="plateNum" ref="vehName"></column>
+        <column id="Position_Lat" ref="latitude"></column>
+        <column id="Position_Lng" ref="longitude"></column>
+        <column id="Position_Direct" ref="upDown"></column>
+        <column id="Position_Site" ref="siteNum"></column>
     </table>
 
     <!-- 站点 -->
     <table name="cqyl_pre.BUS_STATION">
-    <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
-    <column id="Sites" ref="[list]cqyl_pre.BUS_ROUTE_STATION" linkId="RouteId"/>
-</table>
-
-    <table name="cqyl_pre.BUS_ROUTE_STATION">
-        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
-        <column id="Sites_Id" ref="Id"></column>
-        <column id="Sites_Name" ref="Name"></column>
-        <column id="Sites_Direct" ref="Direct"></column>
-        <column id="Sites_Num" ref="Num"></column>
-        <column id="Sites_Lat" ref="Lat"></column>
-        <column id="Sites_Lng" ref="Lng"></column>
-        <column id="Sites_Milage" ref="Milage"></column>
-        <column id="Sites_Attr" ref="Attr"></column>
+        <column id="RouteId" ref="id">RouteId = id</column>
+        <column id="stations" ref="[list]cqyl_pre.BUS_ROUTE_STATION" linkId="id"/>
+        <column id="RouteCode" ref="code"></column>
+        <column id="RouteName" ref="name"></column>
+        <column id="Track" ref="trackPoints"/>
     </table>
 
-    <!-- 线路 -->
+    <table name="cqyl_pre.BUS_ROUTE_STATION">
+        <column id="RouteId" ref="mainId">RouteId = mainId</column>
+        <column id="Sites_Id" ref="id"></column>
+        <column id="Sites_Name" ref="name"></column>
+        <column id="Sites_Direct" ref="upDown"></column>
+        <column id="Sites_Num" ref="code"></column>
+        <column id="Sites_Lat" ref="lat"></column>
+        <column id="Sites_Lng" ref="lng"></column>
+        <column id="Sites_Milage" ref="mileage"></column>
+        <column id="Sites_Attr" ref="attr"></column>
+    </table>
+
+    <table name="cqyl_pre.BUS_ACCESS_TOKEN">
+        <column id="expires_in" ref="expiresIn"/>
+        <column id="access_token" ref="token"/>
+    </table>
+
+    <!-- 线路4.2 -->
     <table name="cqyl_pre.BUS_ROUTE">
-        <column id="StartSite_Name" ref="StartSite.Name"></column>
-        <column id="StartSite_Latitude" ref="StartSite.Latitude"></column>
-        <column id="StartSite_Longitude" ref="StartSite.Longitude"></column>
-        <column id="EndSite_Name" ref="EndSite.Name"></column>
-        <column id="EndSite_Latitude" ref="EndSite.Latitude"></column>
-        <column id="EndSite_Longitude" ref="EndSite.Longitude"></column>
+        <column id="id" ref="id">id = id</column>
+        <column id="StartSite_Name" ref="startStation"></column>
+        <column id="EndSite_Name" ref="endStation"></column>
+        <column id="DepartTime" ref="startTime"></column>
+        <column id="ReturnTime" ref="endTime"></column>
+        <column id="TicketPrice" ref="startPrice"></column>
     </table>
 
     <!-- 车辆信息 -->
     <table name="cqyl_pre.BUS_VEHICLE">
-        <column id="id" ref="VehId">id = VehId</column>
-        <column id="OwnRoute_ID" ref="OwnRoute.ID"></column>
-        <column id="OwnRoute_Code" ref="OwnRoute.Code"></column>
-        <column id="OwnRoute_Name" ref="OwnRoute.Name"></column>
-        <column id="RunRoute_ID" ref="RunRoute.ID"></column>
-        <column id="RunRoute_Code" ref="RunRoute.Code"></column>
-        <column id="RunRoute_Name" ref="RunRoute.Name"></column>
+        <column id="OwnRoute_ID" ref="routeId">OwnRoute_ID=routeId</column>
+        <column id="PlateNum" ref="license"></column>
+        <column id="OwnRoute_Code" ref="routeCode"></column>
+        <column id="OwnRoute_Name" ref="routeName"></column>
+
+        <!--<column id="RunRoute_Code" ref="RunRoute.Code"></column>-->
+        <!--<column id="RunRoute_Name" ref="RunRoute.Name"></column>-->
     </table>
 
-    <!-- 车辆计划运行 -->
-    <table name="cqyl_pre.BUS_ROUTE_DISPT">
-        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
-        <column id="Times" ref="[list]cqyl_pre.BUS_ROUTE_DISPT_DTL" linkId="RouteId"/>
-    </table>
+    <!--&lt;!&ndash; 车辆计划运行 &ndash;&gt;-->
+    <!--<table name="cqyl_pre.BUS_ROUTE_DISPT">-->
+        <!--<column id="RouteId" ref="RouteId">RouteId = RouteId</column>-->
+        <!--<column id="Times" ref="[list]cqyl_pre.BUS_ROUTE_DISPT_DTL" linkId="RouteId"/>-->
+    <!--</table>-->
 
-    <!-- 车辆计划运行明细 -->
-    <table name="cqyl_pre.BUS_ROUTE_DISPT_DTL">
-        <column id="RouteId" ref="RouteId">RouteId = RouteId</column>
-        <column id="Times_Time" ref="Time"></column>
-        <column id="Times_PlateNum" ref="PlateNum"></column>
-        <column id="Times_VehNum" ref="VehNum"></column>
-    </table>
+    <!--&lt;!&ndash; 车辆计划运行明细 &ndash;&gt;-->
+    <!--<table name="cqyl_pre.BUS_ROUTE_DISPT_DTL">-->
+        <!--<column id="RouteId" ref="RouteId">RouteId = RouteId</column>-->
+        <!--<column id="Times_Time" ref="Time"></column>-->
+        <!--<column id="Times_PlateNum" ref="PlateNum"></column>-->
+        <!--<column id="Times_VehNum" ref="VehNum"></column>-->
+    <!--</table>-->
 
     <!-- 展商-->
     <table name="cqyl_ta.T80_TA_EXHIBITOR">

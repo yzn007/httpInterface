@@ -1,20 +1,36 @@
 package com.springboot.common;
 
 
+import com.alibaba.druid.sql.visitor.functions.Length;
+import com.alibaba.druid.sql.visitor.functions.Substring;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.springboot.scala.SaveModelData;
-import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.springboot.scala.SaveCosumerData;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
+import org.apache.hadoop.yarn.server.api.protocolrecords.UpdateNodeResourceRequest;
+
 import org.dom4j.io.SAXReader;
+import org.dom4j.*;
+import org.springframework.util.ResourceUtils;
+import scala.Equals;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
+import scala.tools.nsc.transform.patmat.Logic;
 
-import java.io.IOException;
+import javax.swing.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+
+import static java.util.regex.Matcher.quoteReplacement;
 
 /**
  * Created by yzn00 on 2019/6/27.
@@ -28,29 +44,16 @@ public class JsonObjectToAttach {
      * 取得json数组
      * @param jsonString
      * @param dataName
-     * @param maxDeep
      * @return
      */
-    public static String[] getJsonList(String jsonString,String dataName,boolean maxDeep) {
+    public static String[] getJsonList(String jsonString,String dataName) {
         List<String> listS = null;
         String dataJsonListNm = "results";
         if(!StringUtils.isEmpty(dataName))
            dataJsonListNm = dataName;
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonString);
-            if(maxDeep){
-                //相同结果节点，true取得最深
-                while(true) {
-                    try {
-                        jsonObject = JSONObject.parseObject(jsonObject.get(dataJsonListNm).toString());
-                    }catch (Exception ex){
-                        break;
-                    }
-                }
-                listS = JSONArray.parseArray(jsonObject.toString(), String.class);
-            }else
-                listS = JSONArray.parseArray(jsonObject.get(dataJsonListNm).toString(), String.class);
-
+            listS = JSONArray.parseArray(jsonObject.get(dataJsonListNm).toString(), String.class);
             String[] a = new String[listS.size()];
             int i = 0;
             for (String r : listS) {
@@ -62,36 +65,11 @@ public class JsonObjectToAttach {
             Object obj = null;
             try{
                 jsonObject = JSONObject.parseObject(jsonString);
-                if(maxDeep){
-                    //相同结果节点，true取得最深
-                    while(true) {
-                        try {
-                            jsonObject = JSONObject.parseObject(jsonObject.get(dataJsonListNm).toString());
-                        }catch (Exception ex){
-                            break;
-                        }
-                    }
-                }
                 obj = jsonObject.get(dataJsonListNm);
                 if (obj==null)
                     obj = jsonObject;
             }catch (Exception ex){
                 listS = JSONArray.parseArray(jsonString, String.class);
-
-                if(maxDeep){
-                    //相同结果节点，true取得最深
-                    Map m = new HashMap();
-                    m.put(dataJsonListNm,listS);
-                    jsonObject = new JSONObject(m);
-                    while(true) {
-                        try {
-                            jsonObject = JSONObject.parseObject(jsonObject.get(dataJsonListNm).toString());
-                        }catch (Exception exb){
-                            break;
-                        }
-                    }
-                    listS = JSONArray.parseArray(jsonObject.toString(), String.class);
-                }
                 String[] a = new String[listS.size()];
                 int i = 0;
                 for (String r : listS) {
@@ -136,30 +114,36 @@ public class JsonObjectToAttach {
             int lastCInx = strSplit.lastIndexOf(";");
             int tailInx = strSplit.indexOf(",",lastCInx);
             tailInx = strSplit.indexOf(",",tailInx+1)>-1?strSplit.indexOf(",",tailInx+1):strSplit.length();
-            int firstInx = strSplit.indexOf(";");
-            int firstC = 0;
+//            int firstInx = strSplit.indexOf(";");
+//            int firstC = 0;
             int firstS = 0;
-            int i = 0;
-            int k = 0;
+//            int i = 0;
+//            int k = 0;
 
-            String subStr = strSplit;
-            while(firstC<firstInx){
-                i =subStr.indexOf(",");
-                subStr = subStr.substring(i+1>subStr.length()?subStr.length():i+1);
-                if(StringUtils.isEmpty(subStr))
-                    break;
-                firstC +=i+1;
-                firstC +=i+1;
-                if(++k%2==0 && firstC<firstInx)//保留前两个
-                    firstS = firstC;
-            }
-            headStr = strSplit.substring(0,firstS-1>0?firstS-1:0);
-            midStr = strSplit.substring(firstS,tailInx);
+            int fs = strSplit.indexOf(";");
+            int fl = strSplit.substring(0,fs>0?fs:0).lastIndexOf(",");
+            fl = strSplit.substring(0,fl>0?fl:0).lastIndexOf(",");
+
+//            String subStr = strSplit;
+//            while(firstC<firstInx){
+//                i =subStr.indexOf(",");
+//                subStr = subStr.substring(i+1>subStr.length()?subStr.length():i+1);
+//                if(StringUtils.isEmpty(subStr))
+//                    break;
+//                firstC +=i+1;
+//                if(++k%2==0 && firstC<firstInx)//保留前两个
+//                    firstS = firstC;
+//            }
+            firstS = fl;
+            headStr = strSplit.substring(0,firstS);
+            midStr = strSplit.substring(firstS+1>strSplit.length()?strSplit.length():firstS+1,tailInx);
             tailStr = strSplit.substring(tailInx+1>strSplit.length()?strSplit.length():tailInx+1,strSplit.length());
             return getJoinString(headStr) + (StringUtils.isEmpty(headStr)?"'":",'") +midStr + (!StringUtils.isEmpty(tailStr)?"'," :"'")+ getJoinString(tailStr);
         }else {
 
             String[] ars = strSplit.split(",");
+            if(StringUtils.isEmpty(strSplit.trim()))
+                return "";
             if(ars.length==1)
                 return "'" + ars[0] + "'";
             else if(strSplit.length() == strSplit.lastIndexOf(",")+1){//最后一个为空如"2,3,"
@@ -223,14 +207,6 @@ public class JsonObjectToAttach {
         return m;
     }
 
-    /***
-     * 取得第0：key，1：表，4：是否删除，5：是否清空，7：url（静态isStatic=true）属性
-     * @param propertyNm
-     * @param topicPath
-     * @param code
-     * @param isStatic
-     * @return
-     */
     public static Map<String,String> getValidProperties(String propertyNm,String topicPath,String code,boolean isStatic){
         Map <String,String>m = new HashMap();
         String fileName = "Topic.xml";
@@ -296,7 +272,7 @@ public class JsonObjectToAttach {
         String [] rets = null;
         List<String> whereStr = new ArrayList<>();
         String spChr = "#";
-        String fileName = "TableModelSet.xml";
+        String fileName = "TableTpl.xml";
         if (!StringUtils.isEmpty(tmpFile))
             fileName = tmpFile;
 
@@ -328,9 +304,8 @@ public class JsonObjectToAttach {
                                         continue;
 
                                     Map map = new HashMap();
-                                    map.put(e.attribute(0).getStringValue(),
-                                                e.attribute(1).getValue().substring(e.attribute(1).getValue().indexOf("[list]")+6,
-                                                    e.attribute(1).getValue().length()));
+                                    map.put(e.attribute(0).getStringValue(),e.attribute(1).getValue().substring(e.attribute(1).getValue().indexOf("[list]")+6,
+                                            e.attribute(1).getValue().length()));
 
                                     //关联主表Id
                                     map.put("{linkId}",e.attribute(2).getValue());
@@ -338,18 +313,17 @@ public class JsonObjectToAttach {
                                 }
                             else {
                                 Map map = new HashMap();
-                                map.put(e.attribute(0).getStringValue(),
-                                            e.attribute(1).getValue().substring(e.attribute(1).getValue().indexOf("[list]")+6,
-                                                e.attribute(1).getValue().length()));
+                                map.put(e.attribute(0).getStringValue(),e.attribute(1).getValue().substring(e.attribute(1).getValue().indexOf("[list]")+6,
+                                        e.attribute(1).getValue().length()));
                                 //关联主表Id
                                 map.put("{linkId}",e.attribute(2).getValue());
                                 subTabs.add(map);
                             }
 
                         }else
-                            m.put(e.attribute(1).getValue(),
-                                    e.attribute(0).getValue() + (!StringUtils.isEmpty(e.getStringValue())?
-                                            spChr+e.getStringValue():""));
+                            m.put(e.attribute(1).getValue(), e.attribute(0).getValue()+
+                                (!StringUtils.isEmpty(e.getStringValue())?
+                                spChr+e.getStringValue():""));
                     }
                 }
             }
@@ -419,13 +393,10 @@ public class JsonObjectToAttach {
         else {
             rets = new String[whereStr.size() + 1];
             j = 1;
-            //替换表字段，防止特殊字符//mysql：`;postgrep："
+            //替换表字段，防止特殊字符
             String []keys = tm.split(",");
             for(String key:keys){
-                String delimiter = "`";//mysql的列名转义符如`column`
-                if(JsonObjectToAttach.config.get("DriverClassName").toString().toLowerCase().indexOf("postgresql")>-1)
-                    delimiter = "\"";//postgre列名可以用"
-                tm = replace(tm,key,delimiter+key+delimiter,"");
+                tm = replace(tm,key,"`"+key+"`","");
             }
             rets[0] = tm;
         }
@@ -436,124 +407,38 @@ public class JsonObjectToAttach {
             else
                 rets [j] = whereStr.get(j-1);
         }
+        if(rets.length>1 && StringUtils.isNoneBlank(linkId)) {
+            //替换主表主键为子表对应得字段
+            for (int k = 1; k < rets.length; k++) {
+                String mainId = "";
+                j = k;
+                String origanl = rets[0];
+                int inxStart = 0;
+                int inxEnd = origanl.indexOf(",") + 1;
+                while(j>0){
+                    if(j==1) {
+                        mainId = rets[0].substring(inxStart, inxEnd-1);
+                    }
+                    else {
+                        inxStart = inxEnd;
+                        origanl = rets[0].substring(inxStart);
+                        inxEnd = inxStart + origanl.indexOf(",") + 1;
+                    }
+                    j--;
+                }
+                //实际的主表关联字段
+                String trueMainid = rets[k].split("=")[0].trim();
+                if(mainId.replaceAll("`","").trim().equalsIgnoreCase(trueMainid))
+                    continue;
+                if(inxStart != 0 || inxEnd != 0){
+                    tm = tm.substring(0,inxStart)+"`"+trueMainid +"`,"+tm.substring(inxEnd);
+                    rets[0] = tm;
+                }
+
+                rets[k] = rets[k].substring(0,rets[k].indexOf("=")+1) + linkId + "{" + linkId + "}";
+            }
+        }
         return rets;
-    }
-
-
-    /**
-     * 重复字段处理
-     * @param array
-     * @param table
-     * @param tmpFile
-     * @return
-     * @throws IOException
-     */
-    public static String[] processMutikeys(String []array, String table, String tmpFile ) throws IOException {
-
-        String spChr = "#";
-        String fileName = "TableModelSet.xml";
-        if (!StringUtils.isEmpty(tmpFile))
-            fileName = tmpFile;
-
-        Map<String, String> m = new HashMap();
-
-        try {
-
-//            String path = Thread.currentThread().getClass().getResource("/").getPath() + fileName;
-//            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
-            if(tplDocument==null)
-                tplDocument = parseDom4j(fileName);
-            Element root = tplDocument.getRootElement();
-            for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
-                Element tblEle = (Element) iterator.next();
-                String tableName = tblEle.attribute(0).getValue();
-                boolean isContain = false;
-                if(tableName.indexOf(table)>-1 && (StringUtils.isEmpty(tableName.substring(tableName.indexOf(table)+table.length(),
-                        tableName.indexOf(table)+table.length()+1>tableName.length()?tableName.length():tableName.indexOf(table)+table.length()+1))
-                        ||tableName.substring(tableName.indexOf(table)+table.length(),
-                        tableName.indexOf(table)+table.length()+1>tableName.length()?tableName.length():tableName.indexOf(table)+table.length()+1).equals(";")))
-                    isContain = true;
-                if (isContain || tableName.equals(table)) {
-                    for (Element e : tblEle.elements()) {
-                        m.put(e.attribute(1).getValue(), e.attribute(0).getValue()+
-                                    (!StringUtils.isEmpty(e.getStringValue())?
-                                            spChr+e.getStringValue():""));
-                    }
-                }
-            }
-
-//
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String[] arrayNew = new String[array.length];
-        int i = 0;
-        for(String jsonStr :array){
-            JSONObject jsonObject = null;
-            try {
-                jsonObject = JSONObject.parseObject(jsonStr);
-                for(Map.Entry keyset:m.entrySet()){
-                    if(null!=jsonObject.get(keyset.getValue())){
-                        jsonObject.remove(keyset.getKey());
-                    }
-                }
-                jsonStr = jsonObject.toJSONString();
-                arrayNew[i++] = jsonStr;
-            }catch (Exception e){
-                JSONArray jsonArray = JSONArray.parseArray(jsonStr);
-                JSONArray jsonAarrayTarget = new JSONArray();
-                for(Object o:jsonArray){
-                    JSONObject jsobj = (JSONObject)o;
-                    for(Map.Entry keyset:m.entrySet()){
-                        if(null!=jsonObject.get(keyset.getValue())){
-                            jsobj.remove(keyset.getKey());
-                        }
-                    }
-                    jsonAarrayTarget.add(jsobj);
-                }
-                arrayNew[i++] = jsonAarrayTarget.toJSONString();
-            }
-        }
-        return arrayNew;
-//        int j = 0;
-//        if(StringUtils.isEmpty(tm)) {
-//            rets = new String[whereStr.size()];
-//        }
-//        else {
-//            rets = new String[whereStr.size() + 1];
-//            j = 1;
-//            //替换表字段，防止特殊字符
-//            String []keys = tm.split(",");
-//            for(String key:keys){
-//                tm = replace(tm,key,"`"+key+"`","");
-//            }
-//            rets[0] = tm;
-//        }
-//
-//        for( ;j<rets.length;j++){
-//            if(StringUtils.isEmpty(tm))
-//                rets [j] = whereStr.get(j);
-//            else
-//                rets [j] = whereStr.get(j-1);
-//        }
-//        return m;
-    }
-
-    /**
-     * 替换boolean值
-     * @param jsonObject
-     */
-    public static void replaceBooleanString(JSONObject jsonObject){
-
-        for(Map.Entry keyset:jsonObject.entrySet()) {
-            if (null != keyset.getValue())
-                if( keyset.getValue().toString().trim().equalsIgnoreCase("false"))
-                    jsonObject.put(keyset.getKey().toString(),"0");
-                else if(keyset.getValue().toString().trim().equalsIgnoreCase("true"))
-                    jsonObject.put(keyset.getKey().toString(),"1");
-        }
     }
 
     /**
@@ -688,16 +573,182 @@ public class JsonObjectToAttach {
         return retVals;
     }
 
+    /**
+     * 取得应用库sql语句
+     * @param topic
+     * @param tmpFile
+     * @param jsonArray
+     * @return
+     */
+    public static String[] getMetaSqls(String topic,String tmpFile,String[] jsonArray){
+        List<String> att = new ArrayList<>();
 
+        String[] ret = null;
+        String fileName = "PreRelations.xml";
+        if (!StringUtils.isEmpty(tmpFile))
+            fileName = tmpFile;
 
-    static final Map staticTableRelation = new HashMap(){
-        {
-            put("GTGCDM.PUB_UNIFIED_IDENTITY_USER","TARGET_ACCOUNT");
-            put("GTGCDM.PUB_UNIFIED_IDENTITY_ORG","TARGET_ORGANIZATION");
+        try{
+//            String path = ResourceUtils.getURL("classpath:").getPath()+fileName;
+            if(null==preDocument)
+                preDocument = parseDom4j(fileName);
+            Element root = preDocument.getRootElement();
+            for (Iterator iterator = root.elementIterator(); iterator.hasNext(); ) {
+                Element tblEle = (Element) iterator.next();
+                String isValid = "";
+                try{
+                    isValid = tblEle.attributeValue("valid");
+                }catch (Exception ee){
+
+                }
+                if(!isValid.equalsIgnoreCase("true"))
+                    continue;
+                //取得主题
+                String topicName = tblEle.attribute(1).getValue();
+                String []tops = topicName.split(";");
+                boolean isExists = false;
+                for(String t:tops) {
+                    if(t.equalsIgnoreCase(topic)){
+                        isExists = true;
+                        break;
+                    }
+                }
+                if(isExists){
+                    boolean isExist = false;//没有消费数据
+                    if(jsonArray!=null)
+                        for(int j=0;j<jsonArray.length;j++) {
+                            isExist = true;
+                            JSONObject jsonObject = null;
+                            try{
+                                jsonObject = JSONObject.parseObject(jsonArray[j]);
+                            }catch (Exception ex){
+                                System.out.println(ex.toString());
+                            }
+                            String isSplit = tblEle.attribute(2).getValue();
+                            String sqlStr = quoteReplacement(tblEle.getStringValue().replaceAll("\r","").replaceAll("\n",""));
+
+                            String subString = "";
+                            int i = 0;
+                            while(sqlStr.indexOf(quoteReplacement("{"))>-1) {
+                                subString = sqlStr.substring(sqlStr.indexOf(quoteReplacement("{")) + 1, sqlStr.indexOf(quoteReplacement("}")));
+                                String jsonKey = subString;
+                                for(Map.Entry<String,Object> m:jsonObject.entrySet()){
+                                    if(m.getKey().equalsIgnoreCase(jsonKey)) {
+                                        jsonKey = m.getKey();
+                                        break;
+                                    }
+                                }
+                                int jj = 0;
+                                if(null!=jsonObject.get(jsonKey)){
+                                    while(sqlStr.indexOf(quoteReplacement("{"+subString+"}"))>-1) {
+                                        sqlStr = sqlStr.replace(quoteReplacement("{" + subString + "}"), getJoinString(jsonObject.get(jsonKey).toString()));
+                                        if(jj++>sqlStr.length())//防止替换失败死循环
+                                            break;
+                                    }
+                                }
+                                i++;
+                                if(i>sqlStr.length())//防止替换失败死循环
+                                    break;
+                            }
+
+                            if (isSplit.equalsIgnoreCase("true")) {//需求分割sql
+                                String[] sqls = sqlStr.split(";");
+                                for (String s : sqls) {
+                                    String repl = s.replaceAll("；",";");
+                                    if(!att.contains(repl))
+                                        att.add(repl);
+                                }
+                            } else {
+                                att.add(sqlStr);
+                            }
+                            //闸机事件退出
+                            if(!manyExecute.contains(topic))
+                                break;
+                        }
+                    if(!isExist && topic.equalsIgnoreCase(KafkaSaveData.GATE_EVENT_TBL)){
+                        String isSplit = tblEle.attribute(2).getValue();
+                        String sqlStr = quoteReplacement(tblEle.getStringValue().replaceAll("\r","").replaceAll("\n",""));
+                        if (isSplit.equalsIgnoreCase("true")) {//需求分割sql
+                            String[] sqls = sqlStr.split(";");
+                            for (String s : sqls) {
+                                String repl = s.replaceAll("；",";");
+                                if(!att.contains(repl))
+                                    att.add(repl);
+                            }
+                        } else {
+                            att.add(sqlStr);
+                        }
+                    }
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.toString());
         }
+        if(att.size()>0) {
+            ret = new String[att.size()];
+            int i=0;
+            for(String s :att){
+                ret[i++] = s;
+            }
+        }
+        return  ret;
+    }
 
+    static  final List<String>  manyExecute = new ArrayList(){
+        {add("cqyl_pre.PARK_VEHIC_START_OUT_EVT")
+        ;add("cqyl_pre.PARK_VEHIC_DRV_IN_EVT");
+            add("cqyl_pre.PARK_PARK_SPC_RESV_INFO");}
     };
 
+//routeId 固定
+    public static  final List<String>  routeidList = new ArrayList(){
+        {add("1002405308722246")
+        ;add("1002303188518018");
+            add("1001809133299822");
+        add("1004104235630925");
+        add("1004104102283826");}
+    };
+
+
+    /**
+     * 删除json不用的key
+     * @param obj
+     * @param keys
+     * @return
+     */
+    public static JSONObject JsonObjDeleteByKey(JSONObject obj ,List<String> keys){
+        JSONObject jsonObject = null;
+        if(obj!=null) {
+            jsonObject = obj;
+            for (String key : keys) {
+                if (null != jsonObject.get(key))
+                    jsonObject.remove(key);
+            }
+        }
+        return jsonObject;
+    }
+
+    /**
+     * 删除jsonarry的key
+     * @param array
+     * @param keys
+     * @return
+     */
+    public static JSONArray JsonArrayDeleteByKey(JSONArray array ,List<String> keys){
+        JSONObject jsonObject = null;
+        JSONArray jSONArray = new JSONArray();
+        if(array!=null) {
+            for(Object js :array) {
+                jsonObject = (JSONObject)js;
+                for (String key : keys) {
+                    if (null != jsonObject.get(key))
+                        jsonObject.remove(key);
+                }
+                jSONArray.add(jsonObject);
+            }
+        }
+        return jSONArray;
+    }
 
     /**
      * 生成插入或删除语句
@@ -742,60 +793,49 @@ public class JsonObjectToAttach {
                 String column = getColumsOrValues(JSONObject.parseObject(json), true,keyWhere,noContainCols,linkId,null);
                 Map keyMap = new HashMap<String,Map<String,String>>();
                 rets = getPropertyRelation(column, table, null,subTabs,linkId,keyMap);
-                Map keyColumn = new HashMap();
-                for(int k=1;k<rets.length;k++) {
-                    String[] vals = rets[k].split("=");
 
+                for(int k=1;k<rets.length;k++){
+                    String [] vals = rets[k].split("=");
                     String valByKeys = "";
-//                    if(keyWhere.get(vals[1].substring(0,vals[1].indexOf("{")).trim())==null){
-//                        valByKeys = getValuesByKeys(JSONObject.parseObject(json),vals[1].substring(0,vals[1].indexOf("{")),"");
-                    //keyWhere.put(vals[1].substring(vals[1].indexOf("{")+1,vals[1].indexOf("}")),valByKeys);
-//                    }else{
-//                        valByKeys = keyWhere.get(vals[1].substring(0,vals[1].indexOf("{")).trim()).toString();
-//                    }
-                    valByKeys = getValuesByKeys(JSONObject.parseObject(json), vals[1].substring(0, vals[1].indexOf("{")), "");
-                    keyWhere.put(vals[1].substring(vals[1].indexOf("{") + 1, vals[1].indexOf("}")), valByKeys);
-                    //实际列保存
-                    keyColumn.put(vals[1].substring(vals[1].indexOf("{") + 1, vals[1].indexOf("}")),vals[0]);
-                }
-                if(rets.length>1) {
-                    if (isTruncate) {
+                    if(keyWhere.get(vals[1].substring(0,vals[1].indexOf("{")).trim())==null){
+                        valByKeys = getValuesByKeys(JSONObject.parseObject(json),vals[1].substring(0,vals[1].indexOf("{")),"");
+                        keyWhere.put(vals[1].substring(vals[1].indexOf("{")+1,vals[1].indexOf("}")),valByKeys);
+                    }else{
+                        valByKeys = keyWhere.get(vals[1].substring(0,vals[1].indexOf("{")).trim()).toString();
+                    }
+                    if(isTruncate){
                         String truncateStr = "truncate " + table;
                         //只清空一次
-                        if (!att.contains(truncateStr))
+                        if(!att.contains(truncateStr))
                             att.add(truncateStr);
 
-                    } else if (isModify) {
+                    }else if (isModify){
                         String delSt = "delete from " + table + " where 1=1 ";
                         if (!StringUtils.isEmpty(where))
                             delSt += " and " + where;
 
-                        for(Object e :keyWhere.entrySet()){
-                            Map.Entry<String,Object> m = (Map.Entry<String,Object>)e;
-                            if(null!=keyColumn.get(m.getKey()))
-                                delSt += " and " +keyColumn.get(m.getKey()) + " = '" + m.getValue() + "'";
-                        }
-
-//                        delSt += " and " + vals[0] + " = '" + valByKeys + "'";
-                        if (!att.contains(delSt))
+                        delSt += " and " + vals[0] + " = '" +  valByKeys + "'";
+                        if(!att.contains(delSt))
                             att.add(delSt);
                     }
                 }
-                else if(rets.length == 1){
-                    if (isTruncate) {
-                        String truncateStr = "truncate " + table;
-                        //只清空一次
-                        if (!att.contains(truncateStr))
-                            att.add(truncateStr);
 
-                    } else if (isModify) {
-                        String delSt = "delete from " + table + " where 1=1 ";
-                        if (!StringUtils.isEmpty(where))
-                            delSt += " and " + where;
 
-                        if (!att.contains(delSt))
-                            att.add(delSt);
-                    }
+
+                if(isTruncate && rets.length == 1){
+                    String truncateStr = "truncate " + table;
+                    //只清空一次
+                    if(!att.contains(truncateStr))
+                        att.add(truncateStr);
+
+                }
+                else if (isModify && rets.length == 1) {
+                    String delSt = "delete from " + table + " where 1=1 ";
+                    if (!StringUtils.isEmpty(where))
+                        delSt += " and " + where;
+
+                    if(!att.contains(delSt))
+                        att.add(delSt);
                 }
                 //取得json value
                 String values = getColumsOrValues(JSONObject.parseObject(json), false,keyWhere,noContainCols,linkId,keyMap);
@@ -807,21 +847,7 @@ public class JsonObjectToAttach {
                 //递归调用
 
                 for (Map.Entry<String,String> e : noContainCols.entrySet()) {
-                    //判断linkId是否包含keyWhere里
-                    if(null==keyWhere.get(tmpLink)){
-                        if(rets.length >1 && rets[1].indexOf(tmpLink)>-1 ){
-                            //取出实际json字串linkId的值
-                            String linkRep = rets[1].substring(rets[1].indexOf("{")+1,rets[1].indexOf("}"));
-                            if(!StringUtils.isEmpty(linkRep)) {
-                                keyWhere.put(tmpLink, JSONObject.parseObject(json).get(linkRep));
-                                //删除父节点的key，以访字节主键跟父节点一样
-                                if (null != keyWhere.get(linkRep))
-                                    keyWhere.remove(linkRep);
-                            }
-
-                        }
-                    }
-                    String[] bb = getBatchStatement(getJsonList(json, e.getKey(),false), e.getValue(), null,tmpLink, isModify, keyWhere,isTruncate);
+                    String[] bb = getBatchStatement(getJsonList(json, e.getKey()), e.getValue(), null,tmpLink, isModify, keyWhere,isTruncate);
                     if (bb == null) {//子表无数据都返回空
                         return null;
                     }
@@ -853,213 +879,57 @@ public class JsonObjectToAttach {
         return ret;
     }
 
-    //project.properties
-   public static final Map config ;
-    static {
-        Map map = new HashMap();
-        try {
-            map.putAll(ReadPropertiesUtils.readConfig("project.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        config = Collections.unmodifiableMap(map);
-
-    }
-
-    /**
-     * 返回嵌套children的rows
-     * @param jsonObj json对象
-     * @param childrenNodeName 嵌套节点名{children:[{}]}
-     * @param id key名:org_id
-     * @param parentVal 父code值
-     */
-    public static JSONArray getWhileLoopChildrens(JSONObject jsonObj,String childrenNodeName,String id,Object parentVal){
-        JSONArray jsonArrayRtn = null;
-        if(jsonObj.get(childrenNodeName)!=null)
-            while(true){
-                //是否存在子节点
-                if(!jsonObj.containsKey(childrenNodeName))
-                    break;
-
-                JSONArray jsonArray = JSONArray.parseArray(jsonObj.get(childrenNodeName).toString());
-                if(jsonArray!=null) {
-                    for (Object obj1 : jsonArray) {
-                        if(null!=jsonArrayRtn)
-                            //添加同级子节点
-                            jsonArrayRtn.addAll(getWhileLoopChildrens(JSONObject.parseObject(obj1.toString()), childrenNodeName, id, jsonObj.get(id)));
-                        else
-                            //返回头节点
-                            jsonArrayRtn = getWhileLoopChildrens(JSONObject.parseObject(obj1.toString()), childrenNodeName, id, jsonObj.get(id));
-                    }
-                    //删除已处理节点
-                    jsonObj.remove(childrenNodeName);
-                }
-
-            }
-        //字节的添加父code
-        JSONObject  jsonObjRetrun = new JSONObject();
-
-        for(Map.Entry entry :jsonObj.entrySet()){
-            if(entry.getKey().equals(childrenNodeName))
-                continue;
-            jsonObjRetrun.put(entry.getKey().toString(),entry.getValue());
-            //父code字段前缀
-            jsonObjRetrun.put("parent_"+id,parentVal);
-        }
-        if(jsonArrayRtn==null)//头节点
-            jsonArrayRtn = new JSONArray();
-        if(jsonArrayRtn!=null)
-            jsonArrayRtn.add(jsonObjRetrun);
-        return jsonArrayRtn;
-    }
-
-
     public static void  main(String args[]){
-        String josnStrChildrens = "{\n" +
-                "  \"data\": {\n" +
-                "    \"org_name\": \"全部\",\n" +
-                "    \"org_id\": 0,\n" +
-                "    \"children\": [\n" +
-                "      {\n" +
-                "        \"org_name\": \"厦门\",\n" +
-                "        \"org_id\": 8,\n" +
-                "        \"children\": [\n" +
-                "          {\n" +
-                "            \"org_name\": \"泉州区\",\n" +
-                "            \"org_id\": 81,\n" +
-                "            \"children\": [\n" +
-                "              {\n" +
-                "                \"org_name\": \"泉州城区\",\n" +
-                "                \"org_id\": 811,\n" +
-                "                \"children\": [\n" +
-                "                  {\n" +
-                "                    \"org_name\": \"城关街道\",\n" +
-                "                    \"org_id\": 8111,\n" +
-                "                    \"children\": [\n" +
-                "                      {\n" +
-                "                        \"org_name\": \"公司81111\",\n" +
-                "                        \"org_id\": 81111,\n" +
-                "                        \"children\": [\n" +
-                "                          {\n" +
-                "                            \"org_name\": \"分公司811111\",\n" +
-                "                            \"org_id\": 811111\n" +
-                "                          }\n" +
-                "                        ]\n" +
-                "                      }\n" +
-                "                    ]\n" +
-                "                  },\n" +
-                "                  {\n" +
-                "                    \"org_name\": \"远郊\",\n" +
-                "                    \"org_id\": 8112,\n" +
-                "                    \"children\": [\n" +
-                "                      {\n" +
-                "                        \"org_name\": \"公司81121\",\n" +
-                "                        \"org_id\": 81121,\n" +
-                "                        \"children\": [\n" +
-                "                          {\n" +
-                "                            \"org_name\": \"分公司811211\",\n" +
-                "                            \"org_id\": 811211\n" +
-                "                          }\n" +
-                "                        ]\n" +
-                "                      }\n" +
-                "                    ]\n" +
-                "                  }\n" +
-                "                ]\n" +
-                "              }\n" +
-                "            ]\n" +
-                "          }\n" +
-                "        ]\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"org_name\": \"深圳\",\n" +
-                "        \"org_id\": 1,\n" +
-                "        \"children\": [\n" +
-                "          {\n" +
-                "            \"org_name\": \"南山区\",\n" +
-                "            \"org_id\": 2,\n" +
-                "            \"children\": [\n" +
-                "              {\n" +
-                "                \"org_name\": \"公司21\",\n" +
-                "                \"org_id\": 21\n" +
-                "              },\n" +
-                "              {\n" +
-                "                \"org_name\": \"公司22\",\n" +
-                "                \"org_id\": 22\n" +
-                "              },\n" +
-                "              {\n" +
-                "                \"org_name\": \"公司23\",\n" +
-                "                \"org_id\": 23\n" +
-                "              }\n" +
-                "            ]\n" +
-                "          },\n" +
-                "          {\n" +
-                "            \"org_name\": \"北山区\",\n" +
-                "            \"org_id\": 3,\n" +
-                "            \"children\": [\n" +
-                "              {\n" +
-                "                \"org_name\": \"公司31\",\n" +
-                "                \"org_id\": 31\n" +
-                "              },\n" +
-                "              {\n" +
-                "                \"org_name\": \"公司32\",\n" +
-                "                \"org_id\": 32,\n" +
-                "                \"children\": [\n" +
-                "                  {\n" +
-                "                    \"org_name\": \"公司321\",\n" +
-                "                    \"org_id\": 321\n" +
-                "                  }\n" +
-                "                ]\n" +
-                "              }\n" +
-                "            ]\n" +
-                "          }\n" +
-                "        ]\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  },\n" +
-                "  \"success\": 1\n" +
-                "}";
-        Object obj=null;
-        JSONArray jsonObjectRtn = null;
-        JSONArray jsonObjectRtn1 = getWhileLoopChildrens(JSONObject.parseObject(JSONObject.parseObject(josnStrChildrens).get("data").toString()),
-                "children","org_id",obj);
+        String stat = "965,965线,1002405308722246,sdff";
+        String cols = "id,code,lng,name,id,upDown,attr,lat,mileage";
+        String tableNm = "cqyl_pre.BUS_ROUTE_STATION";
 
+String [] rets = {"`id`,`sites_num`,`sites_lng`,`sites_name`,`sites_id`,`sites_direct`,`sites_attr`,`sites_lat`,`sites_milage`"
+        ,"",""};
+try {
+    String []test = getPropertyRelation(cols, tableNm, null, null, "id", null);
+}catch (Exception ex){
 
-        String stat = "";
+}
+        stat = getJoinString(stat);
+
         stat = replace("vehnum_routeid,times_routeid,time,vehnum","time1","times_id",",");
         String  jsonValue ="{\n" +
-                "  \"code\": \"1\",\n" +
-                "  \"message\": \"success\",\n" +
-                "  \"data\": {\n" +
-                "    \"interrupt\": false,\n" +
-                "    \"timestamp\": 1608537202840,\n" +
-                "    \"taskId\": \"20201221154223919-14E7-734636690\",\n" +
-                "    \"objectType\": \"TARGET_ACCOUNT\",\n" +
-                "    \"objectCode\": \"testdemo_TargetAccount\",\n" +
-                "    \"effectOn\": \"CREATED\",\n" +
-                "    \"data\": {\n" +
-                "      \"_user\": \"zhangsan\",\n" +
-                "      \"_organization\": null,\n" +
-                "      \"username\": \"zhangsan\",\n" +
-                "      \"password\": null,\n" +
-                "      \"fullname\": \"张三测试\",\n" +
-                "      \"isDisabled\": false,\n" +
-                "      \"isLocked\": false,\n" +
-                "      \"createAt\": \"2020-12-21 15:42:23.000\",\n" +
-                "      \"updateAt\": \"2020-12-21 15:42:23.000\",\n" +
-                "      \"isSystem\": false,\n" +
-                "      \"isPublic\": false,\n" +
-                "      \"isMaster\": true,\n" +
-                "      \"email\": \"zhangsan@crecg.com\",\n" +
-                "      \"employeeNo\": null,\n" +
-                "      \"mobile\": \"13247703738\",\n" +
-                "      \"sex\": \"1\"\n" +
-                "    },\n" +
-                "    \"id\": \"20201221154223828-3236-DD9FB740B\"\n" +
-                "  }\n" +
+                "  \"tx_code\": \"0201\",\n" +
+                "  \"results\": [\n" +
+                "    {\n" +
+                "      \"dockingOrgName\": \"\",\n" +
+                "      \"gender\": \"\",\n" +
+                "      \"vapName\": \"\",\n" +
+                "      \"certificateLevel\": \"\",\n" +
+                "      \"isMeeting\": \"\",\n" +
+                "      \"dockingOrgUserphone\": \"\",\n" +
+                "      \"cname\": \"'梁'''\",\n" +
+                "      \"headUrl\": \"http://sdjfkdfjkd.com.cn\",\n" +
+                "      \"roleType\": 0,\n" +
+                "      \"dockingOrgUserName\": \"\",\n" +
+                "      \"institution\": \"\",\n" +
+                "      \"ename\": \"\",\n" +
+                "      \"nationality\": \"CHN\",\n" +
+                "      \"phone\": \"18580866220\",\n" +
+                "      \"vapPhone\": \"\",\n" +
+                "      \"visitDate\": \"2019-08-27\",\n" +
+                "      \"id\": \"0d06af68-9d4e-4ba9-9c91-129212038c2b\",\n" +
+                "      \"position\": \"\",\n" +
+                "      \"travel\": 4,\n" +
+                "      \"certificateNum\": \"510725198604213843\",\n" +
+                "      \"certificateType\": 0\n" +
+                "    }\n" +
+                "  ]\n" +
                 "}";
         String tablePre = "cqyl_ta.T80_TA_EXPO_AUDI_INFO";
-        String [] array = getJsonList(jsonValue,"",true);
-
+        String [] array = getJsonList(jsonValue,"");
+        Map<String, String> config = new HashMap<String, String>();
+        try {
+            config.putAll(ReadPropertiesUtils.readConfig("project.properties"));
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
 //        System.out.println(config);
 //        new KafkaSaveData("bingfu","web_data_profil").start();
 
@@ -1089,14 +959,16 @@ public class JsonObjectToAttach {
                 if(!reds.contains(sql))
                     reds.add(sql);
 
-
+                String[] sqlDyc = JsonObjectToAttach.getMetaSqls(table.split(";")[k], "", array);
+                if (null != sqlDyc && !sqlListDyc.contains(sqlDyc))
+                    sqlListDyc.add(sqlDyc);
 
             }
 
             try {
                 Seq<String[]> tmpSeq = JavaConverters.asScalaIteratorConverter(reds.iterator()).asScala().toSeq();
                 if (tmpSeq.size() > 0) {
-                    SaveModelData.main(tmpSeq.toList());
+                    SaveCosumerData.main(tmpSeq.toList());
                 }
 
             } catch (Exception e) {
@@ -1105,5 +977,82 @@ public class JsonObjectToAttach {
 
         }
     }
+    /**
+     * 取得json数组
+     * @param jsonString
+     * @param dataName
+     * @param maxDeep
+     * @return
+     */
+    public static String[] getJsonList(String jsonString,String dataName,boolean maxDeep) {
+        List<String> listS = null;
+        String dataJsonListNm = "results";
+        if(!StringUtils.isEmpty(dataName))
+            dataJsonListNm = dataName;
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonString);
+            if(maxDeep){
+                //相同结果节点，true取得最深
+                while(true) {
+                    try {
+                        jsonObject = JSONObject.parseObject(jsonObject.get(dataJsonListNm).toString());
+                    }catch (Exception ex){
+                        break;
+                    }
+                }
+                listS = JSONArray.parseArray(jsonObject.toString(), String.class);
+            }else
+                listS = JSONArray.parseArray(jsonObject.get(dataJsonListNm).toString(), String.class);
 
+            String[] a = new String[listS.size()];
+            int i = 0;
+            for (String r : listS) {
+                a[i++] = r;
+            }
+            return a;
+        } catch (Exception e) {
+            JSONObject jsonObject=null;
+            Object obj = null;
+            try{
+                jsonObject = JSONObject.parseObject(jsonString);
+                if(maxDeep){
+                    //相同结果节点，true取得最深
+                    while(true) {
+                        try {
+                            jsonObject = JSONObject.parseObject(jsonObject.get(dataJsonListNm).toString());
+                        }catch (Exception ex){
+                            break;
+                        }
+                    }
+                }
+                obj = jsonObject.get(dataJsonListNm);
+                if (obj==null)
+                    obj = jsonObject;
+            }catch (Exception ex){
+                listS = JSONArray.parseArray(jsonString, String.class);
+
+                if(maxDeep){
+                    //相同结果节点，true取得最深
+                    Map m = new HashMap();
+                    m.put(dataJsonListNm,listS);
+                    jsonObject = new JSONObject(m);
+                    while(true) {
+                        try {
+                            jsonObject = JSONObject.parseObject(jsonObject.get(dataJsonListNm).toString());
+                        }catch (Exception exb){
+                            break;
+                        }
+                    }
+                    listS = JSONArray.parseArray(jsonObject.toString(), String.class);
+                }
+                String[] a = new String[listS.size()];
+                int i = 0;
+                for (String r : listS) {
+                    a[i++] = r;
+                }
+                return a;
+            }
+            return new String[]{obj.toString()};
+        }
+    }
 }

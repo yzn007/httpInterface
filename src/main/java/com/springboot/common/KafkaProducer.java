@@ -28,7 +28,7 @@ public class KafkaProducer extends Thread {
     }
 
     protected static final Logger logger = Logger.getLogger(KafkaProducer.class.getName());
-    
+
     //创建生产者
     private Producer<Integer, String> createProducer(){
         Properties properties = new Properties();
@@ -52,7 +52,7 @@ public class KafkaProducer extends Thread {
 
         return new org.apache.kafka.clients.producer.KafkaProducer(properties);
     }
-    
+
     public void run() {
         BufferedReader br = null;
         // 创建生产者
@@ -62,7 +62,7 @@ public class KafkaProducer extends Thread {
             producer = createProducer();
             if (!StringUtils.isEmpty(value)) {
 //                System.out.println("生产数据为：" + value);
-                logger.info("生产数据为：" + value);
+                logger.info(topic+"=====生产数据为：" + value);
                 producer.send(new ProducerRecord<Integer, String>(topic, value + "\n"));
             }
 

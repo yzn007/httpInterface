@@ -11,16 +11,30 @@ import com.springboot.httpInterface.services.PersonService;
 import com.springboot.httpInterface.services.RyDataLargeService;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +49,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -48,6 +64,32 @@ import java.util.concurrent.Executors;
 @RestController
 @RequestMapping("httpService/")
 public class HttpServiceTest {
+    private static SSLContextBuilder builder = null;
+    private static SSLConnectionSocketFactory sslsf = null;
+    private static PoolingHttpClientConnectionManager cm = null;
+    private static final String HTTP = "http";
+    private static final String HTTPS = "https";
+    static {
+        try {
+            builder = new SSLContextBuilder();
+            // 全部信任 不做身份鉴定
+            builder.loadTrustMaterial(null, new TrustStrategy() {
+                @Override
+                public boolean isTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                    return true;
+                }
+            });
+            sslsf = new SSLConnectionSocketFactory(builder.build(), new String[]{"SSLv2Hello", "SSLv3", "TLSv1", "TLSv1.2"}, null, NoopHostnameVerifier.INSTANCE);
+            Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register(HTTP, new PlainConnectionSocketFactory())
+                    .register(HTTPS, sslsf)
+                    .build();
+            cm = new PoolingHttpClientConnectionManager(registry);
+            cm.setMaxTotal(200);//max connection
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @Resource
     PersonService personService;
     @RequestMapping(value = "sendPostDataByMap", method = RequestMethod.POST)
@@ -218,7 +260,7 @@ public class HttpServiceTest {
 
     @Autowired
     RyDataLargeService ryDataLargeService;
-
+    private static Logger _log = LoggerFactory.getLogger(HttpServiceTest.class);
     private List getResultTable(String param){
         List<Map> result = new ArrayList<>();
 
@@ -723,6 +765,67 @@ public class HttpServiceTest {
         m.put("results",jsonString);
         m.put("status","ok");
         return Ret.ok(m);
+    }
+
+    /**
+     * get模式获取数据
+     * @param url
+     * @param param
+*@param accessToken
+     * @return
+     */
+    public static String sendGet(String url, String param,String accessToken) throws Exception {
+        String result = "";
+        BufferedReader in = null;
+
+        String urlNameString = url + (!StringUtils.isEmpty(param)? "?" + param:"");
+
+        HttpGet httpGet = new HttpGet(urlNameString);
+        httpGet.setHeader("Connection", "close");
+        httpGet.setHeader("access_token",accessToken);
+
+
+
+        // 创建httpclient对象
+        CloseableHttpClient httpClient = getHttpClient();
+
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+//                System.out.println(statusCode);
+            if (statusCode == HttpStatus.SC_OK) {
+                HttpEntity resEntity = httpResponse.getEntity();
+                result = EntityUtils.toString(resEntity);
+            } else {
+                _log.info(httpResponse.toString());
+            }
+        }catch (Exception ee){
+            throw ee;
+        }
+
+
+        // 使用finally块来关闭输入流
+        finally {
+            try {
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+
+        }
+        return result;
+    }
+
+    public static CloseableHttpClient getHttpClient() throws Exception {
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLSocketFactory(sslsf)
+                .setConnectionManager(cm)
+                .setConnectionManagerShared(true)
+                .build();
+        return httpClient;
     }
 
 

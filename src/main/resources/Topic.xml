@@ -48,23 +48,23 @@
     <topics name="StaticJob">
         <!-- topic列表： 名称 表名(多表用;分割) 是否有效 生产者编码(多个用;分割) 是否删除后再插入 是否清空表 是否静态数据 静态数据访问url-->
         <!-- 令牌信息 -->
-        <topic name="BUS_ACCESS_TOKEN" table="cqyl_pre.BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Token?appid=001&amp;secret=ABCDEFG"/>
-        <!-- 线路 -->
-        <topic name="BUS_ROUTE" table="cqyl_pre.BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/GetRoutes"/>
-       <!-- 站点 -->
-        <topic name="BUS_STATION" table="cqyl_pre.BUS_STATION" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/GetTrack"/>
-        <!-- 车辆 -->
-        <topic name="BUS_VEHICLE" table="cqyl_pre.BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Vehicle/Info"/>
-        <!-- 线路计划时间 -->
-        <topic name="BUS_ROUTE_DISPT" table="cqyl_pre.BUS_ROUTE_DISPT" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/Times"/>
+        <topic name="BUS_ACCESS_TOKEN" table="cqyl_pre.BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.154:7031/platform/api/v1.0/passport/access?appid=yuelai_zhibohui"/>
+        <!-- 线路4.2 -->
+        <topic name="BUS_ROUTE" table="cqyl_pre.BUS_ROUTE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.154:7031/open/api/v1.0/route/getroutelist"/>
+       <!-- 站点4.4 -->
+        <topic name="BUS_STATION" table="cqyl_pre.BUS_STATION" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.154:7031/open/api/v1.0/route/gettracksites?isMaster=true"/>
+        <!-- 线路车辆4.3 -->
+        <topic name="BUS_VEHICLE" table="cqyl_pre.BUS_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.154:7031/open/api/v1.0/vehicle/getvehicles"/>
+        <!--&lt;!&ndash; 线路计划时间 &ndash;&gt;-->
+        <!--<topic name="BUS_ROUTE_DISPT" table="cqyl_pre.BUS_ROUTE_DISPT" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.154:7031/api/Route/Times"/>-->
 
     </topics>
 
     <topics name = "StaticJobPer1Min">
         <!-- 令牌信息 -->
-        <topic name="BUS_ACCESS_TOKEN" table="cqyl_pre.BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Token?appid=001&amp;secret=ABCDEFG"/>
-        <!-- 线路车辆 -->
-        <topic name="BUS_ROUTE_VEHICLE" table="cqyl_pre.BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.155:9002/api/Route/GetVehicles"/>
+        <topic name="BUS_ACCESS_TOKEN" table="cqyl_pre.BUS_ACCESS_TOKEN" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.154:7031/platform/api/v1.0/passport/access?appid=yuelai_zhibohui"/>
+        <!-- 车辆位置4.1 -->
+        <topic name="BUS_ROUTE_VEHICLE" table="cqyl_pre.BUS_ROUTE_VEHICLE" valid="true" textCode="" isDelete="true" isTruncate="false" isStatic="true" url="http://183.66.65.154:7031/open/api/v1.0/Vehicle/BusPosition"/>
     </topics>
 
     <topics name="GateJob">
